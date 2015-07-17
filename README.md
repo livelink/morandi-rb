@@ -29,23 +29,14 @@ Or install it yourself as:
 Settings Key | Values | Description
 -------------|--------|---------------
 brighten     | Integer -20..20 | Change image brightness
--------------|--------|---------------
 gamma        | Float  | Gamma correct image
--------------|--------|---------------
 contrast     | Integer -20..20  | Change image contrast
--------------|--------|---------------
 sharpen      | Integer -5..5  | Sharpen / Blur (negative value)
--------------|--------|---------------
 redeye       | Array[[Integer,Integer],...]  | Apply redeye correction at point
--------------|--------|---------------
 angle        | Integer 0,90,180,270  | Rotate image
--------------|--------|---------------
 crop         | Array[Integer,Integer,Integer,Integer] | Crop image
--------------|--------|---------------
 fx           | String greyscale,sepia,bluetone | Apply colour filters
--------------|--------|---------------
 border-style  | String square,retro | Set border style
--------------|--------|---------------
 background-style  | String retro,black,white | Set border colour
 
 
