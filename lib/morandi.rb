@@ -24,20 +24,27 @@ module Morandi
   rescue
     false
   end
+  def self.default_icc_path(path)
+    "#{path}.icc.jpg"
+  end
 
-  def initialize(file, scale_to, options)
+  def initialize(file, user_options, local_options={})
     @file = file
-    #@size = size
-    @scale_to = scale_to
-    @options = options || {}
 
-    @width, @height = options['output.width'], options['output.height']
+    user_options.keys.grep(/^path/).each { |k| user_options.delete(k) }
+
+    # Give priority to user_options
+    @options = (local_options || {}).merge(user_options || {})
+    @local_options = local_options
+
+    @scale_to = @options['output.max']
+    @width, @height = @options['output.width'], @options['output.height']
 
     load_file = @file
     type, width, height = Gdk::Pixbuf.get_file_info(load_file)
 
     if type.name.eql?('jpeg')
-      icc_file = "#{@file}.icc.jpg"
+      icc_file = local_options['path.icc'] || ImageProcessor.default_icc_path(@file)
       if valid_jpeg?(icc_file) || system("jpgicc", "-q97", @file, icc_file)
         load_file = icc_file
       end
@@ -101,7 +108,7 @@ module Morandi
     #STDERR.puts "FILTER: #{options.inspect}"
     if options['brighten'].to_i.nonzero?
       brighten = [ [ 5 * options['brighten'], -100 ].max, 100 ].min
-      STDERR.puts([:brighten, brighten].inspect)
+      #STDERR.puts([:brighten, brighten].inspect)
       @pb = PixbufUtils.brightness(@pb, brighten)
     end
     if options['gamma'] && (options['gamma'] != 1.0)
@@ -169,6 +176,10 @@ module Morandi
 
     if crop.nil? && config_for('image.auto-crop').eql?(false)
       return
+    end
+
+    if crop.is_a?(String) && crop =~ /^\d+,\d+,\d+,\d+/
+      crop = crop.split(/,/).map(&:to_i)
     end
 
     crop = nil unless crop.is_a?(Array) && crop.size.eql?(4) && crop.all? { |i|
@@ -243,8 +254,8 @@ module Morandi
 end
 
   module_function
-  def process(file_in, settings, out_file)
-    pro = ImageProcessor.new(file_in, settings['output.max'], settings)
+  def process(file_in, options, out_file, local_options = {})
+    pro = ImageProcessor.new(file_in, options, local_options)
     pro.process!
     pro.write_to_jpeg(out_file)
   end

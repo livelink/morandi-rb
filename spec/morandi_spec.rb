@@ -28,6 +28,39 @@ RSpec.describe Morandi, "#process_to_file" do
       expect(h).to eq(300)
     end
 
+    it "should use user supplied path.icc" do
+      src = 'sample/sample.jpg'
+      icc = '/tmp/this-is-secure-thing.jpg'
+      default_icc = Morandi::ImageProcessor.default_icc_path(src)
+      out = 'sample/out_icc.jpg'
+      File.unlink(default_icc) rescue nil
+      Morandi.process(src, { }, out, { 'path.icc' => icc })
+      expect(File).to exist(icc)
+      expect(File).not_to exist(default_icc)
+    end
+
+    it "should ignore user supplied path.icc" do
+      src = 'sample/sample.jpg'
+      icc = '/tmp/this-is-insecure-thing.jpg'
+      default_icc = Morandi::ImageProcessor.default_icc_path(src)
+      File.unlink(icc) rescue 0
+      File.unlink(default_icc) rescue 0
+      out = 'sample/out_icc.jpg'
+      Morandi.process(src, { 'path.icc' => icc, 'output.max' => 200 }, out)
+      expect(File).not_to exist(icc)
+      expect(File).to exist(default_icc)
+    end
+
+    it "should do cropping of images with a string" do
+      Morandi.process("sample/sample.jpg", {
+        'crop' => "10,10,300,300"
+      }, out="sample/out_crop.jpg")
+      expect(File.exist?(out))
+      _,w,h = Gdk::Pixbuf.get_file_info(out)
+      expect(w).to eq(300)
+      expect(h).to eq(300)
+    end
+
     it "should reduce the size of images" do
       Morandi.process("sample/sample.jpg", {
         'output.max' => 200

@@ -1,3 +1,6 @@
+require 'pango'
+require 'colorscore'
+
 module Morandi
 class ImageOp
   class << self
