@@ -18,6 +18,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
+  spec.add_dependency "gtk2"
   spec.add_dependency "gdk_pixbuf2"
   spec.add_dependency "cairo"
   spec.add_dependency "pixbufutils"

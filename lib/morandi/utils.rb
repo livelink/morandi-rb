@@ -104,3 +104,14 @@ class Gdk::Pixbuf
   end
 end
 
+class Cairo::ImageSurface
+  def to_pixbuf
+    loader = Gdk::PixbufLoader.new
+    io = StringIO.new
+    write_to_png(io)
+    io.rewind
+    loader.last_write(io.read)
+    loader.pixbuf
+  end
+end
+

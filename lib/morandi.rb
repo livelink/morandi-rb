@@ -1,6 +1,7 @@
 require "morandi/version"
-require 'gdk_pixbuf2'
+require 'gtk2/base'
 require 'cairo'
+require 'gdk_pixbuf2'
 require 'pixbufutils'
 require 'redeye'
 

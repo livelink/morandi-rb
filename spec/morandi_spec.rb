@@ -71,6 +71,24 @@ RSpec.describe Morandi, "#process_to_file" do
       expect(h).to be <= 200
     end
 
+    it "should reduce the straighten images" do
+      Morandi.process("sample/sample.jpg", {
+        'straighten' => 5
+      }, out="sample/out_straighten.jpg")
+      expect(File.exist?(out))
+      _,w,h = Gdk::Pixbuf.get_file_info(out)
+      expect(_.name).to eq('jpeg')
+    end
+
+    it "should reduce the gamma correct images" do
+      Morandi.process("sample/sample.jpg", {
+        'gamma' => 1.2
+      }, out="sample/out_gamma.jpg")
+      expect(File.exist?(out))
+      _,w,h = Gdk::Pixbuf.get_file_info(out)
+      expect(_.name).to eq('jpeg')
+    end
+
     it "should reduce the size of images" do
       Morandi.process("sample/sample.jpg", {
         'fx' => 'sepia'
