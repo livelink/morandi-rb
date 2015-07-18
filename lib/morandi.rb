@@ -82,7 +82,7 @@ module Morandi
     # add border
     apply_decorations!
 
-    if options['output.limit']
+    if @options['output.limit'] && @width && @height
       @pb = @pb.scale_max([@width, @height].max)
     end
 
