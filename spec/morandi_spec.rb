@@ -18,6 +18,13 @@ RSpec.describe Morandi, "#process_to_file" do
       expect(original[2]).to eq(w)
     end
 
+    it "should accept pixbufs as an argument" do
+      pixbuf = Gdk::Pixbuf.new("sample/sample.jpg")
+      pro = Morandi::ImageProcessor.new(pixbuf, {}, {})
+      pro.process!
+      expect(pixbuf.width).to eq(pro.result.width)
+    end
+
     it "should do cropping of images" do
       Morandi.process("sample/sample.jpg", {
         'crop' => [10,10,300,300]
