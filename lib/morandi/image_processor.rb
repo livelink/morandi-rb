@@ -1,4 +1,5 @@
 require 'morandi/profiled_pixbuf'
+require 'morandi/redeye'
 
 class Morandi::ImageProcessor
   attr_reader :options, :pb
@@ -24,6 +25,7 @@ class Morandi::ImageProcessor
       get_pixbuf
     elsif @file.is_a?(Gdk::Pixbuf) or @file.is_a?(Morandi::ProfiledPixbuf)
       @pb = @file
+      @scale = 1.0
     end
   end
 
@@ -134,7 +136,7 @@ protected
 
   def apply_redeye!
     for eye in options['redeye'] || []
-      @pb = Morandi::RedEye.tap_on(@pb, eye[0] * @scale, eye[1] * @scale)
+      @pb = Morandi::RedEye::TapRedEye.tap_on(@pb, eye[0] * @scale, eye[1] * @scale)
     end
   end
 

@@ -1,3 +1,5 @@
+require 'redeye'
+
 module Morandi
 module RedEye
 module TapRedEye
@@ -9,7 +11,7 @@ module TapRedEye
     y1  = [y - n, 0].max
     y2  = [y + n, pb.height].min
     return pb unless (x1 >= 0) && (x2 > x1) && (y1 >= 0) && (y2 > y1)
-    redeye = RedEye.new(pb, x1, y1, x2, y2)
+    redeye = ::RedEye.new(pb, x1, y1, x2, y2)
 
     sensitivity = 2
     blobs = redeye.identify_blobs(sensitivity).reject { |i|
