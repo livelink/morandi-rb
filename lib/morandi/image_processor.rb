@@ -210,7 +210,8 @@ protected
     when 'greyscale'
       op = Morandi::Colourify.new_from_hash('op' => filter)
     when 'sepia', 'bluetone'
-      op = Morandi::Colourify.new_from_hash('op' => filter, 'alpha' => (0.85 * 255).to_i)
+      # could also set 'alpha' => (0.85 * 255).to_i
+      op = Morandi::Colourify.new_from_hash('op' => filter)
     else
       return
     end
