@@ -5,7 +5,7 @@ module Morandi
     # The parameter determines how many reddish pixels needs to be in the area to consider it a valid red eye
     # The reason for its existence is to prevent the situations when the bigger red area causes an excessive correction
     # e.g. continuous red eyeglasses frame or sunburnt person's skin around eyes forming an area
-    RED_AREA_DENSITY_THRESHOLD = 0.4
+    RED_AREA_DENSITY_THRESHOLD = 0.3
   end
 end
 
