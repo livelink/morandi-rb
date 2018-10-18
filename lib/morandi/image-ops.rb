@@ -263,35 +263,6 @@ class Gamma < ImageOp
   end
 end
 
-class RedEyeOp < ImageOp
-  attr_reader :x1, :y1, :x2, :y2, :sensitivity, :no_eyes
-  attr_accessor :order
-  def initialize(x1, y1, x2, y2, sensitivity, no_eyes)
-    super()
-    require 'redeye'
-    x1, x2 = x2, x1 if x1 > x2
-    y1, y2 = y2, y1 if y1 > y2
-    @x1, @y1, @x2, @y2, @sensitivity, @no_eyes =
-      x1, y1, x2, y2, sensitivity, no_eyes
-  end
-  def call(image, pixbuf)
-    @x2 = pixbuf.width if @x2 >= pixbuf.width
-    @y2 = pixbuf.height if @y2 >= pixbuf.height
-    @x1 = @x2 - 1 if @x1 >= @x2
-    @y1 = @y2 - 1 if @y1 >= @y2
-    redeye = ::RedEye.new(pixbuf.dup, @x1, @y1, @x2, @y2)
-    blobs = redeye.identify_blobs(@sensitivity).reject { |i|
-      i.noPixels < 2 or ! i.squareish?(0.5, 0.4)
-    }.sort_by { |i| i.noPixels }
-    biggest = blobs.size > @no_eyes ?  blobs[-1 * @no_eyes..-1] : blobs
-    biggest.each { |blob| redeye.correct_blob(blob.id) }
-    redeye.pixbuf
-  end
-  def priority
-    20 + @order
-  end
-end
-
 class Colourify < ImageOp
   attr_reader :op
   def initialize(op, alpha=255)
