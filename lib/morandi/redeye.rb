@@ -1,6 +1,15 @@
 require 'redeye'
 
 module Morandi
+  module RedEye
+    # The parameter determines how many reddish pixels needs to be in the area to consider it a valid red eye
+    # The reason for its existence is to prevent the situations when the bigger red area causes an excessive correction
+    # e.g. continuous red eyeglasses frame or sunburnt person's skin around eyes forming an area
+    RED_AREA_DENSITY_THRESHOLD = 0.4
+  end
+end
+
+module Morandi
 module RedEye
 module TapRedEye
   module_function
@@ -14,19 +23,15 @@ module TapRedEye
     redeye = ::RedEye.new(pb, x1, y1, x2, y2)
 
     sensitivity = 2
-    blobs = redeye.identify_blobs(sensitivity).reject { |i|
-      i.noPixels < 4 or ! i.squareish?(0.5, 0.4)
-    }.sort_by { |i|
-      i.area_min_x = x1
-      i.area_min_y = y1
+    blobs = redeye.identify_blobs(sensitivity).reject { |region|
+      region.noPixels < 4 || !region.squareish?(0.5, RED_AREA_DENSITY_THRESHOLD)
+    }.sort_by { |region|
+      region.area_min_x = x1
+      region.area_min_y = y1
 
       # Higher is better
-      score = (i.noPixels) / (i.distance_from(x, y) ** 2)
+      score = (region.noPixels) / (region.distance_from(x, y) ** 2)
     }
-
-    #blobs.each do |blob|
-    #  p [ [x, y], blob.centre(), blob.distance_from(x, y), blob]
-    #end
 
     blob = blobs.last
     redeye.correct_blob(blob.id) if blob
