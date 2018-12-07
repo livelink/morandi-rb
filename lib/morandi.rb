@@ -18,4 +18,3 @@ module Morandi
     pro.write_to_jpeg(out_file)
   end
 end
-
