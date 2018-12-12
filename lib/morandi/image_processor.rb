@@ -71,8 +71,9 @@ class Morandi::ImageProcessor
     pb.save(fn, 'png')
   end
 
-  def write_to_jpeg(fn, quality = 97)
-    @pb.save(fn, 'jpeg', :quality => quality)
+  def write_to_jpeg(fn, quality = nil)
+    quality ||= options.fetch(:quality, 97)
+    @pb.save(fn, 'jpeg', quality: quality)
   end
 
 protected
@@ -242,4 +243,3 @@ protected
   end
 
 end
-

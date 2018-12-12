@@ -38,7 +38,7 @@ crop         | Array[Integer,Integer,Integer,Integer] | Crop image
 fx           | String greyscale,sepia,bluetone | Apply colour filters
 border-style  | String square,retro | Set border style
 background-style  | String retro,black,white | Set border colour
-
+quality       | Integer 1..100 | Set JPG compression value, defaults to 97%
 
 ## Contributing
 
