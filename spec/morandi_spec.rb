@@ -1,6 +1,6 @@
 require 'morandi'
 
-RSpec.describe Morandi, "#process_to_file" do
+RSpec.describe Morandi, "#process" do
   context "in command mode" do
     it "should create ouptut" do
       Morandi.process("sample/sample.jpg", {}, out="sample/out_plain.jpg")
@@ -117,6 +117,29 @@ RSpec.describe Morandi, "#process_to_file" do
       expect(_.name).to eq('jpeg')
       expect(h).to be <= 200
       expect(w).to be <= 300
+    end
+  end
+
+  context 'with increasing quality settings' do
+    let(:max_quality_file_size) do
+      Morandi.process("sample/sample.jpg", { quality: 100 }, "sample/out-100.jpg")
+      File.size("sample/out-100.jpg")
+    end
+
+    let(:default_of_97_quality) do
+      Morandi.process("sample/sample.jpg", {}, "sample/out-97.jpg")
+      File.size("sample/out-97.jpg")
+    end
+
+    let(:quality_of_40_by_options_args) do
+      Morandi.process("sample/sample.jpg", { quality: 40 }, "sample/out-40.jpg")
+      File.size("sample/out-40.jpg")
+    end
+
+    # Sort the output files' sizes and expect them to match to quality order
+    it "creates files of increasing size" do
+      expect([default_of_97_quality, max_quality_file_size, quality_of_40_by_options_args].sort).to
+        eq([quality_of_40_by_options_args, default_of_97_quality, max_quality_file_size])
     end
   end
 end
