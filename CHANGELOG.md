@@ -9,3 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [0.11.0] 07.12.2018
 ### Added
 - Added option to set the JPEG image compression size [104324]
+
+## [0.11.1] 21.02.2019
+### Added
+- Have option to set the JPEG image compression size be a string like all the other options. [TECH-7701]
