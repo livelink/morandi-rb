@@ -13,3 +13,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [0.11.1] 21.02.2019
 ### Added
 - Have option to set the JPEG image compression size be a string like all the other options. [TECH-7701]
+- While throwing Gdk::PixbufError::CorruptImage in Morandi::ProfiledPixbuf#initialize try to recover the image by saving it to a tempfile and re-read. This operation should remove all wrong markers. [TECH-7663]
