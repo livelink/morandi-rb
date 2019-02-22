@@ -12,6 +12,15 @@ class Morandi::ProfiledPixbuf < Gdk::Pixbuf
     false
   end
 
+  def self.from_string(string, loader: nil, chunk_size: 4096)
+    loader ||= Gdk::PixbufLoader.new
+    ((string.bytesize + chunk_size - 1) / chunk_size).times do |i|
+      loader.write(string.byteslice(i * chunk_size, chunk_size))
+    end
+    loader.close
+    loader.pixbuf
+  end
+
   def self.default_icc_path(path)
     "#{path}.icc.jpg"
   end
@@ -33,6 +42,7 @@ class Morandi::ProfiledPixbuf < Gdk::Pixbuf
   rescue Gdk::PixbufError::CorruptImage => e
     if args[0].is_a? String
       temp_path =  Tempfile.new.path
+      pixbuf = self.class.from_string(File.read(args[0]))
       pixbuf.save(temp_path, 'jpeg')
       args[0] = temp_path
       super(*args)
