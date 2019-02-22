@@ -30,6 +30,15 @@ class Morandi::ProfiledPixbuf < Gdk::Pixbuf
     end
 
     super(*args)
+  rescue Gdk::PixbufError::CorruptImage => e
+    if args[0].is_a? String
+      temp_path =  Tempfile.new.path
+      pixbuf.save(temp_path, 'jpeg')
+      args[0] = temp_path
+      super(*args)
+    else
+      throw e
+    end
   end
 
 
