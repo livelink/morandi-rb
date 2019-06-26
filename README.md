@@ -5,6 +5,8 @@ morandi-js.
 
 ## Installation
 
+Install `liblcms2-utils` to provide the `jpgicc` command used by `Morandi::ProfiledPixbuf`
+
 Add this line to your application's Gemfile:
 
     gem 'morandi'
