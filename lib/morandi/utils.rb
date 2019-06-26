@@ -1,3 +1,5 @@
+require 'gdk_pixbuf2'
+
 module Morandi
   module Utils
     module_function
@@ -97,6 +99,10 @@ module Morandi
 end
 
 class Gdk::Pixbuf
+  unless defined?(::Gdk::Pixbuf::InterpType)
+    InterpType = GdkPixbuf::InterpType
+  end
+
   def scale_max(max_size, interp = Gdk::Pixbuf::InterpType::BILINEAR, max_scale = 1.0)
     mul = (max_size / [width,height].max.to_f)
     mul = [max_scale = 1.0,mul].min
@@ -114,4 +120,3 @@ class Cairo::ImageSurface
     loader.pixbuf
   end
 end
-
