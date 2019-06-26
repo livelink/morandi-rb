@@ -4,7 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## Last updated 07.12.2018
+## Last updated 26.06.2019
+
+## [0.11.3] 26.06.2019
+### Fixed
+- Compatability with gdk_pixbuf v3.0.9+ [TECH-9065]
 
 ## [0.11.2] 21.02.2019
 ### Added
