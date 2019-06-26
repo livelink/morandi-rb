@@ -138,8 +138,8 @@ RSpec.describe Morandi, "#process" do
 
     # Sort the output files' sizes and expect them to match to quality order
     it "creates files of increasing size" do
-      expect([default_of_97_quality, max_quality_file_size, quality_of_40_by_options_args].sort).to
-        eq([quality_of_40_by_options_args, default_of_97_quality, max_quality_file_size])
+      created_file_sizes = [default_of_97_quality, max_quality_file_size, quality_of_40_by_options_args].sort
+      expect(created_file_sizes).to eq([quality_of_40_by_options_args, default_of_97_quality, max_quality_file_size])
     end
   end
 end
