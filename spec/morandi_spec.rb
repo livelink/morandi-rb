@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'fileutils'
 require 'morandi'
 
 RSpec.describe Morandi, '#process' do
@@ -15,9 +16,9 @@ RSpec.describe Morandi, '#process' do
                         'angle' => 90
                       }, out = 'sample/out_rotate90.jpg')
       expect(File.exist?(out))
-      _, w, h = Gdk::Pixbuf.get_file_info(out)
-      expect(original[1]).to eq(h)
-      expect(original[2]).to eq(w)
+      _, width, height = Gdk::Pixbuf.get_file_info(out)
+      expect(original[1]).to eq(height)
+      expect(original[2]).to eq(width)
     end
 
     it 'should accept pixbufs as an argument' do
@@ -32,9 +33,9 @@ RSpec.describe Morandi, '#process' do
                         'crop' => [10, 10, 300, 300]
                       }, out = 'sample/out_crop.jpg')
       expect(File.exist?(out))
-      _, w, h = Gdk::Pixbuf.get_file_info(out)
-      expect(w).to eq(300)
-      expect(h).to eq(300)
+      _, width, height = Gdk::Pixbuf.get_file_info(out)
+      expect(width).to eq(300)
+      expect(height).to eq(300)
     end
 
     it 'should use user supplied path.icc' do
@@ -42,11 +43,7 @@ RSpec.describe Morandi, '#process' do
       icc = '/tmp/this-is-secure-thing.jpg'
       default_icc = Morandi::ImageProcessor.default_icc_path(src)
       out = 'sample/out_icc.jpg'
-      begin
-        File.unlink(default_icc)
-      rescue StandardError
-        nil
-      end
+      FileUtils.rm_f(default_icc)
       Morandi.process(src, {}, out, 'path.icc' => icc)
       expect(File).to exist(icc)
       expect(File).not_to exist(default_icc)
@@ -56,16 +53,8 @@ RSpec.describe Morandi, '#process' do
       src = 'sample/sample.jpg'
       icc = '/tmp/this-is-insecure-thing.jpg'
       default_icc = Morandi::ImageProcessor.default_icc_path(src)
-      begin
-        File.unlink(icc)
-      rescue StandardError
-        0
-      end
-      begin
-        File.unlink(default_icc)
-      rescue StandardError
-        0
-      end
+      FileUtils.rm_f(icc)
+      FileUtils.rm_f(default_icc)
       out = 'sample/out_icc.jpg'
       Morandi.process(src, { 'path.icc' => icc, 'output.max' => 200 }, out)
       expect(File).not_to exist(icc)
@@ -77,9 +66,9 @@ RSpec.describe Morandi, '#process' do
                         'crop' => '10,10,300,300'
                       }, out = 'sample/out_crop.jpg')
       expect(File.exist?(out))
-      _, w, h = Gdk::Pixbuf.get_file_info(out)
-      expect(w).to eq(300)
-      expect(h).to eq(300)
+      _, width, height = Gdk::Pixbuf.get_file_info(out)
+      expect(width).to eq(300)
+      expect(height).to eq(300)
     end
 
     it 'should reduce the size of images' do
@@ -87,9 +76,9 @@ RSpec.describe Morandi, '#process' do
                         'output.max' => 200
                       }, out = 'sample/out_reduce.jpg')
       expect(File.exist?(out))
-      _, w, h = Gdk::Pixbuf.get_file_info(out)
-      expect(w).to be <= 200
-      expect(h).to be <= 200
+      _, width, height = Gdk::Pixbuf.get_file_info(out)
+      expect(width).to be <= 200
+      expect(height).to be <= 200
     end
 
     it 'should reduce the straighten images' do
@@ -97,8 +86,8 @@ RSpec.describe Morandi, '#process' do
                         'straighten' => 5
                       }, out = 'sample/out_straighten.jpg')
       expect(File.exist?(out))
-      _, w, h = Gdk::Pixbuf.get_file_info(out)
-      expect(_.name).to eq('jpeg')
+      info, _, _ = Gdk::Pixbuf.get_file_info(out)
+      expect(info.name).to eq('jpeg')
     end
 
     it 'should reduce the gamma correct images' do
@@ -106,8 +95,8 @@ RSpec.describe Morandi, '#process' do
                         'gamma' => 1.2
                       }, out = 'sample/out_gamma.jpg')
       expect(File.exist?(out))
-      _, w, h = Gdk::Pixbuf.get_file_info(out)
-      expect(_.name).to eq('jpeg')
+      info, _, _ = Gdk::Pixbuf.get_file_info(out)
+      expect(info.name).to eq('jpeg')
     end
 
     it 'should reduce the size of images' do
@@ -115,8 +104,8 @@ RSpec.describe Morandi, '#process' do
                         'fx' => 'sepia'
                       }, out = 'sample/out_sepia.jpg')
       expect(File.exist?(out))
-      _, w, h = Gdk::Pixbuf.get_file_info(out)
-      expect(_.name).to eq('jpeg')
+      info, _, _ = Gdk::Pixbuf.get_file_info(out)
+      expect(info.name).to eq('jpeg')
     end
 
     it 'should output at the specified size' do
@@ -127,10 +116,10 @@ RSpec.describe Morandi, '#process' do
                         'output.limit' => true
                       }, out = 'sample/out_at_size.jpg')
       expect(File.exist?(out))
-      _, w, h = Gdk::Pixbuf.get_file_info(out)
-      expect(_.name).to eq('jpeg')
-      expect(h).to be <= 200
-      expect(w).to be <= 300
+      info, width, height = Gdk::Pixbuf.get_file_info(out)
+      expect(info.name).to eq('jpeg')
+      expect(width).to be <= 300
+      expect(height).to be <= 200
     end
 
     it 'should blur the image' do
