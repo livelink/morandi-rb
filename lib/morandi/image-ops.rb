@@ -223,6 +223,7 @@ class ImageBorder < ImageOp
 
     case style
     when 'retro'
+      # WARNING: CairoUtils class is not available in this gem!
       CairoUtils.rounded_rectangle(cr, x, y,
                                    img_width + x - (size*2), img_height+y-(size*2), size)
     when 'square'
