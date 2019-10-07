@@ -132,6 +132,50 @@ RSpec.describe Morandi, '#process' do
       expect(h).to be <= 200
       expect(w).to be <= 300
     end
+
+    it 'should blur the image' do
+      Morandi.process('sample/sample.jpg', {
+        'sharpen'  => -3
+      }, out = 'sample/out_blur.jpg')
+      expect(File.exist?(out))
+    end
+
+    it 'should apply a border and maintain the target size' do
+      Morandi.process('sample/sample.jpg', {
+        'border-style'     => 'square',
+        'background-style' => 'dominant',
+        'border-size-mm'   => 5,
+        'output.width'     => 800,
+        'output.height'    => 650
+      }, out = 'sample/out_border.jpg')
+      expect(File.exist?(out))
+
+      info, width, height = Gdk::Pixbuf.get_file_info(out)
+      expect(info.name).to eq('jpeg')
+      expect(width).to eq 800
+      expect(height).to eq 650
+    end
+
+    it 'should apply multiple transformations' do
+      Morandi.process('sample/sample.jpg', {
+        'brighten'         => 5,
+        'contrast'         => 5,
+        'sharpen'          => 2,
+        'fx'               => 'greyscale',
+        'border-style'     => 'solid',
+        'background-style' => '#00FF00',
+        'crop'             => [50, 0, 750, 650],
+        'output.width'     => 300,
+        'output.height'    => 260,
+        'output.limit'     => true
+      }, out = 'sample/out_various.jpg')
+      expect(File.exist?(out))
+
+      info, width, height = Gdk::Pixbuf.get_file_info(out)
+      expect(info.name).to eq('jpeg')
+      expect(width).to eq 300
+      expect(height).to eq 260
+    end
   end
 
   context 'with increasing quality settings' do
