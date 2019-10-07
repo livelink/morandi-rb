@@ -44,7 +44,7 @@ quality       | String '1'..'100' | Set JPG compression value, defaults to 97%
 
 ## Contributing
 
-1. Fork it ( http://github.com/<my-github-username>/morandi/fork )
+1. Fork it ( http://github.com/livelink/morandi-rb/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
