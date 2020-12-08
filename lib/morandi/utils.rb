@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'gdk_pixbuf2'
 
 module Morandi
@@ -46,25 +48,8 @@ module Morandi
 
     def apply_crop(pixbuf, x, y, w, h, fill_col = 0xffffffff)
       if (x < 0) or (y < 0) || ((x+w) > pixbuf.width) || ((y+h) > pixbuf.height)
-        #tw, th = [w-x,w].max, [h-y,h].max
-        base_pixbuf = Gdk::Pixbuf.new(Gdk::Pixbuf::ColorSpace::RGB, false, 8, w, h)
+        base_pixbuf = GdkPixbuf::Pixbuf.new(GdkPixbuf::Colorspace::RGB, false, 8, w, h)
         base_pixbuf.fill!(fill_col)
-        dest_x = [x, 0].min
-        dest_y = [y, 0].min
-        #src_x = [x,0].max
-        #src_y = [y,0].max
-        dest_x = [-x,0].max
-        dest_y = [-y,0].max
-
-        #if x < 0
-        #else
-        #end
-        #if y < 0
-        #  dest_h = [h-dest_y, pixbuf.height, base_pixbuf.height-dest_y].min
-        #else
-        #	dest_h = [h,pixbuf.height].min
-        #end
-        #  dest_w  = [w-dest_x, pixbuf.width, base_pixbuf.width-dest_x].min
 
         offset_x = [x,0].max
         offset_y = [y,0].max
@@ -81,16 +66,26 @@ module Morandi
           copy_h = base_pixbuf.height - paste_y
         end
 
-        args = [pixbuf, paste_x, paste_y, copy_w, copy_h, paste_x - offset_x, paste_y - offset_y, 1, 1, Gdk::Pixbuf::INTERP_HYPER, 255]
-        #p args
-        base_pixbuf.composite!(*args)
+        base_pixbuf.composite!(
+          pixbuf,
+          dest_x: paste_x,
+          dest_y: paste_y,
+          dest_width: copy_w,
+          dest_height: copy_h,
+          offset_x: paste_x - offset_x,
+          offset_y: paste_y - offset_y,
+          scale_x: 1,
+          scale_y: y,
+          interpolation_type: GdkPixbuf::InterpType::HYPER,
+          overall_alpha: 255
+        )
         pixbuf = base_pixbuf
       else
         x = constrain(x, 0, pixbuf.width)
         y = constrain(y, 0, pixbuf.height)
         w = constrain(w, 1, pixbuf.width - x)
         h = constrain(h, 1, pixbuf.height - y)
-        #p [pixbuf, x, y, w, h]
+
         pixbuf = Gdk::Pixbuf.new(pixbuf, x, y, w, h)
       end
       pixbuf

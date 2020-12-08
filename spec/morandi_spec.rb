@@ -4,189 +4,317 @@ require 'fileutils'
 require 'morandi'
 
 RSpec.describe Morandi, '#process' do
+  subject(:process_image) {
+    Morandi.process(file_in, options, file_out)
+  }
+
+  let(:file_in) { 'sample/sample.jpg' }
+  let(:file_out) { 'sample/sample_out.jpg' }
+  let(:options) { {} }
+  let(:original_image_width) { 800 }
+  let(:original_image_height) { 650 }
+  let(:processed_image_info) { Gdk::Pixbuf.get_file_info(file_out) }
+  let(:processed_image_type) { processed_image_info[0].name }
+  let(:processed_image_width) { processed_image_info[1] }
+  let(:processed_image_height) { processed_image_info[2] }
+
+  before do
+    generate_test_image(file_in, original_image_width, original_image_height)
+  end
+
+  after do
+    FileUtils.rm_rf(Dir['sample/*'])
+  end
+
   context 'in command mode' do
-    it 'should create ouptut' do
-      Morandi.process('sample/sample.jpg', {}, out = 'sample/out_plain.jpg')
-      expect(File.exist?(out))
+    describe 'when given an input without any options' do
+      it 'should create ouptut' do
+        process_image
+        expect(File).to exist(file_out)
+      end
     end
 
-    it 'should do rotation of images' do
-      original = Gdk::Pixbuf.get_file_info('sample/sample.jpg')
-      Morandi.process('sample/sample.jpg', {
-                        'angle' => 90
-                      }, out = 'sample/out_rotate90.jpg')
-      expect(File.exist?(out))
-      _, width, height = Gdk::Pixbuf.get_file_info(out)
-      expect(original[1]).to eq(height)
-      expect(original[2]).to eq(width)
+    describe 'when given an angle of rotation' do
+      let(:options) { { 'angle' => 90 } }
+
+      it 'should do rotation of images' do
+        process_image
+
+        expect(File).to exist(file_out)
+        expect(original_image_width).to eq(processed_image_height)
+        expect(original_image_height).to eq(processed_image_width)
+      end
     end
 
-    it 'should accept pixbufs as an argument' do
-      pixbuf = Gdk::Pixbuf.new('sample/sample.jpg')
-      pro = Morandi::ImageProcessor.new(pixbuf, {}, {})
-      pro.process!
-      expect(pixbuf.width).to eq(pro.result.width)
+    describe 'when given a pixbuf as an input' do
+      subject(:process_image) {
+        Morandi.process(pixbuf, options, file_out)
+      }
+
+      let(:pixbuf) { Gdk::Pixbuf.new(file_in)  }
+
+      it 'should accept pixbufs as an argument' do
+        process_image
+
+        expect(processed_image_width).to eq(pixbuf.width)
+        expect(processed_image_height).to eq(pixbuf.height)
+      end
     end
 
-    it 'should do cropping of images' do
-      Morandi.process('sample/sample.jpg', {
-                        'crop' => [10, 10, 300, 300]
-                      }, out = 'sample/out_crop.jpg')
-      expect(File.exist?(out))
-      _, width, height = Gdk::Pixbuf.get_file_info(out)
-      expect(width).to eq(300)
-      expect(height).to eq(300)
+    context 'when give a "crop" option'  do
+      let(:cropped_width) { 300 }
+      let(:cropped_height) { 300 }
+
+      describe 'when given an array of dimensions' do
+        let(:options) { {'crop' => [10, 10, cropped_width, cropped_height] } }
+
+        it 'should crop the image' do
+          process_image
+
+          expect(File).to exist(file_out)
+          expect(processed_image_width).to eq(cropped_width)
+          expect(processed_image_height).to eq(cropped_height)
+        end
+      end
+
+      describe 'when given a string of dimensions' do
+        let(:options) { { 'crop' => "10,10,#{cropped_width},#{cropped_height}" } }
+
+        it 'should do cropping of images with a string' do
+          process_image
+
+          expect(File).to exist(file_out)
+          expect(processed_image_width).to eq(cropped_width)
+          expect(processed_image_height).to eq(cropped_height)
+        end
+      end
     end
 
-    it 'should use user supplied path.icc' do
-      src = 'sample/sample.jpg'
-      icc = '/tmp/this-is-secure-thing.jpg'
-      default_icc = Morandi::ImageProcessor.default_icc_path(src)
-      out = 'sample/out_icc.jpg'
-      FileUtils.rm_f(default_icc)
-      Morandi.process(src, {}, out, 'path.icc' => icc)
-      expect(File).to exist(icc)
-      expect(File).not_to exist(default_icc)
+    describe 'when the user supplies a path.icc in the "local_options" argument' do
+      subject(:process_image) {
+        Morandi.process(file_in, options, file_out, local_options)
+      }
+
+      let(:icc_path) { 'sample/icc_secure_test.jpg' }
+      let(:local_options) { { 'path.icc' => icc_path } }
+      let(:icc_width) { 900 }
+      let(:icc_height) { 400 }
+
+      before do
+        generate_test_image(icc_path, icc_width, icc_height)
+      end
+
+      it 'it should use a file at this location as the input' do
+        process_image
+
+        expect(File).to exist(file_out)
+        expect(processed_image_width).to eq(icc_width)
+        expect(processed_image_height).to eq(icc_height)
+      end
+
+      context 'if no file at this location exists' do
+        let(:different_icc_path) { 'sample/different_secure_test.jpg' }
+        let(:local_options) { { 'path.icc' => different_icc_path } }
+
+        it 'should create one' do
+          process_image
+
+          expect(File).to exist(different_icc_path)
+        end
+      end
     end
 
-    it 'should ignore user supplied path.icc' do
-      src = 'sample/sample.jpg'
-      icc = '/tmp/this-is-insecure-thing.jpg'
-      default_icc = Morandi::ImageProcessor.default_icc_path(src)
-      FileUtils.rm_f(icc)
-      FileUtils.rm_f(default_icc)
-      out = 'sample/out_icc.jpg'
-      Morandi.process(src, { 'path.icc' => icc, 'output.max' => 200 }, out)
-      expect(File).not_to exist(icc)
-      expect(File).to exist(default_icc)
+    describe 'when the user supplies a path.icc in the "options" argument' do
+      let(:icc_path) { 'sample/icc_insecure_test.jpg' }
+      let(:options) { { 'path.icc' => icc_path } }
+      let(:icc_width) { 900 }
+      let(:icc_height) { 400 }
+
+      before do
+        generate_test_image(icc_path, icc_width, icc_height)
+      end
+
+      it 'should ignore the file at this path' do
+        process_image
+
+        expect(File).to exist(file_out)
+        expect(processed_image_width).not_to eq(icc_width)
+        expect(processed_image_height).not_to eq(icc_height)
+      end
     end
 
-    it 'should do cropping of images with a string' do
-      Morandi.process('sample/sample.jpg', {
-                        'crop' => '10,10,300,300'
-                      }, out = 'sample/out_crop.jpg')
-      expect(File.exist?(out))
-      _, width, height = Gdk::Pixbuf.get_file_info(out)
-      expect(width).to eq(300)
-      expect(height).to eq(300)
+    describe 'when given an output.max option' do
+      let(:options) { { 'output.max' => max_size } }
+      let(:max_size) { 200 }
+
+      it 'should reduce the size of images' do
+        process_image
+
+        expect(File).to exist(file_out)
+        expect(processed_image_width).to be <=(max_size)
+        expect(processed_image_height).to be <=(max_size)
+      end
     end
 
-    it 'should reduce the size of images' do
-      Morandi.process('sample/sample.jpg', {
-                        'output.max' => 200
-                      }, out = 'sample/out_reduce.jpg')
-      expect(File.exist?(out))
-      _, width, height = Gdk::Pixbuf.get_file_info(out)
-      expect(width).to be <= 200
-      expect(height).to be <= 200
+    describe 'when given a straighten option' do
+      let(:options) { { 'straighten' => 5 } }
+
+      it 'should reduce the straighten images' do
+        process_image
+
+        expect(File).to exist(file_out)
+        expect(processed_image_type).to eq('jpeg')
+      end
     end
 
-    it 'should reduce the straighten images' do
-      Morandi.process('sample/sample.jpg', {
-                        'straighten' => 5
-                      }, out = 'sample/out_straighten.jpg')
-      expect(File.exist?(out))
-      info, _, _ = Gdk::Pixbuf.get_file_info(out)
-      expect(info.name).to eq('jpeg')
+    describe 'when given a gamma option' do
+      let(:options) { { 'gamma' => 1.2 } }
+
+      it 'should reduce the straighten images' do
+        process_image
+
+        expect(File).to exist(file_out)
+        expect(processed_image_type).to eq('jpeg')
+      end
     end
 
-    it 'should reduce the gamma correct images' do
-      Morandi.process('sample/sample.jpg', {
-                        'gamma' => 1.2
-                      }, out = 'sample/out_gamma.jpg')
-      expect(File.exist?(out))
-      info, _, _ = Gdk::Pixbuf.get_file_info(out)
-      expect(info.name).to eq('jpeg')
+    describe 'when given an fx option' do
+      let(:options) { {'fx' => 'sepia'} }
+
+      it 'should reduce the size of images' do
+        process_image
+
+        expect(File).to exist(file_out)
+        expect(processed_image_type).to eq('jpeg')
+      end
     end
 
-    it 'should reduce the size of images' do
-      Morandi.process('sample/sample.jpg', {
-                        'fx' => 'sepia'
-                      }, out = 'sample/out_sepia.jpg')
-      expect(File.exist?(out))
-      info, _, _ = Gdk::Pixbuf.get_file_info(out)
-      expect(info.name).to eq('jpeg')
+    describe 'when changing the dimensions and auto-cropping' do
+      let(:max_width) { 300 }
+      let(:max_height) { 200 }
+
+      let(:options) {
+        {
+            'output.width' => max_width,
+            'output.height' => max_height,
+            'image.auto-crop' => true,
+            'output.limit' => true
+        }
+      }
+
+      it 'should output at the specified size, or less' do
+        process_image
+
+        expect(File).to exist(file_out)
+        expect(processed_image_type).to eq('jpeg')
+        expect(processed_image_width).to be <= max_width
+        expect(processed_image_height).to be <= max_height
+      end
     end
 
-    it 'should output at the specified size' do
-      Morandi.process('sample/sample.jpg', {
-                        'output.width' => 300,
-                        'output.height' => 200,
-                        'image.auto-crop' => true,
-                        'output.limit' => true
-                      }, out = 'sample/out_at_size.jpg')
-      expect(File.exist?(out))
-      info, width, height = Gdk::Pixbuf.get_file_info(out)
-      expect(info.name).to eq('jpeg')
-      expect(width).to be <= 300
-      expect(height).to be <= 200
+    describe 'when given a sharpen option' do
+      let(:options) { { 'sharpen'  => -3 } }
+
+      it 'should blur the image' do
+        process_image
+
+        expect(File).to exist(file_out)
+        expect(processed_image_type).to eq('jpeg')
+      end
     end
 
-    it 'should blur the image' do
-      Morandi.process('sample/sample.jpg', {
-        'sharpen'  => -3
-      }, out = 'sample/out_blur.jpg')
-      expect(File.exist?(out))
+    describe 'when applying a border and maintaining the original size' do
+      let(:options) {
+        {
+          'border-style'     => 'square',
+          'background-style' => 'dominant',
+          'border-size-mm'   => 5,
+          'output.width'     => original_image_width,
+          'output.height'    => original_image_height
+        }
+      }
+
+      it 'should maintain the target size' do
+        process_image
+
+        expect(File).to exist(file_out)
+        expect(processed_image_type).to eq('jpeg')
+        expect(processed_image_width).to eq(original_image_width)
+        expect(processed_image_height).to eq(original_image_height)
+      end
     end
 
-    it 'should apply a border and maintain the target size' do
-      Morandi.process('sample/sample.jpg', {
-        'border-style'     => 'square',
-        'background-style' => 'dominant',
-        'border-size-mm'   => 5,
-        'output.width'     => 800,
-        'output.height'    => 650
-      }, out = 'sample/out_border.jpg')
-      expect(File.exist?(out))
+    describe 'when applying multiple transformations' do
+      let(:desired_image_width) { 300 }
+      let(:desired_image_height) { 260 }
 
-      info, width, height = Gdk::Pixbuf.get_file_info(out)
-      expect(info.name).to eq('jpeg')
-      expect(width).to eq 800
-      expect(height).to eq 650
-    end
+      let(:options) {
+        {
+          'brighten'         => 5,
+          'contrast'         => 5,
+          'sharpen'          => 2,
+          'fx'               => 'greyscale',
+          'border-style'     => 'solid',
+          'background-style' => '#00FF00',
+          'crop'             => [50, 0, 750, 650],
+          'output.width'     => desired_image_width,
+          'output.height'    => desired_image_height,
+          'output.limit'     => true
+        }
+      }
 
-    it 'should apply multiple transformations' do
-      Morandi.process('sample/sample.jpg', {
-        'brighten'         => 5,
-        'contrast'         => 5,
-        'sharpen'          => 2,
-        'fx'               => 'greyscale',
-        'border-style'     => 'solid',
-        'background-style' => '#00FF00',
-        'crop'             => [50, 0, 750, 650],
-        'output.width'     => 300,
-        'output.height'    => 260,
-        'output.limit'     => true
-      }, out = 'sample/out_various.jpg')
-      expect(File.exist?(out))
+      it 'should shrink the image to the desired dimensions' do
+        process_image
 
-      info, width, height = Gdk::Pixbuf.get_file_info(out)
-      expect(info.name).to eq('jpeg')
-      expect(width).to eq 300
-      expect(height).to eq 260
+        expect(File).to exist(file_out)
+        expect(processed_image_type).to eq('jpeg')
+        expect(processed_image_width).to eq(desired_image_width)
+        expect(processed_image_height).to eq(desired_image_height)
+      end
     end
   end
 
   context 'with increasing quality settings' do
-    let(:max_quality_file_size) do
-      Morandi.process('sample/sample.jpg', { 'quality' => 100 }, 'sample/out-100.jpg')
-      File.size('sample/out-100.jpg')
-    end
+    let!(:max_quality_file) {
+      Morandi.process(file_in, { 'quality' => 100 }, 'sample/out-100.jpg')
+    }
 
-    let(:default_of_97_quality) do
-      Morandi.process('sample/sample.jpg', {}, 'sample/out-97.jpg')
-      File.size('sample/out-97.jpg')
-    end
+    let(:max_quality_file_size) { File.size('sample/out-100.jpg') }
 
-    let(:quality_of_40_by_options_args) do
-      Morandi.process('sample/sample.jpg', { 'quality' => 40 }, 'sample/out-40.jpg')
-      File.size('sample/out-40.jpg')
-    end
+    let!(:default_of_97_quality_file) {
+      Morandi.process(file_in, {}, 'sample/out-97.jpg')
+    }
 
-    # Sort the output files' sizes and expect them to match to quality order
+    let(:default_of_97_quality_file_size) { File.size('sample/out-97.jpg') }
+
+    let!(:quality_of_40_file) {
+      Morandi.process(file_in, { 'quality' => 40 }, 'sample/out-40.jpg')
+    }
+
+    let(:quality_of_40_file_size) { File.size('sample/out-40.jpg') }
+
+    let(:created_file_sizes) {
+      [default_of_97_quality_file_size, max_quality_file_size, quality_of_40_file_size]
+    }
+
+    let(:files_in_increasing_quality_order) {
+      [quality_of_40_file_size, default_of_97_quality_file_size, max_quality_file_size]
+    }
+
     it 'creates files of increasing size' do
-      created_file_sizes = [default_of_97_quality, max_quality_file_size, quality_of_40_by_options_args].sort
-      expect(created_file_sizes).to eq([quality_of_40_by_options_args, default_of_97_quality, max_quality_file_size])
+      expect(created_file_sizes.sort).to eq(files_in_increasing_quality_order)
     end
+  end
+
+  def generate_test_image(at_file_path, width = 600, height = 300)
+    system(
+      'convert',
+      '-size',
+      "#{width}x#{height}",
+      '-seed',
+      '5432',
+      'plasma:red-blue',
+      at_file_path
+    )
   end
 end

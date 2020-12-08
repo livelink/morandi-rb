@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'morandi/profiled_pixbuf'
 require 'morandi/redeye'
 
@@ -76,9 +78,10 @@ class Morandi::ImageProcessor
     @pb.save(fn, 'jpeg', quality: quality.to_s)
   end
 
-protected
+  protected
+
   def get_pixbuf
-    _, width, height = Gdk::Pixbuf.get_file_info(@file)
+    _, width, height = GdkPixbuf::Pixbuf.get_file_info(@file)
 
     if @scale_to
       @pb = Morandi::ProfiledPixbuf.new(@file, @scale_to, @scale_to, @local_options)
@@ -175,7 +178,6 @@ protected
     DEFAULT_CONFIG[key]
   end
 
-  #
   def apply_crop!
     crop = options['crop']
 
