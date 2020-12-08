@@ -6,7 +6,8 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-    ports:
-      - 3000:3000
     volumes:
       - '.:/app'
+    stdin_open: true
+    tty: true
+    command: bundle exec guard

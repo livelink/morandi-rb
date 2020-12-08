@@ -1,0 +1,17 @@
+source 'https://rubygems.org'
+
+gem 'cairo'
+gem 'colorscore'
+gem 'gdk_pixbuf2'
+gem 'gtk2'
+gem 'pango'
+gem 'pixbufutils'
+gem 'redeye'
+
+group :development, :test do
+  gem 'rake'
+  gem 'rspec'
+  gem 'guard'
+  gem 'guard-rspec', require: false
+  gem 'pry'
+end
