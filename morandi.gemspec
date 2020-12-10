@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "gtk2"
-  spec.add_dependency "gdk_pixbuf2"
+  spec.add_dependency "gdk_pixbuf2", "~> 3.4.0"
   spec.add_dependency "cairo"
   spec.add_dependency "pixbufutils"
   spec.add_dependency "redeye"
