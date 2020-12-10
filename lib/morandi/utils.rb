@@ -47,7 +47,13 @@ module Morandi
     def apply_crop(pixbuf, x, y, w, h, fill_col = 0xffffffff)
       if (x < 0) or (y < 0) || ((x+w) > pixbuf.width) || ((y+h) > pixbuf.height)
         #tw, th = [w-x,w].max, [h-y,h].max
-        base_pixbuf = Gdk::Pixbuf.new(Gdk::Pixbuf::ColorSpace::RGB, false, 8, w, h)
+        base_pixbuf = GdkPixbuf::Pixbuf.new(
+          colorspace: GdkPixbuf::Colorspace::RGB,
+          has_alpha: false,
+          bits_per_sample: 8,
+          width: w,
+          height: h
+        )
         base_pixbuf.fill!(fill_col)
         dest_x = [x, 0].min
         dest_y = [y, 0].min
@@ -80,10 +86,18 @@ module Morandi
         if copy_h + paste_y > base_pixbuf.height
           copy_h = base_pixbuf.height - paste_y
         end
-
-        args = [pixbuf, paste_x, paste_y, copy_w, copy_h, paste_x - offset_x, paste_y - offset_y, 1, 1, Gdk::Pixbuf::INTERP_HYPER, 255]
-        #p args
-        base_pixbuf.composite!(*args)
+        base_pixbuf.composite! pixbuf, {
+          dest_x: paste_x,
+          dest_y: paste_y,
+          dest_width: copy_w,
+          dest_height: copy_h,
+          offset_x: paste_x - offset_x,
+          offset_y: paste_y - offset_y,
+          scale_x: 1,
+          scale_y: 1,
+          interpolation_type: :hyper,
+          overall_alpha: 255
+        }
         pixbuf = base_pixbuf
       else
         x = constrain(x, 0, pixbuf.width)
@@ -91,19 +105,19 @@ module Morandi
         w = constrain(w, 1, pixbuf.width - x)
         h = constrain(h, 1, pixbuf.height - y)
         #p [pixbuf, x, y, w, h]
-        pixbuf = Gdk::Pixbuf.new(pixbuf, x, y, w, h)
+        pixbuf = pixbuf.subpixbuf(x, y, w, h)
       end
       pixbuf
     end
   end
 end
 
-class Gdk::Pixbuf
-  unless defined?(::Gdk::Pixbuf::InterpType)
+class GdkPixbuf::Pixbuf
+  unless defined?(::GdkPixbuf::Pixbuf::InterpType)
     InterpType = GdkPixbuf::InterpType
   end
 
-  def scale_max(max_size, interp = Gdk::Pixbuf::InterpType::BILINEAR, max_scale = 1.0)
+  def scale_max(max_size, interp = GdkPixbuf::Pixbuf::InterpType::BILINEAR, max_scale = 1.0)
     mul = (max_size / [width,height].max.to_f)
     mul = [max_scale = 1.0,mul].min
     scale(width * mul, height * mul, interp)
@@ -112,7 +126,7 @@ end
 
 class Cairo::ImageSurface
   def to_pixbuf
-    loader = Gdk::PixbufLoader.new
+    loader = GdkPixbuf::PixbufLoader.new
     io = StringIO.new
     write_to_png(io)
     io.rewind

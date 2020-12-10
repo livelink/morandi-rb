@@ -10,19 +10,36 @@ RSpec.describe Morandi, '#process' do
       expect(File.exist?(out))
     end
 
+    context "with a big image and a bigger cropped area to fill" do
+      it 'should create ouptut' do
+        binding.pry
+        settings = {
+          "crop"=>"0,477,15839,18804",
+          "angle"=>90,
+          "fx"=>"colour",
+          "straighten"=>0.0,
+          "gamma"=>0.98,
+          "redeye"=>[]
+        }
+
+        Morandi.process('sample/100_mb_image.jpg', settings, out = 'sample/out_plain.jpg')
+        expect(File.exist?(out))
+      end
+    end
+
     it 'should do rotation of images' do
-      original = Gdk::Pixbuf.get_file_info('sample/sample.jpg')
+      original = GdkPixbuf::Pixbuf.get_file_info('sample/sample.jpg')
       Morandi.process('sample/sample.jpg', {
                         'angle' => 90
                       }, out = 'sample/out_rotate90.jpg')
       expect(File.exist?(out))
-      _, width, height = Gdk::Pixbuf.get_file_info(out)
+      _, width, height = GdkPixbuf::Pixbuf.get_file_info(out)
       expect(original[1]).to eq(height)
       expect(original[2]).to eq(width)
     end
 
     it 'should accept pixbufs as an argument' do
-      pixbuf = Gdk::Pixbuf.new('sample/sample.jpg')
+      pixbuf = GdkPixbuf::Pixbuf.new(file: 'sample/sample.jpg')
       pro = Morandi::ImageProcessor.new(pixbuf, {}, {})
       pro.process!
       expect(pixbuf.width).to eq(pro.result.width)
@@ -33,7 +50,7 @@ RSpec.describe Morandi, '#process' do
                         'crop' => [10, 10, 300, 300]
                       }, out = 'sample/out_crop.jpg')
       expect(File.exist?(out))
-      _, width, height = Gdk::Pixbuf.get_file_info(out)
+      _, width, height = GdkPixbuf::Pixbuf.get_file_info(out)
       expect(width).to eq(300)
       expect(height).to eq(300)
     end
@@ -66,7 +83,7 @@ RSpec.describe Morandi, '#process' do
                         'crop' => '10,10,300,300'
                       }, out = 'sample/out_crop.jpg')
       expect(File.exist?(out))
-      _, width, height = Gdk::Pixbuf.get_file_info(out)
+      _, width, height = GdkPixbuf::Pixbuf.get_file_info(out)
       expect(width).to eq(300)
       expect(height).to eq(300)
     end
@@ -76,7 +93,7 @@ RSpec.describe Morandi, '#process' do
                         'output.max' => 200
                       }, out = 'sample/out_reduce.jpg')
       expect(File.exist?(out))
-      _, width, height = Gdk::Pixbuf.get_file_info(out)
+      _, width, height = GdkPixbuf::Pixbuf.get_file_info(out)
       expect(width).to be <= 200
       expect(height).to be <= 200
     end
@@ -86,7 +103,7 @@ RSpec.describe Morandi, '#process' do
                         'straighten' => 5
                       }, out = 'sample/out_straighten.jpg')
       expect(File.exist?(out))
-      info, _, _ = Gdk::Pixbuf.get_file_info(out)
+      info, _, _ = GdkPixbuf::Pixbuf.get_file_info(out)
       expect(info.name).to eq('jpeg')
     end
 
@@ -95,7 +112,7 @@ RSpec.describe Morandi, '#process' do
                         'gamma' => 1.2
                       }, out = 'sample/out_gamma.jpg')
       expect(File.exist?(out))
-      info, _, _ = Gdk::Pixbuf.get_file_info(out)
+      info, _, _ = GdkPixbuf::Pixbuf.get_file_info(out)
       expect(info.name).to eq('jpeg')
     end
 
@@ -104,7 +121,7 @@ RSpec.describe Morandi, '#process' do
                         'fx' => 'sepia'
                       }, out = 'sample/out_sepia.jpg')
       expect(File.exist?(out))
-      info, _, _ = Gdk::Pixbuf.get_file_info(out)
+      info, _, _ = GdkPixbuf::Pixbuf.get_file_info(out)
       expect(info.name).to eq('jpeg')
     end
 
@@ -116,7 +133,7 @@ RSpec.describe Morandi, '#process' do
                         'output.limit' => true
                       }, out = 'sample/out_at_size.jpg')
       expect(File.exist?(out))
-      info, width, height = Gdk::Pixbuf.get_file_info(out)
+      info, width, height = GdkPixbuf::Pixbuf.get_file_info(out)
       expect(info.name).to eq('jpeg')
       expect(width).to be <= 300
       expect(height).to be <= 200
@@ -139,7 +156,7 @@ RSpec.describe Morandi, '#process' do
       }, out = 'sample/out_border.jpg')
       expect(File.exist?(out))
 
-      info, width, height = Gdk::Pixbuf.get_file_info(out)
+      info, width, height = GdkPixbuf::Pixbuf.get_file_info(out)
       expect(info.name).to eq('jpeg')
       expect(width).to eq 800
       expect(height).to eq 650
@@ -160,7 +177,7 @@ RSpec.describe Morandi, '#process' do
       }, out = 'sample/out_various.jpg')
       expect(File.exist?(out))
 
-      info, width, height = Gdk::Pixbuf.get_file_info(out)
+      info, width, height = GdkPixbuf::Pixbuf.get_file_info(out)
       expect(info.name).to eq('jpeg')
       expect(width).to eq 300
       expect(height).to eq 260
