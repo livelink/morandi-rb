@@ -36,7 +36,7 @@ class Crop < ImageOp
   def call(image, pixbuf)
     if @area and (not @area.width.zero?) and (not @area.height.zero?)
       # NB: Cheap - fast & shares memory
-      Gdk::Pixbuf.new(pixbuf, @area.x, @area.y,
+      GdkPixbuf::Pixbuf.new(pixbuf, @area.x, @area.y,
           @area.width, @area.height)
     else
       pixbuf
