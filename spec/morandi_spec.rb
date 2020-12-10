@@ -12,7 +12,6 @@ RSpec.describe Morandi, '#process' do
 
     context "with a big image and a bigger cropped area to fill" do
       it 'should create ouptut' do
-        binding.pry
         settings = {
           "crop"=>"0,477,15839,18804",
           "angle"=>90,
