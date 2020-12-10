@@ -21,7 +21,7 @@ RSpec.describe Morandi, '#process' do
           "redeye"=>[]
         }
 
-        Morandi.process('sample/100_mb_image.jpg', settings, out = 'sample/out_plain.jpg')
+        Morandi.process('sample/100_mb_image.jpg', settings, out = 'sample/out_100_mb_image.jpg')
         expect(File.exist?(out))
       end
     end
