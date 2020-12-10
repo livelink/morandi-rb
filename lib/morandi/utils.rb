@@ -86,19 +86,19 @@ module Morandi
         w = constrain(w, 1, pixbuf.width - x)
         h = constrain(h, 1, pixbuf.height - y)
 
-        pixbuf = Gdk::Pixbuf.new(pixbuf, x, y, w, h)
+        pixbuf = pixbuf.subpixbuf(x, y, w, h)
       end
       pixbuf
     end
   end
 end
 
-class Gdk::Pixbuf
+class GdkPixbuf::Pixbuf
   unless defined?(::Gdk::Pixbuf::InterpType)
     InterpType = GdkPixbuf::InterpType
   end
 
-  def scale_max(max_size, interp = Gdk::Pixbuf::InterpType::BILINEAR, max_scale = 1.0)
+  def scale_max(max_size, interp = GdkPixbuf::Pixbuf::InterpType::BILINEAR, max_scale = 1.0)
     mul = (max_size / [width,height].max.to_f)
     mul = [max_scale = 1.0,mul].min
     scale(width * mul, height * mul, interp)
@@ -107,7 +107,7 @@ end
 
 class Cairo::ImageSurface
   def to_pixbuf
-    loader = Gdk::PixbufLoader.new
+    loader = GdkPixbuf::PixbufLoader.new
     io = StringIO.new
     write_to_png(io)
     io.rewind

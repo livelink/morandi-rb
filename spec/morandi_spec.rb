@@ -13,7 +13,7 @@ RSpec.describe Morandi, '#process' do
   let(:options) { {} }
   let(:original_image_width) { 800 }
   let(:original_image_height) { 650 }
-  let(:processed_image_info) { Gdk::Pixbuf.get_file_info(file_out) }
+  let(:processed_image_info) { GdkPixbuf::Pixbuf.get_file_info(file_out) }
   let(:processed_image_type) { processed_image_info[0].name }
   let(:processed_image_width) { processed_image_info[1] }
   let(:processed_image_height) { processed_image_info[2] }
@@ -51,9 +51,9 @@ RSpec.describe Morandi, '#process' do
         Morandi.process(pixbuf, options, file_out)
       }
 
-      let(:pixbuf) { Gdk::Pixbuf.new(file_in)  }
+      let(:pixbuf) { GdkPixbuf::Pixbuf.new(file_in)  }
 
-      it 'should accept pixbufs as an argument' do
+      it 'should process the file' do
         process_image
 
         expect(processed_image_width).to eq(pixbuf.width)

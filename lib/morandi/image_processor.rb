@@ -25,7 +25,7 @@ class Morandi::ImageProcessor
 
     if @file.is_a?(String)
       get_pixbuf
-    elsif @file.is_a?(Gdk::Pixbuf) or @file.is_a?(Morandi::ProfiledPixbuf)
+    elsif @file.is_a?(GdkPixbuf::Pixbuf) or @file.is_a?(Morandi::ProfiledPixbuf)
       @pb = @file
       @scale = 1.0
     end
@@ -84,7 +84,7 @@ class Morandi::ImageProcessor
     _, width, height = GdkPixbuf::Pixbuf.get_file_info(@file)
 
     if @scale_to
-      @pb = Morandi::ProfiledPixbuf.new(@file, @scale_to, @scale_to, @local_options)
+      @pb = Morandi::ProfiledPixbuf.new(@file, @local_options, @scale_to)
       @src_max = [width, height].max
       @actual_max = [@pb.width, @pb.height].max
     else

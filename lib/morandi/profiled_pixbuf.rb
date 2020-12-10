@@ -2,7 +2,7 @@
 
 require 'gdk_pixbuf2'
 
-class Morandi::ProfiledPixbuf < Gdk::Pixbuf
+class Morandi::ProfiledPixbuf < GdkPixbuf::Pixbuf
   def valid_jpeg?(filename)
     return false unless File.exist?(filename)
     return false unless File.size(filename) > 0
@@ -27,28 +27,38 @@ class Morandi::ProfiledPixbuf < Gdk::Pixbuf
     "#{path}.icc.jpg"
   end
 
-  def initialize(*args, local_options)
+  def initialize(file, local_options, scale_to = nil)
     @local_options = local_options
 
-    if args[0].is_a?(String)
+    if file.is_a?(String)
 
-      @file = args[0]
+      @file = file
 
       if suitable_for_jpegicc?
         icc_file = icc_cache_path
 
-        args[0] = icc_file if (valid_jpeg?(icc_file) || system("jpgicc", "-q97", @file, icc_file))
+        file = icc_file if (valid_jpeg?(icc_file) || system("jpgicc", "-q97", @file, icc_file))
       end
     end
 
-    super(*args)
+    if scale_to
+      super(path: file, width: scale_to, height: scale_to)
+    else
+      super(file: file)
+    end
   rescue Gdk::PixbufError::CorruptImage => e
-    if args[0].is_a?(String) && defined? Tempfile
+    if file.is_a?(String) && defined? Tempfile
       temp =  Tempfile.new
-      pixbuf = self.class.from_string(File.read(args[0]))
+      pixbuf = self.class.from_string(File.read(file))
       pixbuf.save(temp.path, 'jpeg')
-      args[0] = temp.path
-      super(*args)
+      file = temp.path
+
+      if scale_to
+        super(path: file, width: scale_to, height: scale_to)
+      else
+        super(file: file)
+      end
+
       temp.close
       temp.unlink
     else
@@ -56,15 +66,19 @@ class Morandi::ProfiledPixbuf < Gdk::Pixbuf
     end
   end
 
-
   protected
-  def suitable_for_jpegicc?
-    type, _, _ = GdkPixbuf::Pixbuf.get_file_info(@file)
 
-    type && type.name.eql?('jpeg')
+  def suitable_for_jpegicc?
+    file_type && file_type.name.eql?('jpeg')
   end
 
   def icc_cache_path
     @local_options['path.icc'] || Morandi::ProfiledPixbuf.default_icc_path(@file)
+  end
+
+  private
+
+  def file_type
+    GdkPixbuf::Pixbuf.get_file_info(@file)[0]
   end
 end
