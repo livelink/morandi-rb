@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Last updated 10.12.2020
 
+## [0.12.1] 10.12.2020
+### Fixed
+- Removed large test image
+
 ## [0.12.0] 10.12.2020
 ### Fixed
 - Compatability with gdk_pixbuf v3.4.0+ [TECH-14001]
