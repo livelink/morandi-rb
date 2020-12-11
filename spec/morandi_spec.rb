@@ -18,12 +18,20 @@ RSpec.describe Morandi, '#process' do
   let(:processed_image_width) { processed_image_info[1] }
   let(:processed_image_height) { processed_image_info[2] }
 
+  before(:all) do
+    Dir.mkdir('sample/')
+  end
+
   before do
     generate_test_image(file_in, original_image_width, original_image_height)
   end
 
   after do
     FileUtils.rm_rf(Dir['sample/*'])
+  end
+
+  after(:all) do
+    FileUtils.remove_dir('sample/')
   end
 
   context 'in command mode' do
