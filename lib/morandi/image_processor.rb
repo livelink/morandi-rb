@@ -194,10 +194,7 @@ module Morandi
       filter = options['fx']
 
       case filter
-      when 'greyscale'
-        op = Morandi::Colourify.new_from_hash('op' => filter)
-      when 'sepia', 'bluetone'
-        # could also set 'alpha' => (0.85 * 255).to_i
+      when 'greyscale', 'sepia', 'bluetone'
         op = Morandi::Colourify.new_from_hash('op' => filter)
       else
         return

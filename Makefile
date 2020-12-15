@@ -18,5 +18,5 @@ stop:
 	docker container stop ${CONTAINER_NAME}
 
 clean:
-	docker ps -q --filter name=${CONTAINER_NAME} | grep -q . && docker container stop ${CONTAINER_NAME} || exit 0
-	docker image ls -q ${IMAGE_NAME} | grep -q . && docker image rm ${IMAGE_NAME} || exit 0
+	docker ps -q --filter name=${CONTAINER_NAME} | grep -q . && docker container stop ${CONTAINER_NAME} || true
+	docker image ls -q ${IMAGE_NAME} | grep -q . && docker image rm ${IMAGE_NAME} || true

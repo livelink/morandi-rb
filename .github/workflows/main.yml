@@ -18,6 +18,15 @@ jobs:
           context: .
           file: ./Dockerfile
           push: false
+  rubocop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v2
+      - name: lint code with rubocop
+        uses: andrewmcodes/rubocop-linter-action@v3.3.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   tests:
     runs-on: ubuntu-latest
     strategy:
