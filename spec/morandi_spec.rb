@@ -4,9 +4,9 @@ require 'fileutils'
 require 'morandi'
 
 RSpec.describe Morandi, '#process' do
-  subject(:process_image) {
+  subject(:process_image) do
     Morandi.process(file_in, options, file_out)
-  }
+  end
 
   let(:file_in) { 'sample/sample.jpg' }
   let(:file_out) { 'sample/sample_out.jpg' }
@@ -55,11 +55,11 @@ RSpec.describe Morandi, '#process' do
     end
 
     describe 'when given a pixbuf as an input' do
-      subject(:process_image) {
+      subject(:process_image) do
         Morandi.process(pixbuf, options, file_out)
-      }
+      end
 
-      let(:pixbuf) { GdkPixbuf::Pixbuf.new(file_in)  }
+      let(:pixbuf) { GdkPixbuf::Pixbuf.new(file_in) }
 
       it 'should process the file' do
         process_image
@@ -69,12 +69,12 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    context 'when give a "crop" option'  do
+    context 'when give a "crop" option' do
       let(:cropped_width) { 300 }
       let(:cropped_height) { 300 }
 
       describe 'when given an array of dimensions' do
-        let(:options) { {'crop' => [10, 10, cropped_width, cropped_height] } }
+        let(:options) { { 'crop' => [10, 10, cropped_width, cropped_height] } }
 
         it 'should crop the image' do
           process_image
@@ -99,9 +99,9 @@ RSpec.describe Morandi, '#process' do
     end
 
     describe 'when the user supplies a path.icc in the "local_options" argument' do
-      subject(:process_image) {
+      subject(:process_image) do
         Morandi.process(file_in, options, file_out, local_options)
-      }
+      end
 
       let(:icc_path) { 'sample/icc_secure_test.jpg' }
       let(:local_options) { { 'path.icc' => icc_path } }
@@ -159,8 +159,8 @@ RSpec.describe Morandi, '#process' do
         process_image
 
         expect(File).to exist(file_out)
-        expect(processed_image_width).to be <=(max_size)
-        expect(processed_image_height).to be <=(max_size)
+        expect(processed_image_width).to be <= (max_size)
+        expect(processed_image_height).to be <= (max_size)
       end
     end
 
@@ -187,7 +187,7 @@ RSpec.describe Morandi, '#process' do
     end
 
     describe 'when given an fx option' do
-      let(:options) { {'fx' => 'sepia'} }
+      let(:options) { { 'fx' => 'sepia' } }
 
       it 'should reduce the size of images' do
         process_image
@@ -201,14 +201,14 @@ RSpec.describe Morandi, '#process' do
       let(:max_width) { 300 }
       let(:max_height) { 200 }
 
-      let(:options) {
+      let(:options) do
         {
-            'output.width' => max_width,
-            'output.height' => max_height,
-            'image.auto-crop' => true,
-            'output.limit' => true
+          'output.width' => max_width,
+          'output.height' => max_height,
+          'image.auto-crop' => true,
+          'output.limit' => true
         }
-      }
+      end
 
       it 'should output at the specified size, or less' do
         process_image
@@ -221,7 +221,7 @@ RSpec.describe Morandi, '#process' do
     end
 
     describe 'when given a sharpen option' do
-      let(:options) { { 'sharpen'  => -3 } }
+      let(:options) { { 'sharpen' => -3 } }
 
       it 'should blur the image' do
         process_image
@@ -232,15 +232,15 @@ RSpec.describe Morandi, '#process' do
     end
 
     describe 'when applying a border and maintaining the original size' do
-      let(:options) {
+      let(:options) do
         {
-          'border-style'     => 'square',
+          'border-style' => 'square',
           'background-style' => 'dominant',
-          'border-size-mm'   => 5,
-          'output.width'     => original_image_width,
-          'output.height'    => original_image_height
+          'border-size-mm' => 5,
+          'output.width' => original_image_width,
+          'output.height' => original_image_height
         }
-      }
+      end
 
       it 'should maintain the target size' do
         process_image
@@ -256,20 +256,20 @@ RSpec.describe Morandi, '#process' do
       let(:desired_image_width) { 300 }
       let(:desired_image_height) { 260 }
 
-      let(:options) {
+      let(:options) do
         {
-          'brighten'         => 5,
-          'contrast'         => 5,
-          'sharpen'          => 2,
-          'fx'               => 'greyscale',
-          'border-style'     => 'solid',
+          'brighten' => 5,
+          'contrast' => 5,
+          'sharpen' => 2,
+          'fx' => 'greyscale',
+          'border-style' => 'solid',
           'background-style' => '#00FF00',
-          'crop'             => [50, 0, 750, 650],
-          'output.width'     => desired_image_width,
-          'output.height'    => desired_image_height,
-          'output.limit'     => true
+          'crop' => [50, 0, 750, 650],
+          'output.width' => desired_image_width,
+          'output.height' => desired_image_height,
+          'output.limit' => true
         }
-      }
+      end
 
       it 'should shrink the image to the desired dimensions' do
         process_image
@@ -283,31 +283,31 @@ RSpec.describe Morandi, '#process' do
   end
 
   context 'with increasing quality settings' do
-    let!(:max_quality_file) {
+    let!(:max_quality_file) do
       Morandi.process(file_in, { 'quality' => 100 }, 'sample/out-100.jpg')
-    }
+    end
 
     let(:max_quality_file_size) { File.size('sample/out-100.jpg') }
 
-    let!(:default_of_97_quality_file) {
+    let!(:default_of_97_quality_file) do
       Morandi.process(file_in, {}, 'sample/out-97.jpg')
-    }
+    end
 
     let(:default_of_97_quality_file_size) { File.size('sample/out-97.jpg') }
 
-    let!(:quality_of_40_file) {
+    let!(:quality_of_40_file) do
       Morandi.process(file_in, { 'quality' => 40 }, 'sample/out-40.jpg')
-    }
+    end
 
     let(:quality_of_40_file_size) { File.size('sample/out-40.jpg') }
 
-    let(:created_file_sizes) {
+    let(:created_file_sizes) do
       [default_of_97_quality_file_size, max_quality_file_size, quality_of_40_file_size]
-    }
+    end
 
-    let(:files_in_increasing_quality_order) {
+    let(:files_in_increasing_quality_order) do
       [quality_of_40_file_size, default_of_97_quality_file_size, max_quality_file_size]
-    }
+    end
 
     it 'creates files of increasing size' do
       expect(created_file_sizes.sort).to eq(files_in_increasing_quality_order)
