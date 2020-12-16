@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Last updated 10.12.2020
 
+## [0.12.2] 16.12.2020
+### Fixed
+- Refactored test suite
+- Fixed most rubocop offenses
+### Aded
+- CI pipeline
+- rubocop
+- Development image
+
 ## [0.12.1] 10.12.2020
 ### Fixed
 - Removed large test image
