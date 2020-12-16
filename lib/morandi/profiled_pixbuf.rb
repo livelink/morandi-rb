@@ -16,7 +16,7 @@ module Morandi
     end
 
     def self.from_string(string, loader: nil, chunk_size: 4096)
-      loader ||= Gdk::PixbufLoader.new
+      loader ||= GdkPixbuf::PixbufLoader.new
       ((string.bytesize + chunk_size - 1) / chunk_size).times do |i|
         loader.write(string.byteslice(i * chunk_size, chunk_size))
       end

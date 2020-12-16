@@ -42,6 +42,24 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
+    describe 'with a big image and a bigger cropped area to fill' do
+      let(:options) do
+        {
+          'crop' => '0,477,15839,18804',
+          'angle' => 90,
+          'fx' => 'colour',
+          'straighten' => 0.0,
+          'gamma' => 0.98,
+          'redeye' => []
+        }
+      end
+
+      it 'should create ouptut' do
+        process_image
+        expect(File).to exist(file_out)
+      end
+    end
+
     describe 'when given an angle of rotation' do
       let(:options) { { 'angle' => 90 } }
 

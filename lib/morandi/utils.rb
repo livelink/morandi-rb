@@ -54,7 +54,13 @@ module Morandi
          ((x_coord + width) > pixbuf.width) ||
          ((y_coord + height) > pixbuf.height)
 
-        base_pixbuf = GdkPixbuf::Pixbuf.new(GdkPixbuf::Colorspace::RGB, false, 8, width, height)
+        base_pixbuf = GdkPixbuf::Pixbuf.new(
+          colorspace: GdkPixbuf::Colorspace::RGB,
+          has_alpha: false,
+          bits_per_sample: 8,
+          width: width,
+          height: height
+        )
         base_pixbuf.fill!(fill_col)
 
         offset_x = [x_coord, 0].max
@@ -78,7 +84,7 @@ module Morandi
           offset_y: paste_y - offset_y,
           scale_x: 1,
           scale_y: y_coord,
-          interpolation_type: GdkPixbuf::InterpType::HYPER,
+          interpolation_type: :hyper,
           overall_alpha: 255
         )
         pixbuf = base_pixbuf
