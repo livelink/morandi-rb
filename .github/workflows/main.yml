@@ -1,0 +1,52 @@
+name: CI build for the morandi-rb gem
+
+on:
+  push:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-dev:
+    runs-on: ubuntu-latest
+    name: ensures the dev environment image builds
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v2
+      - name: build container
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+  rubocop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v2
+      - name: lint code with rubocop
+        uses: andrewmcodes/rubocop-linter-action@v3.3.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby: [2.0, 2.3, 2.7]
+    name: install dependencies and run tests
+    steps:
+      - name: install image processing dependencies
+        run: |
+          sudo apt-get install -yqq liblcms2-utils libglib2.0-dev libgtk2.0-dev libgdk-pixbuf2.0-dev
+      - name: set up ruby environment
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      - name: checkout repo
+        uses: actions/checkout@v2
+      - name: install ruby dependencies
+        run: |
+          gem install bundler
+          bundle install
+      - name: run the tests
+        run: bundle exec rspec

@@ -1,245 +1,237 @@
+# frozen_string_literal: true
+
 require 'morandi/profiled_pixbuf'
 require 'morandi/redeye'
 
-class Morandi::ImageProcessor
-  attr_reader :options, :pb
-  attr_accessor :config
+module Morandi
+  class ImageProcessor
+    attr_reader :options, :pb
+    attr_accessor :config
 
-  def self.default_icc_path(path)
-    "#{path}.icc.jpg"
-  end
-
-  def initialize(file, user_options, local_options={})
-    @file = file
-
-    user_options.keys.grep(/^path/).each { |k| user_options.delete(k) }
-
-    # Give priority to user_options
-    @options = (local_options || {}).merge(user_options || {})
-    @local_options = local_options
-
-    @scale_to = @options['output.max']
-    @width, @height = @options['output.width'], @options['output.height']
-
-    if @file.is_a?(String)
-      get_pixbuf
-    elsif @file.is_a?(GdkPixbuf::Pixbuf) or @file.is_a?(Morandi::ProfiledPixbuf)
-      @pb = @file
-      @scale = 1.0
-    end
-  end
-
-  def process!
-    # Apply Red-Eye corrections
-    apply_redeye!
-
-    # Apply contrast, brightness etc
-    apply_colour_manipulations!
-
-    # apply rotation
-    apply_rotate!
-
-    # apply crop
-    apply_crop!
-
-    # apply filter
-    apply_filters!
-
-    # add border
-    apply_decorations!
-
-    if @options['output.limit'] && @width && @height
-      @pb = @pb.scale_max([@width, @height].max)
+    def self.default_icc_path(path)
+      "#{path}.icc.jpg"
     end
 
-    @pb
-  end
+    def initialize(file, user_options, local_options = {})
+      @file = file
 
-  def result
-    @pb
-  end
+      user_options.keys.grep(/^path/).each { |k| user_options.delete(k) }
 
-  def write_to_png(fn, orientation=:any)
-    pb = @pb
+      # Give priority to user_options
+      @options = (local_options || {}).merge(user_options || {})
+      @local_options = local_options
 
-    case orientation
-    when :landscape
-      pb = @pb.rotate(90) if @pb.width < @pb.height
-    when :portrait
-      pb = @pb.rotate(90) if @pb.width > @pb.height
+      @scale_to = @options['output.max']
+      @width = @options['output.width']
+      @height = @options['output.height']
+
+      case @file
+      when String
+        get_pixbuf
+      when GdkPixbuf::Pixbuf, Morandi::ProfiledPixbuf
+        @pb = @file
+        @scale = 1.0
+      end
     end
-    pb.save(fn, 'png')
-  end
 
-  def write_to_jpeg(fn, quality = nil)
-    quality ||= options.fetch('quality', '97')
-    @pb.save(fn, 'jpeg', quality: quality.to_s)
-  end
+    def process!
+      # Apply Red-Eye corrections
+      apply_redeye!
 
-protected
-  def get_pixbuf
-    _, width, height = GdkPixbuf::Pixbuf.get_file_info(@file)
+      # Apply contrast, brightness etc
+      apply_colour_manipulations!
 
-    if @scale_to
-      @pb = Morandi::ProfiledPixbuf.new(@file, @scale_to, @scale_to, @local_options)
-      @src_max = [width, height].max
+      # apply rotation
+      apply_rotate!
+
+      # apply crop
+      apply_crop!
+
+      # apply filter
+      apply_filters!
+
+      # add border
+      apply_decorations!
+
+      @pb = @pb.scale_max([@width, @height].max) if @options['output.limit'] && @width && @height
+
+      @pb
+    end
+
+    def result
+      @pb
+    end
+
+    def write_to_png(write_to, orientation = :any)
+      pb = @pb
+
+      case orientation
+      when :landscape
+        pb = @pb.rotate(90) if @pb.width < @pb.height
+      when :portrait
+        pb = @pb.rotate(90) if @pb.width > @pb.height
+      end
+      pb.save(write_to, 'png')
+    end
+
+    def write_to_jpeg(write_to, quality = nil)
+      quality ||= options.fetch('quality', '97')
+      @pb.save(write_to, 'jpeg', quality: quality.to_s)
+    end
+
+    protected
+
+    def get_pixbuf
+      _, width, height = GdkPixbuf::Pixbuf.get_file_info(@file)
+      @pb = Morandi::ProfiledPixbuf.new(@file, @local_options, @scale_to)
       @actual_max = [@pb.width, @pb.height].max
-    else
-      @pb = Morandi::ProfiledPixbuf.new(@file, @local_options)
-      @src_max = [@pb.width, @pb.height].max
-      @actual_max = [@pb.width, @pb.height].max
+
+      @src_max = if @scale_to
+                   [width, height].max
+                 else
+                   [@pb.width, @pb.height].max
+                 end
+
+      @scale = @actual_max / @src_max.to_f
     end
 
-    @scale = @actual_max / @src_max.to_f
-  end
+    SHARPEN = [
+      -1, -1, -1, -1, -1,
+      -1,  2,  2,  2, -1,
+      -1,  2,  8,  2, -1,
+      -1,  2,  2,  2, -1,
+      -1, -1, -1, -1, -1
+    ].freeze
 
-  SHARPEN = [
-    -1, -1, -1, -1, -1,
-    -1,  2,  2,  2, -1,
-    -1,  2,  8,  2, -1,
-    -1,  2,  2,  2, -1,
-    -1, -1, -1, -1, -1,
-  ]
-  BLUR = [
-    0, 1, 1, 1, 0,
-    1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1,
-    0, 1, 1, 1, 0,
-  ]
+    BLUR = [
+      0, 1, 1, 1, 0,
+      1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1,
+      0, 1, 1, 1, 0
+    ].freeze
 
-  def apply_colour_manipulations!
-    if options['brighten'].to_i.nonzero?
-      brighten = [ [ 5 * options['brighten'], -100 ].max, 100 ].min
-      @pb = PixbufUtils.brightness(@pb, brighten)
-    end
+    def apply_colour_manipulations!
+      if options['brighten'].to_i.nonzero?
+        brighten = [[5 * options['brighten'], -100].max, 100].min
+        @pb = PixbufUtils.brightness(@pb, brighten)
+      end
 
-    if options['gamma'] && (options['gamma'] != 1.0)
-      @pb = PixbufUtils.gamma(@pb, options['gamma'])
-    end
+      @pb = PixbufUtils.gamma(@pb, options['gamma']) if options['gamma'] && not_equal_to_one(options['gamma'])
 
-    if options['contrast'].to_i.nonzero?
-      @pb = PixbufUtils.contrast(@pb, [ [ 5 * options['contrast'], -100 ].max, 100 ].min)
-    end
+      if options['contrast'].to_i.nonzero?
+        @pb = PixbufUtils.contrast(@pb,
+                                   [[5 * options['contrast'], -100].max, 100].min)
+      end
 
-    if options['sharpen'].to_i.nonzero?
-      if options['sharpen'] > 0
+      return unless options['sharpen'].to_i.nonzero?
+
+      if options['sharpen'].positive?
         [options['sharpen'], 5].min.times do
           @pb = PixbufUtils.filter(@pb, SHARPEN, SHARPEN.inject(0, &:+))
         end
-      elsif options['sharpen'] < 0
-        [ (options['sharpen']*-1), 5].min.times do
+      elsif options['sharpen'].negative?
+        [(options['sharpen'] * -1), 5].min.times do
           @pb = PixbufUtils.filter(@pb, BLUR, BLUR.inject(0, &:+))
         end
       end
     end
-  end
 
-  def apply_redeye!
-    for eye in options['redeye'] || []
-      @pb = Morandi::RedEye::TapRedEye.tap_on(@pb, eye[0] * @scale, eye[1] * @scale)
-    end
-  end
-
-  def angle
-    a = options['angle'].to_i
-    if a
-      (360-a)%360
-    else
-      nil
-    end
-  end
-
-  # modifies @pb with any applied rotation
-  def apply_rotate!
-    a = angle()
-
-    unless (a%360).zero?
-      @pb = @pb.rotate(a)
+    def apply_redeye!
+      options['redeye'] || [].each do |eye|
+        @pb = Morandi::RedEye::TapRedEye.tap_on(@pb, eye[0] * @scale, eye[1] * @scale)
+      end
     end
 
-    unless options['straighten'].to_f.zero?
-      @pb = Morandi::Straighten.new(options['straighten'].to_f).call(nil, @pb)
+    def angle
+      a = options['angle'].to_i
+      (360 - a) % 360 if a
     end
 
-    @image_width = @pb.width
-    @image_height = @pb.height
-  end
+    # modifies @pb with any applied rotation
+    def apply_rotate!
+      a = angle
 
-  DEFAULT_CONFIG = {
-    'border-size-mm' => 5
-  }
-  def config_for(key)
-    return options[key] if options && options.has_key?(key)
-    return @config[key] if @config && @config.has_key?(key)
-    DEFAULT_CONFIG[key]
-  end
+      @pb = @pb.rotate(a) unless (a % 360).zero?
 
-  #
-  def apply_crop!
-    crop = options['crop']
+      @pb = Morandi::Straighten.new(options['straighten'].to_f).call(nil, @pb) unless options['straighten'].to_f.zero?
 
-    if crop.nil? && config_for('image.auto-crop').eql?(false)
-      return
+      @image_width = @pb.width
+      @image_height = @pb.height
     end
 
-    if crop.is_a?(String) && crop =~ /^\d+,\d+,\d+,\d+/
-      crop = crop.split(/,/).map(&:to_i)
+    DEFAULT_CONFIG = {
+      'border-size-mm' => 5
+    }.freeze
+    def config_for(key)
+      return options[key] if options&.key?(key)
+      return @config[key] if @config&.key?(key)
+
+      DEFAULT_CONFIG[key]
     end
 
-    crop = nil unless crop.is_a?(Array) && crop.size.eql?(4) && crop.all? { |i|
-      i.kind_of?(Numeric)
-    }
+    def apply_crop!
+      crop = options['crop']
 
-    # can't crop, won't crop
-    return if @width.nil? && @height.nil? && crop.nil?
+      return if crop.nil? && config_for('image.auto-crop').eql?(false)
 
-    if crop && @scale != 1.0
-      crop = crop.map { |s| (s.to_f * @scale).floor  }
+      crop = crop.split(/,/).map(&:to_i) if crop.is_a?(String) && crop =~ /^\d+,\d+,\d+,\d+/
+
+      crop = nil unless crop.is_a?(Array) && crop.size.eql?(4) && crop.all? do |i|
+        i.is_a?(Numeric)
+      end
+
+      # can't crop, won't crop
+      return if @width.nil? && @height.nil? && crop.nil?
+
+      crop = crop.map { |s| (s.to_f * @scale).floor } if crop && not_equal_to_one(@scale)
+
+      crop ||= Morandi::Utils.autocrop_coords(@pb.width, @pb.height, @width, @height)
+
+      @pb = Morandi::Utils.apply_crop(@pb, crop[0], crop[1], crop[2], crop[3])
     end
 
-    crop ||= Morandi::Utils.autocrop_coords(@pb.width, @pb.height, @width, @height)
+    def apply_filters!
+      filter = options['fx']
 
-    @pb = Morandi::Utils.apply_crop(@pb, crop[0], crop[1], crop[2], crop[3])
-  end
-
-
-  def apply_filters!
-    filter = options['fx']
-
-    case filter
-    when 'greyscale'
-      op = Morandi::Colourify.new_from_hash('op' => filter)
-    when 'sepia', 'bluetone'
-      # could also set 'alpha' => (0.85 * 255).to_i
-      op = Morandi::Colourify.new_from_hash('op' => filter)
-    else
-      return
+      case filter
+      when 'greyscale', 'sepia', 'bluetone'
+        op = Morandi::Colourify.new_from_hash('op' => filter)
+      else
+        return
+      end
+      @pb = op.call(nil, @pb)
     end
-    @pb = op.call(nil, @pb)
+
+    def apply_decorations!
+      style = options['border-style']
+      colour = options['background-style']
+
+      return if style.nil? || style.eql?('none')
+      return if colour.eql?('none')
+
+      colour ||= 'black'
+
+      crop = options['crop']
+      crop = crop.map { |s| (s.to_f * @scale).floor } if crop && not_equal_to_one(@scale)
+
+      op = Morandi::ImageBorder.new_from_hash(
+        'style' => style,
+        'colour' => colour || '#000000',
+        'crop' => crop,
+        'size' => [@image_width, @image_height],
+        'print_size' => [@width, @height],
+        'shrink' => true,
+        'border_size' => @scale * config_for('border-size-mm').to_i * 300 / 25.4 # 5mm at 300dpi
+      )
+
+      @pb = op.call(nil, @pb)
+    end
+
+    private
+
+    def not_equal_to_one(float)
+      (float - 1.0) >= Float::EPSILON
+    end
   end
-
-  def apply_decorations!
-    style, colour = options['border-style'], options['background-style']
-
-    return if style.nil? or style.eql?('none')
-    return if colour.eql?('none')
-    colour ||= 'black'
-
-    crop = options['crop']
-    crop = crop.map { |s| (s.to_f * @scale).floor  } if crop && @scale != 1.0
-
-    op = Morandi::ImageBorder.new_from_hash(data={
-      'style' => style,
-      'colour' => colour || '#000000',
-      'crop' => crop,
-      'size' => [@image_width, @image_height],
-      'print_size' => [@width, @height],
-      'shrink'  => true,
-      'border_size' => @scale * config_for('border-size-mm').to_i * 300 / 25.4 # 5mm at 300dpi
-    })
-
-    @pb = op.call(nil, @pb)
-  end
-
 end
