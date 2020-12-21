@@ -4,9 +4,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## Last updated 10.12.2020
+## Last updated 16.12.2020
 
-## [0.12.2] 16.12.2020
+## [0.13.0] 16.12.2020
 ### Fixed
 - Refactored test suite
 - Fixed most rubocop offenses
