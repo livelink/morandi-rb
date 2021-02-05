@@ -19,7 +19,7 @@ RSpec.describe Morandi, '#process' do
   let(:processed_image_height) { processed_image_info[2] }
 
   before(:all) do
-    Dir.mkdir('sample/')
+    FileUtils.mkdir_p('sample')
   end
 
   before do
@@ -77,7 +77,7 @@ RSpec.describe Morandi, '#process' do
         Morandi.process(pixbuf, options, file_out)
       end
 
-      let(:pixbuf) { GdkPixbuf::Pixbuf.new(file_in) }
+      let(:pixbuf) { GdkPixbuf::Pixbuf.new(file: file_in) }
 
       it 'should process the file' do
         process_image

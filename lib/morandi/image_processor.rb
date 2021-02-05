@@ -114,13 +114,13 @@ module Morandi
     def apply_colour_manipulations!
       if options['brighten'].to_i.nonzero?
         brighten = [[5 * options['brighten'], -100].max, 100].min
-        @pb = PixbufUtils.brightness(@pb, brighten)
+        @pb = MorandiNative::PixbufUtils.brightness(@pb, brighten)
       end
 
-      @pb = PixbufUtils.gamma(@pb, options['gamma']) if options['gamma'] && not_equal_to_one(options['gamma'])
+      @pb = MorandiNative::PixbufUtils.gamma(@pb, options['gamma']) if options['gamma'] && not_equal_to_one(options['gamma'])
 
       if options['contrast'].to_i.nonzero?
-        @pb = PixbufUtils.contrast(@pb,
+        @pb = MorandiNative::PixbufUtils.contrast(@pb,
                                    [[5 * options['contrast'], -100].max, 100].min)
       end
 
@@ -128,11 +128,11 @@ module Morandi
 
       if options['sharpen'].positive?
         [options['sharpen'], 5].min.times do
-          @pb = PixbufUtils.filter(@pb, SHARPEN, SHARPEN.inject(0, &:+))
+          @pb = MorandiNative::PixbufUtils.filter(@pb, SHARPEN, SHARPEN.inject(0, &:+))
         end
       elsif options['sharpen'].negative?
         [(options['sharpen'] * -1), 5].min.times do
-          @pb = PixbufUtils.filter(@pb, BLUR, BLUR.inject(0, &:+))
+          @pb = MorandiNative::PixbufUtils.filter(@pb, BLUR, BLUR.inject(0, &:+))
         end
       end
     end
