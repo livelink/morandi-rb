@@ -2,6 +2,9 @@
 
 require 'pango'
 require 'colorscore'
+require 'gdk3'
+require 'gdk3/loader'
+Gdk::Loader.new(Gdk).load
 
 module Morandi
   class ImageOp
@@ -42,7 +45,7 @@ module Morandi
     def call(_image, pixbuf)
       if @area && !@area.width.zero? && !@area.height.zero?
         # NB: Cheap - fast & shares memory
-        Gdk::Pixbuf.new(pixbuf, @area.x, @area.y,
+        GdkPixbuf::Pixbuf.new(pixbuf, @area.x, @area.y,
                         @area.width, @area.height)
       else
         pixbuf

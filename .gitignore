@@ -17,3 +17,10 @@ test/tmp
 test/version_tmp
 tmp
 sample/
+*.bundle
+.idea
+*.o
+*.so
+Makefile
+*.rdb
+tags
