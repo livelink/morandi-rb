@@ -7,7 +7,6 @@ RUN apt-get update && apt-get install -yyq --no-install-recommends \
   libglib2.0-dev \
   libgtk2.0-dev \
   libgdk-pixbuf2.0-dev \
-  libtiff5-dev \
   imagemagick \
   liblcms2-utils \
   && apt-get clean \

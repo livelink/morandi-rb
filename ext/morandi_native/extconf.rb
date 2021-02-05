@@ -3,7 +3,7 @@
 # rubocop:disable Style/GlobalVars
 require 'mkmf'
 
-require 'english'
+require 'English'
 require 'rubygems'
 gem 'glib2'
 require 'mkmf-gnome2'
