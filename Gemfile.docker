@@ -7,8 +7,6 @@ gem 'colorscore'
 gem 'gdk_pixbuf2'
 gem 'gtk2'
 gem 'pango'
-gem 'pixbufutils'
-gem 'redeye'
 
 group :development, :test do
   gem 'rake'
