@@ -46,7 +46,7 @@ module Morandi
       if @area && !@area.width.zero? && !@area.height.zero?
         # NB: Cheap - fast & shares memory
         GdkPixbuf::Pixbuf.new(pixbuf, @area.x, @area.y,
-                        @area.width, @area.height)
+                              @area.width, @area.height)
       else
         pixbuf
       end

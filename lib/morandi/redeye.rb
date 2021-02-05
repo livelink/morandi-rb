@@ -38,21 +38,25 @@ module Morandi
   end
 end
 
-class MorandiNative::RedEye::Region
-  attr_accessor :area_min_x, :area_min_y
+module MorandiNative
+  module RedEye
+    class Region
+      attr_accessor :area_min_x, :area_min_y
 
-  def centre
-    [@area_min_x.to_i + ((maxX + minX) >> 1),
-     @area_min_y.to_i + ((maxY + minY) >> 1)]
-  end
+      def centre
+        [@area_min_x.to_i + ((maxX + minX) >> 1),
+         @area_min_y.to_i + ((maxY + minY) >> 1)]
+      end
 
-  # Pythagorean
-  def distance_from(x_coord, y_coord)
-    cx, cy = centre
+      # Pythagorean
+      def distance_from(x_coord, y_coord)
+        cx, cy = centre
 
-    dx = cx - x_coord
-    dy = cy - y_coord
+        dx = cx - x_coord
+        dy = cy - y_coord
 
-    Math.sqrt((dx**2) + (dy**2))
+        Math.sqrt((dx**2) + (dy**2))
+      end
+    end
   end
 end
