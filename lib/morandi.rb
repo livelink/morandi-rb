@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
 require 'morandi/version'
-require 'gtk2/base'
 require 'cairo'
 require 'gdk_pixbuf2'
-require 'pixbufutils'
-require 'redeye'
+require 'morandi_native'
 
 require 'morandi/image_processor'
 require 'morandi/utils'
