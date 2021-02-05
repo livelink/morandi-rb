@@ -39,7 +39,7 @@ module Morandi
 end
 
 module MorandiNative
-  module RedEye
+  class RedEye
     class Region
       attr_accessor :area_min_x, :area_min_y
 
