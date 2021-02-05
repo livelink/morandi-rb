@@ -4,6 +4,7 @@ require 'morandi/profiled_pixbuf'
 require 'morandi/redeye'
 
 module Morandi
+  # rubocop:disable Metrics/ClassLength
   class ImageProcessor
     attr_reader :options, :pb
     attr_accessor :config
@@ -117,11 +118,14 @@ module Morandi
         @pb = MorandiNative::PixbufUtils.brightness(@pb, brighten)
       end
 
-      @pb = MorandiNative::PixbufUtils.gamma(@pb, options['gamma']) if options['gamma'] && not_equal_to_one(options['gamma'])
+      if options['gamma'] && not_equal_to_one(options['gamma'])
+        @pb = MorandiNative::PixbufUtils.gamma(@pb,
+                                               options['gamma'])
+      end
 
       if options['contrast'].to_i.nonzero?
         @pb = MorandiNative::PixbufUtils.contrast(@pb,
-                                   [[5 * options['contrast'], -100].max, 100].min)
+                                                  [[5 * options['contrast'], -100].max, 100].min)
       end
 
       return unless options['sharpen'].to_i.nonzero?
@@ -234,4 +238,5 @@ module Morandi
       (float - 1.0) >= Float::EPSILON
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end
