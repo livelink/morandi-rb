@@ -4,7 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## Last updated 16.12.2020
+## Last updated 19.02.2021
+
+### Added
+- Copied pixbufutils and redeye gems into main gem
+- Added gdk_pixbuf_cairo C extension to convert between GdkPixbufs and ImageSurfaces
+- Added Ruby 3 support
+- Bumped version to 0.99.01 in preparation for a 1.0 release
+
+### Removed
+- gtk2 dependency
 
 ## [0.13.0] 16.12.2020
 ### Fixed

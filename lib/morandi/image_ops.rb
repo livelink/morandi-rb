@@ -2,9 +2,7 @@
 
 require 'pango'
 require 'colorscore'
-require 'gdk3'
-require 'gdk3/loader'
-Gdk::Loader.new(Gdk).load
+require 'morandi/cairo'
 
 module Morandi
   class ImageOp

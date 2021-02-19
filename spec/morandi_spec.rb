@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-require 'fileutils'
-require 'morandi'
+require_relative 'spec_helper'
 
 RSpec.describe Morandi, '#process' do
   subject(:process_image) do

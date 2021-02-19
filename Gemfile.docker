@@ -5,7 +5,6 @@ source 'https://rubygems.org'
 gem 'cairo'
 gem 'colorscore'
 gem 'gdk_pixbuf2'
-gem 'gtk2'
 gem 'pango'
 
 group :development, :test do

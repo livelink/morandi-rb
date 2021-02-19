@@ -6,6 +6,12 @@
 # loaded once.
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
+require 'fileutils'
+
+require 'morandi'
+require 'gdk_pixbuf_cairo'
+require 'morandi_native'
+require "super_diff/rspec"
 
 require 'pry'
 
