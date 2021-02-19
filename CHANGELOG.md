@@ -5,9 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Added
+- Copied pixbufutils and redeye gems into main gem
+- Added gdk_pixbuf_cairo C extension to convert between GdkPixbufs and ImageSurfaces
+- Added Ruby 3 support
+- Bumped version to 0.99.01 in preparation for a 1.0 release
+
 ### Removed
 - support for Ruby 2.0 (and illusion of it being tested by CI)
 - support for Ruby 2.3
+- gtk2 dependency
 
 ## [0.13.0] 16.12.2020
 ### Fixed
