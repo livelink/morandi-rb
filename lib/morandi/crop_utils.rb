@@ -3,7 +3,8 @@
 require 'gdk_pixbuf2'
 
 module Morandi
-  module Utils
+  # Utility functions relating to cropping
+  module CropUtils
     module_function
 
     def autocrop_coords(i_width, i_height, width, height)
@@ -97,31 +98,6 @@ module Morandi
         pixbuf = pixbuf.subpixbuf(x_coord, y_coord, width, height)
       end
       pixbuf
-    end
-  end
-end
-
-module GdkPixbuf
-  class Pixbuf
-    InterpType = GdkPixbuf::InterpType unless defined?(::Gdk::Pixbuf::InterpType)
-
-    def scale_max(max_size, interp = GdkPixbuf::Pixbuf::InterpType::BILINEAR, _max_scale = 1.0)
-      mul = (max_size / [width, height].max.to_f)
-      mul = [1.0, mul].min
-      scale(width * mul, height * mul, interp)
-    end
-  end
-end
-
-module Cairo
-  class ImageSurface
-    def to_pixbuf
-      loader = GdkPixbuf::PixbufLoader.new
-      io = StringIO.new
-      write_to_png(io)
-      io.rewind
-      loader.last_write(io.read)
-      loader.pixbuf
     end
   end
 end
