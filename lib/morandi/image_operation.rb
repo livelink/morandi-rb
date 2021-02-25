@@ -4,6 +4,7 @@ require 'colorscore'
 
 module Morandi
   # Base Image Op class
+  # @!visibility private
   class ImageOperation
     class << self
       def new_from_hash(hash)
@@ -18,6 +19,7 @@ module Morandi
 
   # Straighten operation
   # Does a small (ie. not 90,180,270 deg) rotation and zooms to avoid cropping
+  # @!visibility private
   class Straighten < ImageOperation
     attr_accessor :angle
 
@@ -58,6 +60,7 @@ module Morandi
   # Image Border operation
   # Supports retro (rounded) and square borders
   # Background colour (ie. border colour) can be white, black, dominant (ie. from image)
+  # @!visibility private
   class ImageBorder < ImageOperation
     attr_accessor :style, :colour, :crop, :size, :print_size, :shrink, :border_size
 

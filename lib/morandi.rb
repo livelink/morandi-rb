@@ -16,7 +16,7 @@ module Morandi
 
   def process(file_in, options, file_out, local_options = {})
     pro = ImageProcessor.new(file_in, options, local_options)
-    pro.process!
+    pro.result
     pro.write_to_jpeg(file_out)
   end
 end
