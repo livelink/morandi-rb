@@ -5,7 +5,8 @@ require 'morandi/redeye'
 
 module Morandi
   # rubocop:disable Metrics/ClassLength
-  # ImageProcessor does the actual application of settings to an image.
+
+  # ImageProcessor transforms an image.
   class ImageProcessor
     attr_reader :options, :pb
     attr_accessor :config
@@ -22,7 +23,9 @@ module Morandi
       @scale_to = @options['output.max']
       @width = @options['output.width']
       @height = @options['output.height']
+    end
 
+    def process!
       case @file
       when String
         get_pixbuf
@@ -30,9 +33,7 @@ module Morandi
         @pb = @file
         @scale = 1.0
       end
-    end
 
-    def process!
       # Apply Red-Eye corrections
       apply_redeye!
 
@@ -56,7 +57,9 @@ module Morandi
       @pb
     end
 
+    # Returns generated pixbuf
     def result
+      process! unless @pb
       @pb
     end
 
