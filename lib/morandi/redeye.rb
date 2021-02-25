@@ -7,6 +7,7 @@ module Morandi
     # e.g. continuous red eyeglasses frame or sunburnt person's skin around eyes forming an area
     RED_AREA_DENSITY_THRESHOLD = 0.3
 
+    # RedEye finder that looks for "eye" closest to a point
     module TapRedEye
       module_function
 
@@ -16,6 +17,7 @@ module Morandi
         x2  = [x_coord + n, pixbuf.width].min
         y1  = [y_coord - n, 0].max
         y2  = [y_coord + n, pixbuf.height].min
+
         return pixbuf unless (x1 >= 0) && (x2 > x1) && (y1 >= 0) && (y2 > y1)
 
         red_eye = MorandiNative::RedEye.new(pixbuf, x1, y1, x2, y2)
@@ -42,21 +44,6 @@ module MorandiNative
   class RedEye
     class Region
       attr_accessor :area_min_x, :area_min_y
-
-      def centre
-        [@area_min_x.to_i + ((maxX + minX) >> 1),
-         @area_min_y.to_i + ((maxY + minY) >> 1)]
-      end
-
-      # Pythagorean
-      def distance_from(x_coord, y_coord)
-        cx, cy = centre
-
-        dx = cx - x_coord
-        dy = cy - y_coord
-
-        Math.sqrt((dx**2) + (dy**2))
-      end
     end
   end
 end

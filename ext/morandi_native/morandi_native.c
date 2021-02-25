@@ -344,7 +344,7 @@ static void free_redeye(redeyeop_t *ptr) {
     free(ptr);
 }
 
-inline gboolean in_region(redeyeop_t *op, int x, int y, int blob_id) {
+static gboolean in_region(redeyeop_t *op, int x, int y, int blob_id) {
     int index;
 
     if (x < op->area.minX || x > op->area.maxX ||
@@ -356,7 +356,7 @@ inline gboolean in_region(redeyeop_t *op, int x, int y, int blob_id) {
     return op->regions.data[index] == blob_id;
 }
 
-inline double alpha_level_for_pixel(redeyeop_t *op, int x, int y, int blob_id) {
+static double alpha_level_for_pixel(redeyeop_t *op, int x, int y, int blob_id) {
     int j = 0, c = 0, xm, ym;
 
     if (in_region(op, x, y, blob_id))
@@ -375,7 +375,7 @@ inline double alpha_level_for_pixel(redeyeop_t *op, int x, int y, int blob_id) {
     return ((double) j) / ((double) c);
 }
 
-inline unsigned char col(double val) {
+static unsigned char col(double val) {
     if (val < 0) return 0;
     if (val > 255) return 255;
     return val;

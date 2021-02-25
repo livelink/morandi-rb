@@ -3,6 +3,8 @@
 require 'gdk_pixbuf2'
 
 module Morandi
+  # ProfiledPixbuf is a descendent of GdkPixbuf::Pixbuf with ICC support.
+  # It attempts to load an image using jpegicc/littlecms to ensure that it is sRGB.
   class ProfiledPixbuf < GdkPixbuf::Pixbuf
     def valid_jpeg?(filename)
       return false unless File.exist?(filename)
@@ -15,6 +17,7 @@ module Morandi
       false
     end
 
+    # TODO: this doesn't use lcms
     def self.from_string(string, loader: nil, chunk_size: 4096)
       loader ||= GdkPixbuf::PixbufLoader.new
       ((string.bytesize + chunk_size - 1) / chunk_size).times do |i|
@@ -46,24 +49,6 @@ module Morandi
         super(path: file, width: scale_to, height: scale_to)
       else
         super(file: file)
-      end
-    rescue Gdk::PixbufError::CorruptImage => e
-      if file.is_a?(String) && defined? Tempfile
-        temp = Tempfile.new
-        pixbuf = self.class.from_string(File.read(file))
-        pixbuf.save(temp.path, 'jpeg')
-        file = temp.path
-
-        if scale_to
-          super(path: file, width: scale_to, height: scale_to)
-        else
-          super(file: file)
-        end
-
-        temp.close
-        temp.unlink
-      else
-        throw e
       end
     end
 

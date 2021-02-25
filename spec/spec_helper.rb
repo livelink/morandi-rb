@@ -7,11 +7,15 @@
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 require 'fileutils'
+require 'simplecov'
 
+SimpleCov.start do
+  add_filter '/spec/'
+end
 require 'morandi'
 require 'gdk_pixbuf_cairo'
 require 'morandi_native'
-require "super_diff/rspec"
+require 'super_diff/rspec'
 
 require 'pry'
 

@@ -1,15 +1,16 @@
 # frozen_string_literal: true
 
 require 'morandi/version'
-require 'cairo'
-require 'gdk_pixbuf2'
 require 'morandi_native'
 
+require 'morandi/cairo_ext'
+require 'morandi/pixbuf_ext'
 require 'morandi/image_processor'
-require 'morandi/utils'
-require 'morandi/image_ops'
+require 'morandi/image_operation'
 require 'morandi/redeye'
+require 'morandi/crop_utils'
 
+# Morandi namespace should contain all the functionality of the gem
 module Morandi
   module_function
 
