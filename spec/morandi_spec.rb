@@ -4,11 +4,12 @@ require_relative 'spec_helper'
 
 RSpec.describe Morandi, '#process' do
   subject(:process_image) do
-    Morandi.process(file_in, options, file_out)
+    Morandi.process(file_arg, options, file_out)
   end
 
   let(:file_in) { 'sample/sample.jpg' }
   let(:file_out) { 'sample/sample_out.jpg' }
+  let(:file_arg) { file_in }
   let(:options) { {} }
   let(:original_image_width) { 800 }
   let(:original_image_height) { 650 }
@@ -22,7 +23,7 @@ RSpec.describe Morandi, '#process' do
   end
 
   before do
-    generate_test_image(file_in, original_image_width, original_image_height)
+    generate_test_image(file_in, original_image_width, original_image_height) unless File.exist?(file_in)
   end
 
   after do
@@ -35,6 +36,14 @@ RSpec.describe Morandi, '#process' do
 
   context 'in command mode' do
     describe 'when given an input without any options' do
+      it 'should create ouptut' do
+        process_image
+        expect(File).to exist(file_out)
+      end
+    end
+
+    describe 'when given an input without any options' do
+      let(:file_arg) { Morandi::ProfiledPixbuf.from_string(File.read(file_in)) }
       it 'should create ouptut' do
         process_image
         expect(File).to exist(file_out)
@@ -237,6 +246,23 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
+    describe 'when given a redeye option' do
+      let(:file_in) { 'spec/fixtures/public-domain-redeye-image-from-wikipedia.jpg' }
+      let(:options) { { 'redeye' => [[540, 650]] } }
+
+      it 'should blur the image' do
+        process_image
+
+        expect(File).to exist(file_out)
+        expect(processed_image_type).to eq('jpeg')
+
+        expect(crude_average_colour(GdkPixbuf::Pixbuf.new(file: file_in).subpixbuf(505, 605, 100,
+                                                                                   100))).to eq([116, 28, 43])
+        expect(crude_average_colour(GdkPixbuf::Pixbuf.new(file: file_out).subpixbuf(505, 605, 100,
+                                                                                    100))).to eq([30, 36, 37])
+      end
+    end
+
     describe 'when given a sharpen option' do
       let(:options) { { 'sharpen' => -3 } }
 
@@ -248,10 +274,85 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
+    describe 'when given a postive sharpen option' do
+      let(:options) { { 'sharpen' => 3 } }
+
+      it 'should sharpen the image' do
+        process_image
+
+        expect(File).to exist(file_out)
+        expect(processed_image_type).to eq('jpeg')
+      end
+    end
+
     describe 'when applying a border and maintaining the original size' do
       let(:options) do
         {
           'border-style' => 'square',
+          'background-style' => background_style,
+          'border-size-mm' => 5,
+          'output.width' => original_image_width,
+          'output.height' => original_image_height
+        }
+      end
+
+      context 'dominant colour background' do
+        let(:background_style) { 'dominant' }
+
+        it 'should maintain the target size' do
+          process_image
+
+          expect(File).to exist(file_out)
+          expect(processed_image_type).to eq('jpeg')
+          expect(processed_image_width).to eq(original_image_width)
+          expect(processed_image_height).to eq(original_image_height)
+        end
+      end
+
+      context 'black colour background' do
+        let(:background_style) { 'black' }
+
+        it 'should maintain the target size' do
+          process_image
+
+          expect(File).to exist(file_out)
+          expect(processed_image_type).to eq('jpeg')
+          expect(processed_image_width).to eq(original_image_width)
+          expect(processed_image_height).to eq(original_image_height)
+        end
+      end
+
+      context 'white colour background' do
+        let(:background_style) { 'white' }
+
+        it 'should maintain the target size' do
+          process_image
+
+          expect(File).to exist(file_out)
+          expect(processed_image_type).to eq('jpeg')
+          expect(processed_image_width).to eq(original_image_width)
+          expect(processed_image_height).to eq(original_image_height)
+        end
+      end
+
+      context 'retro colour background' do
+        let(:background_style) { 'retro' }
+
+        it 'should maintain the target size' do
+          process_image
+
+          expect(File).to exist(file_out)
+          expect(processed_image_type).to eq('jpeg')
+          expect(processed_image_width).to eq(original_image_width)
+          expect(processed_image_height).to eq(original_image_height)
+        end
+      end
+    end
+
+    describe 'when applying a retro border and maintaining the original size' do
+      let(:options) do
+        {
+          'border-style' => 'retro',
           'background-style' => 'dominant',
           'border-size-mm' => 5,
           'output.width' => original_image_width,
@@ -341,5 +442,20 @@ RSpec.describe Morandi, '#process' do
       'plasma:red-blue',
       at_file_path
     )
+  end
+
+  def crude_average_colour(pixbuf)
+    get_pixels = lambda do |pb|
+      pb.pixels.each_slice(pb.rowstride).map do |row|
+        row.each_slice(3).to_a[0...pb.width]
+      end.to_a[0...pb.height].flatten(1)
+    end
+    avg_color = lambda do |pixels|
+      list = pixels.inject([0, 0, 0]) do |(br, bg, bb), (r, g, b)|
+        [br + r, bg + g, bb + b]
+      end
+      list.map { |a| (a / pixels.size.to_f).to_i }
+    end
+    avg_color.call(get_pixels.call(pixbuf))
   end
 end

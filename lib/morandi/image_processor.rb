@@ -5,13 +5,10 @@ require 'morandi/redeye'
 
 module Morandi
   # rubocop:disable Metrics/ClassLength
+  # ImageProcessor does the actual application of settings to an image.
   class ImageProcessor
     attr_reader :options, :pb
     attr_accessor :config
-
-    def self.default_icc_path(path)
-      "#{path}.icc.jpg"
-    end
 
     def initialize(file, user_options, local_options = {})
       @file = file
@@ -142,7 +139,7 @@ module Morandi
     end
 
     def apply_redeye!
-      options['redeye'] || [].each do |eye|
+      (options['redeye'] || []).each do |eye|
         @pb = Morandi::RedEye::TapRedEye.tap_on(@pb, eye[0] * @scale, eye[1] * @scale)
       end
     end
@@ -158,7 +155,10 @@ module Morandi
 
       @pb = @pb.rotate(a) unless (a % 360).zero?
 
-      @pb = Morandi::Straighten.new(options['straighten'].to_f).call(nil, @pb) unless options['straighten'].to_f.zero?
+      unless options['straighten'].to_f.zero?
+        @pb = Morandi::Straighten.new_from_hash(angle: options['straighten'].to_f).call(nil,
+                                                                                        @pb)
+      end
 
       @image_width = @pb.width
       @image_height = @pb.height
@@ -190,9 +190,9 @@ module Morandi
 
       crop = crop.map { |s| (s.to_f * @scale).floor } if crop && not_equal_to_one(@scale)
 
-      crop ||= Morandi::Utils.autocrop_coords(@pb.width, @pb.height, @width, @height)
+      crop ||= Morandi::CropUtils.autocrop_coords(@pb.width, @pb.height, @width, @height)
 
-      @pb = Morandi::Utils.apply_crop(@pb, crop[0], crop[1], crop[2], crop[3])
+      @pb = Morandi::CropUtils.apply_crop(@pb, crop[0], crop[1], crop[2], crop[3])
     end
 
     def apply_filters!
@@ -200,7 +200,7 @@ module Morandi
 
       case filter
       when 'greyscale', 'sepia', 'bluetone'
-        op = Morandi::Colourify.new_from_hash('op' => filter)
+        op = Morandi::Colourify.new_from_hash('filter' => filter)
       else
         return
       end

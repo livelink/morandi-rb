@@ -22,7 +22,7 @@ Metrics/AbcSize:
 # Configuration parameters: CountComments, CountAsOne, ExcludedMethods, IgnoredMethods.
 # IgnoredMethods: refine
 Metrics/BlockLength:
-  Max: 269
+  Max: 363
 
 # Offense count: 1
 # Configuration parameters: CountComments, CountAsOne.
@@ -42,12 +42,22 @@ Metrics/MethodLength:
 # Offense count: 1
 # Configuration parameters: CountKeywordArgs, MaxOptionalParameters.
 Metrics/ParameterLists:
-  Max: 6
+  Max: 7
 
 # Offense count: 6
 # Configuration parameters: IgnoredMethods.
 Metrics/PerceivedComplexity:
   Max: 17
+
+Naming/MethodParameterName:
+  AllowedNames:
+    - x
+    - y
+    - cr
+    - x1
+    - y1
+    - x2
+    - y2
 
 # Offense count: 1
 Naming/AccessorMethodName:
@@ -59,9 +69,4 @@ Style/Documentation:
   Exclude:
     - 'spec/**/*'
     - 'test/**/*'
-    - 'lib/morandi.rb'
-    - 'lib/morandi/image_ops.rb'
-    - 'lib/morandi/image_processor.rb'
-    - 'lib/morandi/profiled_pixbuf.rb'
-    - 'lib/morandi/redeye.rb'
-    - 'lib/morandi/utils.rb'
+
