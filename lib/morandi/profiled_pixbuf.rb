@@ -46,7 +46,7 @@ module Morandi
       end
 
       if scale_to
-        super(path: file, width: scale_to, height: scale_to)
+        super(file: file, width: scale_to, height: scale_to)
       else
         super(file: file)
       end
