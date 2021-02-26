@@ -37,8 +37,8 @@ module Morandi
 
       if suitable_for_jpegicc?
         icc_file = icc_cache_path
-
-        file = icc_file if valid_jpeg?(icc_file) || system('jpgicc', '-q97', @file, icc_file)
+        valid_jpeg?(icc_file) || system('jpgicc', '-q97', @file, icc_file)
+        file = icc_file if valid_jpeg?(icc_file)
       end
 
       if scale_to
