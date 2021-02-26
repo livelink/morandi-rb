@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-require 'fileutils'
-require 'morandi'
+require_relative 'spec_helper'
 
 RSpec.describe Morandi, '#process' do
   subject(:process_image) do
-    Morandi.process(file_in, options, file_out)
+    Morandi.process(file_arg, options, file_out)
   end
 
   let(:file_in) { 'sample/sample.jpg' }
   let(:file_out) { 'sample/sample_out.jpg' }
+  let(:file_arg) { file_in }
   let(:options) { {} }
   let(:original_image_width) { 800 }
   let(:original_image_height) { 650 }
@@ -19,15 +19,20 @@ RSpec.describe Morandi, '#process' do
   let(:processed_image_height) { processed_image_info[2] }
 
   before(:all) do
-    Dir.mkdir('sample/')
+    FileUtils.mkdir_p('sample')
+    FileUtils.rm_rf(Dir['sample/*'])
+    FileUtils.rm_rf('spec/reports')
+    FileUtils.mkdir_p('spec/reports/images')
+    create_visual_report
   end
 
   before do
-    generate_test_image(file_in, original_image_width, original_image_height)
+    generate_test_image(file_in, original_image_width, original_image_height) unless File.exist?(file_in)
   end
 
-  after do
-    FileUtils.rm_rf(Dir['sample/*'])
+  after do |ex|
+    add_to_visual_report(ex, files = Dir['sample/*'])
+    FileUtils.rm_rf(files)
   end
 
   after(:all) do
@@ -39,6 +44,41 @@ RSpec.describe Morandi, '#process' do
       it 'should create ouptut' do
         process_image
         expect(File).to exist(file_out)
+      end
+    end
+
+    describe 'when given a pixbuf instead of a file' do
+      let!(:file_arg) { Morandi::ProfiledPixbuf.from_string(File.read(file_in)) }
+      it 'should create ouptut' do
+        FileUtils.rm_f(file_in)
+        process_image
+        expect(File).to exist(file_out)
+      end
+    end
+
+    describe 'when given a blank file' do
+      it 'should fail' do
+        File.open(file_in, 'w') { |fp| fp << '' }
+        expect { process_image }.to raise_exception(GdkPixbuf::PixbufError::CorruptImage)
+        expect(File).not_to exist(file_out)
+      end
+    end
+
+    describe 'when given a corrupt file' do
+      it 'should fail' do
+        File.open(file_in, 'ab') { |fp| fp.truncate(64) }
+        expect { process_image }.to raise_exception(GdkPixbuf::PixbufError::CorruptImage)
+        expect(File).not_to exist(file_out)
+      end
+    end
+
+    describe 'when given a invalid file format' do
+      it 'should fail' do
+        File.open(file_in, 'wb') { |fp| fp << 'INVALID' }
+        (expect { process_image }).to(raise_error do |err|
+          err.is_a?(GdkPixbuf::PixbufError::UnknownType) or err.is_a?(GdkPixbuf::PixbufError::CorruptImage)
+        end)
+        expect(File).not_to exist(file_out)
       end
     end
 
@@ -77,7 +117,7 @@ RSpec.describe Morandi, '#process' do
         Morandi.process(pixbuf, options, file_out)
       end
 
-      let(:pixbuf) { GdkPixbuf::Pixbuf.new(file_in) }
+      let(:pixbuf) { GdkPixbuf::Pixbuf.new(file: file_in) }
 
       it 'should process the file' do
         process_image
@@ -194,9 +234,10 @@ RSpec.describe Morandi, '#process' do
     end
 
     describe 'when given a gamma option' do
-      let(:options) { { 'gamma' => 1.2 } }
+      let(:options) { { 'gamma' => 2.0 } }
 
-      it 'should reduce the straighten images' do
+      it 'should apply the gamma to the image' do
+        expect(MorandiNative::PixbufUtils).to receive(:gamma).and_call_original
         process_image
 
         expect(File).to exist(file_out)
@@ -238,6 +279,39 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
+    describe 'when given a redeye option' do
+      let(:file_in) { 'spec/fixtures/public-domain-redeye-image-from-wikipedia.jpg' }
+      let(:options) { { 'redeye' => [[540, 650]] } }
+
+      it 'should correct the redeye' do
+        process_image
+
+        expect(File).to exist(file_out)
+        expect(processed_image_type).to eq('jpeg')
+
+        expect(crude_average_colour(GdkPixbuf::Pixbuf.new(file: file_in).subpixbuf(505, 605, 100,
+                                                                                   100))).to be_redish
+        expect(crude_average_colour(GdkPixbuf::Pixbuf.new(file: file_out).subpixbuf(505, 605, 100,
+                                                                                    100))).to be_greyish
+      end
+
+      context 'with a black image and invalid spots' do
+        let(:file_arg) { solid_colour_image(800, 800, 0x666666ff) }
+        let(:options) { { 'redeye' => [[540, 650], [-100, 100]] } }
+
+        it 'should not break or corrupt the image' do
+          process_image
+
+          expect(File).to exist(file_out)
+          expect(processed_image_type).to eq('jpeg')
+
+          expect(crude_average_colour(file_arg.subpixbuf(505, 605, 100, 100))).to be_greyish
+          expect(crude_average_colour(GdkPixbuf::Pixbuf.new(file: file_out).subpixbuf(505, 605, 100,
+                                                                                      100))).to be_greyish
+        end
+      end
+    end
+
     describe 'when given a sharpen option' do
       let(:options) { { 'sharpen' => -3 } }
 
@@ -249,10 +323,85 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
+    describe 'when given a postive sharpen option' do
+      let(:options) { { 'sharpen' => 3 } }
+
+      it 'should sharpen the image' do
+        process_image
+
+        expect(File).to exist(file_out)
+        expect(processed_image_type).to eq('jpeg')
+      end
+    end
+
     describe 'when applying a border and maintaining the original size' do
       let(:options) do
         {
           'border-style' => 'square',
+          'background-style' => background_style,
+          'border-size-mm' => 5,
+          'output.width' => original_image_width,
+          'output.height' => original_image_height
+        }
+      end
+
+      context 'dominant colour background' do
+        let(:background_style) { 'dominant' }
+
+        it 'should maintain the target size' do
+          process_image
+
+          expect(File).to exist(file_out)
+          expect(processed_image_type).to eq('jpeg')
+          expect(processed_image_width).to eq(original_image_width)
+          expect(processed_image_height).to eq(original_image_height)
+        end
+      end
+
+      context 'black colour background' do
+        let(:background_style) { 'black' }
+
+        it 'should maintain the target size' do
+          process_image
+
+          expect(File).to exist(file_out)
+          expect(processed_image_type).to eq('jpeg')
+          expect(processed_image_width).to eq(original_image_width)
+          expect(processed_image_height).to eq(original_image_height)
+        end
+      end
+
+      context 'white colour background' do
+        let(:background_style) { 'white' }
+
+        it 'should maintain the target size' do
+          process_image
+
+          expect(File).to exist(file_out)
+          expect(processed_image_type).to eq('jpeg')
+          expect(processed_image_width).to eq(original_image_width)
+          expect(processed_image_height).to eq(original_image_height)
+        end
+      end
+
+      context 'retro colour background' do
+        let(:background_style) { 'retro' }
+
+        it 'should maintain the target size' do
+          process_image
+
+          expect(File).to exist(file_out)
+          expect(processed_image_type).to eq('jpeg')
+          expect(processed_image_width).to eq(original_image_width)
+          expect(processed_image_height).to eq(original_image_height)
+        end
+      end
+    end
+
+    describe 'when applying a retro border and maintaining the original size' do
+      let(:options) do
+        {
+          'border-style' => 'retro',
           'background-style' => 'dominant',
           'border-size-mm' => 5,
           'output.width' => original_image_width,
@@ -330,17 +479,5 @@ RSpec.describe Morandi, '#process' do
     it 'creates files of increasing size' do
       expect(created_file_sizes.sort).to eq(files_in_increasing_quality_order)
     end
-  end
-
-  def generate_test_image(at_file_path, width = 600, height = 300)
-    system(
-      'convert',
-      '-size',
-      "#{width}x#{height}",
-      '-seed',
-      '5432',
-      'plasma:red-blue',
-      at_file_path
-    )
   end
 end

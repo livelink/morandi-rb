@@ -3,36 +3,39 @@
 require 'gdk_pixbuf2'
 
 module Morandi
-  module Utils
+  # Utility functions relating to cropping
+  module CropUtils
     module_function
 
-    def autocrop_coords(i_width, i_height, width, height)
-      return nil unless width
+    def autocrop_coords(pixbuf_width, pixbuf_height, target_width, target_height)
+      return nil unless target_width
 
-      aspect = width.to_f / height
-      iaspect = i_width.to_f / i_height
+      aspect = target_width.to_f / target_height
+      pixbuf_aspect = pixbuf_width.to_f / pixbuf_height
 
-      if i_height > i_width
+      # TODO: this looks wrong - typically relative aspect ratios matter more
+      # than whether this is portrait or landscape
+      if pixbuf_height > pixbuf_width
         # Portrait image
         # Check whether the aspect ratio is greater or smaller
         # ie. where constraints will hit
-        aspect = height.to_f / width
+        aspect = target_height.to_f / target_width
       end
 
       # Landscape
-      if aspect > iaspect
+      if aspect > pixbuf_aspect
         # Width constraint - aspect-rect wider
-        crop_width  = i_width
+        crop_width  = pixbuf_width
         crop_height = (crop_width / aspect).to_i
       else
         # Height constraint - aspect-rect wider
-        crop_height = i_height
+        crop_height = pixbuf_height
         crop_width  = (crop_height * aspect).to_i
       end
 
       [
-        ((i_width - crop_width) >> 1),
-        ((i_height - crop_height) >> 1),
+        ((pixbuf_width - crop_width) >> 1),
+        ((pixbuf_height - crop_height) >> 1),
         crop_width,
         crop_height
       ].map(&:to_i)
@@ -97,31 +100,6 @@ module Morandi
         pixbuf = pixbuf.subpixbuf(x_coord, y_coord, width, height)
       end
       pixbuf
-    end
-  end
-end
-
-module GdkPixbuf
-  class Pixbuf
-    InterpType = GdkPixbuf::InterpType unless defined?(::Gdk::Pixbuf::InterpType)
-
-    def scale_max(max_size, interp = GdkPixbuf::Pixbuf::InterpType::BILINEAR, _max_scale = 1.0)
-      mul = (max_size / [width, height].max.to_f)
-      mul = [1.0, mul].min
-      scale(width * mul, height * mul, interp)
-    end
-  end
-end
-
-module Cairo
-  class ImageSurface
-    def to_pixbuf
-      loader = GdkPixbuf::PixbufLoader.new
-      io = StringIO.new
-      write_to_png(io)
-      io.rewind
-      loader.last_write(io.read)
-      loader.pixbuf
     end
   end
 end

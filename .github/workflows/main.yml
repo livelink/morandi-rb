@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby: [2.0, 2.3, 2.7]
+        ruby: [2.0, 2.3, 2.7, 3.0]
     name: install dependencies and run tests
     steps:
       - name: install image processing dependencies
@@ -48,5 +48,7 @@ jobs:
         run: |
           gem install bundler
           bundle install
+      - name: build the extension
+        run: bundle exec rake compile
       - name: run the tests
         run: bundle exec rspec

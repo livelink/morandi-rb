@@ -4,13 +4,12 @@ require 'morandi/profiled_pixbuf'
 require 'morandi/redeye'
 
 module Morandi
+  # rubocop:disable Metrics/ClassLength
+
+  # ImageProcessor transforms an image.
   class ImageProcessor
     attr_reader :options, :pb
     attr_accessor :config
-
-    def self.default_icc_path(path)
-      "#{path}.icc.jpg"
-    end
 
     def initialize(file, user_options, local_options = {})
       @file = file
@@ -24,7 +23,9 @@ module Morandi
       @scale_to = @options['output.max']
       @width = @options['output.width']
       @height = @options['output.height']
+    end
 
+    def process!
       case @file
       when String
         get_pixbuf
@@ -32,9 +33,7 @@ module Morandi
         @pb = @file
         @scale = 1.0
       end
-    end
 
-    def process!
       # Apply Red-Eye corrections
       apply_redeye!
 
@@ -58,7 +57,9 @@ module Morandi
       @pb
     end
 
+    # Returns generated pixbuf
     def result
+      process! unless @pb
       @pb
     end
 
@@ -114,31 +115,34 @@ module Morandi
     def apply_colour_manipulations!
       if options['brighten'].to_i.nonzero?
         brighten = [[5 * options['brighten'], -100].max, 100].min
-        @pb = PixbufUtils.brightness(@pb, brighten)
+        @pb = MorandiNative::PixbufUtils.brightness(@pb, brighten)
       end
 
-      @pb = PixbufUtils.gamma(@pb, options['gamma']) if options['gamma'] && not_equal_to_one(options['gamma'])
+      if options['gamma'] && not_equal_to_one(options['gamma'])
+        @pb = MorandiNative::PixbufUtils.gamma(@pb,
+                                               options['gamma'])
+      end
 
       if options['contrast'].to_i.nonzero?
-        @pb = PixbufUtils.contrast(@pb,
-                                   [[5 * options['contrast'], -100].max, 100].min)
+        @pb = MorandiNative::PixbufUtils.contrast(@pb,
+                                                  [[5 * options['contrast'], -100].max, 100].min)
       end
 
       return unless options['sharpen'].to_i.nonzero?
 
       if options['sharpen'].positive?
         [options['sharpen'], 5].min.times do
-          @pb = PixbufUtils.filter(@pb, SHARPEN, SHARPEN.inject(0, &:+))
+          @pb = MorandiNative::PixbufUtils.filter(@pb, SHARPEN, SHARPEN.inject(0, &:+))
         end
       elsif options['sharpen'].negative?
         [(options['sharpen'] * -1), 5].min.times do
-          @pb = PixbufUtils.filter(@pb, BLUR, BLUR.inject(0, &:+))
+          @pb = MorandiNative::PixbufUtils.filter(@pb, BLUR, BLUR.inject(0, &:+))
         end
       end
     end
 
     def apply_redeye!
-      options['redeye'] || [].each do |eye|
+      (options['redeye'] || []).each do |eye|
         @pb = Morandi::RedEye::TapRedEye.tap_on(@pb, eye[0] * @scale, eye[1] * @scale)
       end
     end
@@ -154,7 +158,10 @@ module Morandi
 
       @pb = @pb.rotate(a) unless (a % 360).zero?
 
-      @pb = Morandi::Straighten.new(options['straighten'].to_f).call(nil, @pb) unless options['straighten'].to_f.zero?
+      unless options['straighten'].to_f.zero?
+        @pb = Morandi::Straighten.new_from_hash(angle: options['straighten'].to_f).call(nil,
+                                                                                        @pb)
+      end
 
       @image_width = @pb.width
       @image_height = @pb.height
@@ -186,9 +193,9 @@ module Morandi
 
       crop = crop.map { |s| (s.to_f * @scale).floor } if crop && not_equal_to_one(@scale)
 
-      crop ||= Morandi::Utils.autocrop_coords(@pb.width, @pb.height, @width, @height)
+      crop ||= Morandi::CropUtils.autocrop_coords(@pb.width, @pb.height, @width, @height)
 
-      @pb = Morandi::Utils.apply_crop(@pb, crop[0], crop[1], crop[2], crop[3])
+      @pb = Morandi::CropUtils.apply_crop(@pb, crop[0], crop[1], crop[2], crop[3])
     end
 
     def apply_filters!
@@ -196,7 +203,7 @@ module Morandi
 
       case filter
       when 'greyscale', 'sepia', 'bluetone'
-        op = Morandi::Colourify.new_from_hash('op' => filter)
+        op = Morandi::Colourify.new_from_hash('filter' => filter)
       else
         return
       end
@@ -234,4 +241,5 @@ module Morandi
       (float - 1.0) >= Float::EPSILON
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end
