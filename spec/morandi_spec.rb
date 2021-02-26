@@ -75,7 +75,9 @@ RSpec.describe Morandi, '#process' do
     describe 'when given a invalid file format' do
       it 'should fail' do
         File.open(file_in, 'wb') { |fp| fp << 'INVALID' }
-        expect { process_image }.to raise_exception(GdkPixbuf::PixbufError::UnknownType)
+        expect { process_image }.to raise_error { |err|
+          err.is_a?(GdkPixbuf::PixbufError::UnknownType) or err.is_a?(GdkPixbuf::PixbufError::CorruptImage)
+        }
         expect(File).not_to exist(file_out)
       end
     end
