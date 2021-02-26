@@ -11,7 +11,7 @@ require 'simplecov'
 
 SimpleCov.start do
   add_filter '/spec/'
-  enable_coverage :branch if RUBY_VERSION >= "2.5.0"
+  enable_coverage :branch if RUBY_VERSION >= '2.5.0'
 end
 require 'morandi'
 require 'gdk_pixbuf_cairo'
@@ -46,6 +46,6 @@ end
 RSpec::Matchers.define :be_greyish do
   match do |colour|
     average = (colour.inject(&:+) / colour.size)
-    colour.all? { |channel| (average - channel).abs < 15  }
+    colour.all? { |channel| (average - channel).abs < 15 }
   end
 end

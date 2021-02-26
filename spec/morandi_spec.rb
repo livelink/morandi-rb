@@ -25,7 +25,6 @@ RSpec.describe Morandi, '#process' do
     FileUtils.mkdir_p('spec/reports/images')
     create_visual_report
     puts "Creating visual report #{visual_report_path}"
-
   end
 
   before do
@@ -39,10 +38,9 @@ RSpec.describe Morandi, '#process' do
 
   after(:all) do
     FileUtils.remove_dir('sample/')
-    puts "Reminder:"
+    puts 'Reminder:'
     puts "Visual report is available here: #{visual_report_path}"
-    puts "Coverage report is here: coverage/index.html"
-
+    puts 'Coverage report is here: coverage/index.html'
   end
 
   context 'in command mode' do
