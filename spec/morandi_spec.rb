@@ -80,7 +80,6 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-
     describe 'with a big image and a bigger cropped area to fill' do
       let(:options) do
         {
