@@ -4,6 +4,9 @@ module VisualReportHelper
   class << self
     attr_accessor :group
   end
+
+  module_function
+
   def visual_report_path
     'spec/reports/visual_report.html'
   end

@@ -24,7 +24,6 @@ RSpec.describe Morandi, '#process' do
     FileUtils.rm_rf('spec/reports')
     FileUtils.mkdir_p('spec/reports/images')
     create_visual_report
-    puts "Creating visual report #{visual_report_path}"
   end
 
   before do
@@ -38,9 +37,6 @@ RSpec.describe Morandi, '#process' do
 
   after(:all) do
     FileUtils.remove_dir('sample/')
-    puts 'Reminder:'
-    puts "Visual report is available here: #{visual_report_path}"
-    puts 'Coverage report is here: coverage/index.html'
   end
 
   context 'in command mode' do
@@ -261,7 +257,7 @@ RSpec.describe Morandi, '#process' do
       let(:file_in) { 'spec/fixtures/public-domain-redeye-image-from-wikipedia.jpg' }
       let(:options) { { 'redeye' => [[540, 650]] } }
 
-      it 'should blur the image' do
+      it 'should correct the redeye' do
         process_image
 
         expect(File).to exist(file_out)
@@ -271,6 +267,22 @@ RSpec.describe Morandi, '#process' do
                                                                                    100))).to be_redish
         expect(crude_average_colour(GdkPixbuf::Pixbuf.new(file: file_out).subpixbuf(505, 605, 100,
                                                                                     100))).to be_greyish
+      end
+
+      context 'with a black image and invalid spots' do
+        let(:file_arg) { solid_colour_image(800, 800, 0x666666ff) }
+        let(:options) { { 'redeye' => [[540, 650], [-100, 100]] } }
+
+        it 'should not break or corrupt the image' do
+          process_image
+
+          expect(File).to exist(file_out)
+          expect(processed_image_type).to eq('jpeg')
+
+          expect(crude_average_colour(file_arg.subpixbuf(505, 605, 100, 100))).to be_greyish
+          expect(crude_average_colour(GdkPixbuf::Pixbuf.new(file: file_out).subpixbuf(505, 605, 100,
+                                                                                      100))).to be_greyish
+        end
       end
     end
 

@@ -14,10 +14,20 @@ module ColourHelper
     )
   end
 
+  def solid_colour_image(width, height, colour = 0x000000ff)
+    pb = GdkPixbuf::Pixbuf.new(colorspace: GdkPixbuf::Colorspace::RGB,
+                               has_alpha: false,
+                               bits_per_sample: 8,
+                               width: width,
+                               height: height)
+    pb.fill!(colour)
+    pb
+  end
+
   def crude_average_colour(pixbuf)
     get_pixels = lambda do |pb|
       pb.pixels.each_slice(pb.rowstride).map do |row|
-        row.each_slice(3).to_a[0...pb.width]
+        row.each_slice(pb.n_channels).to_a[0...pb.width]
       end.to_a[0...pb.height].flatten(1)
     end
     avg_color = lambda do |pixels|

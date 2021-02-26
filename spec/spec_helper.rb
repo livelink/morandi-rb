@@ -33,6 +33,16 @@ RSpec.configure do |config|
   config.order = 'random'
   config.include ColourHelper
   config.include VisualReportHelper
+
+  config.before(:suite) do
+    puts "Creating visual report #{VisualReportHelper.visual_report_path}"
+  end
+
+  config.after(:suite) do
+    puts 'Reminder:'
+    puts "Visual report is available here: #{VisualReportHelper.visual_report_path}"
+    puts 'Coverage report is here: coverage/index.html'
+  end
 end
 
 RSpec::Matchers.define :be_redish do
