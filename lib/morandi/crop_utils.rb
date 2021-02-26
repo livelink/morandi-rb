@@ -13,6 +13,8 @@ module Morandi
       aspect = target_width.to_f / target_height
       pixbuf_aspect = pixbuf_width.to_f / pixbuf_height
 
+      # TODO: this looks wrong - typically relative aspect ratios matter more
+      # than whether this is portrait or landscape
       if pixbuf_height > pixbuf_width
         # Portrait image
         # Check whether the aspect ratio is greater or smaller
