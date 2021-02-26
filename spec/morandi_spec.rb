@@ -56,6 +56,22 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
+    describe 'when given a blank file' do
+      it 'should fail' do
+        File.open(file_in, 'w') { |fp| fp << '' }
+        expect { process_image }.to raise_exception(GdkPixbuf::PixbufError::CorruptImage)
+        expect(File).not_to exist(file_out)
+      end
+    end
+
+    describe 'when given a corrupt file' do
+      it 'should fail' do
+        File.open(file_in, 'ab') { |fp| fp.truncate(64) }
+        expect { process_image }.to raise_exception(GdkPixbuf::PixbufError::CorruptImage)
+        expect(File).not_to exist(file_out)
+      end
+    end
+
     describe 'with a big image and a bigger cropped area to fill' do
       let(:options) do
         {

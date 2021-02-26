@@ -33,16 +33,12 @@ module Morandi
 
     def initialize(file, local_options, scale_to = nil)
       @local_options = local_options
+      @file = file
 
-      if file.is_a?(String)
+      if suitable_for_jpegicc?
+        icc_file = icc_cache_path
 
-        @file = file
-
-        if suitable_for_jpegicc?
-          icc_file = icc_cache_path
-
-          file = icc_file if valid_jpeg?(icc_file) || system('jpgicc', '-q97', @file, icc_file)
-        end
+        file = icc_file if valid_jpeg?(icc_file) || system('jpgicc', '-q97', @file, icc_file)
       end
 
       if scale_to
@@ -52,20 +48,14 @@ module Morandi
       end
     end
 
-    protected
+    private
 
     def suitable_for_jpegicc?
-      file_type && file_type.name.eql?('jpeg')
+      valid_jpeg?(@file)
     end
 
     def icc_cache_path
       @local_options['path.icc'] || Morandi::ProfiledPixbuf.default_icc_path(@file)
-    end
-
-    private
-
-    def file_type
-      GdkPixbuf::Pixbuf.get_file_info(@file)[0]
     end
   end
 end
