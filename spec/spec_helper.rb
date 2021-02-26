@@ -45,7 +45,7 @@ end
 
 RSpec::Matchers.define :be_greyish do
   match do |colour|
-    average = (colour.sum / colour.size)
+    average = (colour.inject(&:+) / colour.size)
     colour.all? { |channel| (average - channel).abs < 15  }
   end
 end
