@@ -39,6 +39,7 @@ RSpec.configure do |config|
   end
 
   config.after(:suite) do
+    puts ''
     puts 'Reminder:'
     puts "Visual report is available here: #{VisualReportHelper.visual_report_path}"
     puts 'Coverage report is here: coverage/index.html'
