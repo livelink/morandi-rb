@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ColourHelper
   def generate_test_image(at_file_path, width = 600, height = 300)
     system(
@@ -7,7 +9,7 @@ module ColourHelper
       '-seed',
       '5432',
       'plasma:red-blue',
-      'pattern:checkerboard', '-gravity','center','-geometry', "+#{width*3/4},+0",'-composite',
+      'pattern:checkerboard', '-gravity', 'center', '-geometry', "+#{width * 3 / 4},+0", '-composite',
       at_file_path
     )
   end

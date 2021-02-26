@@ -1,4 +1,9 @@
+# frozen_string_literal: true
+
 module VisualReportHelper
+  class << self
+    attr_accessor :group
+  end
   def visual_report_path
     'spec/reports/visual_report.html'
   end
@@ -33,11 +38,11 @@ module VisualReportHelper
             if (sessionStorage.scrollToBottom == "yes") {
               window.scrollTo({top: document.body.offsetHeight - window.innerHeight + 50, behavior: 'smooth' })
             }
-            setInterval(() => fetch(location.href).then(response => response.text()).then(body => { 
+            setInterval(() => fetch(location.href).then(response => response.text()).then(body => {
               if ([...body.matchAll(/[<]img /g)].length !== document.getElementsByTagName('img').length) {
                 sessionStorage.scrollToBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight ? "yes" : "no";
-                window.location.reload(); 
-              } 
+                window.location.reload();
+              }
             }), 500);
           }
         </script>
@@ -53,20 +58,22 @@ module VisualReportHelper
       lines.each do |line|
         if line =~ /insert results/
           group = description_of(example)
-          fp.puts %Q{<tr><th colspan=2>#{group}</th><tr>} unless $group == group
-          fp.puts %Q{<tr><td>#{example.description}}
-          fp.puts %Q{<pre>#{CGI.escapeHTML(JSON.pretty_generate(example.example_group_instance.options))}</pre>}
-          fp.puts %Q{</td><td>}
+          fp.puts %(<tr><th colspan=2>#{group}</th><tr>) unless VisualReportHelper.group == group
+          fp.puts %(<tr><td>#{example.description})
+          fp.puts %(<pre>#{CGI.escapeHTML(JSON.pretty_generate(example.example_group_instance.options))}</pre>)
+          fp.puts %(</td><td>)
           files.each.with_index do |filename, index|
             next if File.basename(filename) == 'sample.jpg.icc.jpg'
+
             base = name_for(filename, example, index)
             FileUtils.cp(filename, "spec/reports/#{base}")
-            fp << %Q{<div class="img-block"><img src="#{base}" style="max-width: 300px; height: auto;"><br>}
+            fp << %(<div class="img-block"><img src="#{base}" style="max-width: 300px; height: auto;"><br>)
             type, width, height = GdkPixbuf::Pixbuf.get_file_info(filename)
-            fp << "w: #{width}, h: #{height}, t: #{type.name},<br>f: #{File.basename(filename)}, s: #{File.size(filename)}</div>"
+            fp << "w: #{width}, h: #{height}, t: #{type.name},<br>" \
+              "f: #{File.basename(filename)}, s: #{File.size(filename)}</div>"
           end
-          fp.puts %Q{</td></tr>}
-          $group = group
+          fp.puts %(</td></tr>)
+          VisualReportHelper.group = group
         end
         fp.puts line
       end
@@ -78,6 +85,7 @@ module VisualReportHelper
   end
 
   def name_for(filename, example, index)
-    (description_of(example) + ' ' + example.description).downcase.gsub(/[^0-9a-z]/, '_')+"_#{index}#{File.extname(filename)}"
+    name = "#{description_of(example)} #{example.description}"
+    name.downcase.gsub(/[^0-9a-z]/, '_') + "_#{index}#{File.extname(filename)}"
   end
 end
