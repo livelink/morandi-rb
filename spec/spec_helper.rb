@@ -11,6 +11,7 @@ require 'simplecov'
 
 SimpleCov.start do
   add_filter '/spec/'
+  enable_coverage :branch if RUBY_VERSION >= "2.5.0"
 end
 require 'morandi'
 require 'gdk_pixbuf_cairo'
@@ -18,6 +19,8 @@ require 'morandi_native'
 require 'super_diff/rspec'
 
 require 'pry'
+require_relative 'visual_report_helper'
+require_relative 'colour_helper'
 
 RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
@@ -28,4 +31,21 @@ RSpec.configure do |config|
   # the seed, which is printed after each run.
   #     --seed 1234
   config.order = 'random'
+  config.include ColourHelper
+  config.include VisualReportHelper
+end
+
+RSpec::Matchers.define :be_redish do
+  match do |(red, green, blue)|
+    red > 100 &&
+      green < 50 &&
+      blue < 50
+  end
+end
+
+RSpec::Matchers.define :be_greyish do
+  match do |colour|
+    average = (colour.sum / colour.size)
+    colour.all? { |channel| (average - channel).abs < 15  }
+  end
 end

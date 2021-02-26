@@ -20,18 +20,29 @@ RSpec.describe Morandi, '#process' do
 
   before(:all) do
     FileUtils.mkdir_p('sample')
+    FileUtils.rm_rf(Dir['sample/*'])
+    FileUtils.rm_rf('spec/reports')
+    FileUtils.mkdir_p('spec/reports/images')
+    create_visual_report
+    puts "Creating visual report #{visual_report_path}"
+
   end
 
   before do
     generate_test_image(file_in, original_image_width, original_image_height) unless File.exist?(file_in)
   end
 
-  after do
-    FileUtils.rm_rf(Dir['sample/*'])
+  after do |ex|
+    add_to_visual_report(ex, files = Dir['sample/*'])
+    FileUtils.rm_rf(files)
   end
 
   after(:all) do
     FileUtils.remove_dir('sample/')
+    puts "Reminder:"
+    puts "Visual report is available here: #{visual_report_path}"
+    puts "Coverage report is here: coverage/index.html"
+
   end
 
   context 'in command mode' do
@@ -42,9 +53,10 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when given an input without any options' do
-      let(:file_arg) { Morandi::ProfiledPixbuf.from_string(File.read(file_in)) }
+    describe 'when given a pixbuf instead of a file' do
+      let!(:file_arg) { Morandi::ProfiledPixbuf.from_string(File.read(file_in)) }
       it 'should create ouptut' do
+        FileUtils.rm_f(file_in)
         process_image
         expect(File).to exist(file_out)
       end
@@ -202,9 +214,10 @@ RSpec.describe Morandi, '#process' do
     end
 
     describe 'when given a gamma option' do
-      let(:options) { { 'gamma' => 1.2 } }
+      let(:options) { { 'gamma' => 2.0 } }
 
-      it 'should reduce the straighten images' do
+      it 'should apply the gamma to the image' do
+        expect(MorandiNative::PixbufUtils).to receive(:gamma).and_call_original
         process_image
 
         expect(File).to exist(file_out)
@@ -257,9 +270,9 @@ RSpec.describe Morandi, '#process' do
         expect(processed_image_type).to eq('jpeg')
 
         expect(crude_average_colour(GdkPixbuf::Pixbuf.new(file: file_in).subpixbuf(505, 605, 100,
-                                                                                   100))).to eq([116, 28, 43])
+                                                                                   100))).to be_redish
         expect(crude_average_colour(GdkPixbuf::Pixbuf.new(file: file_out).subpixbuf(505, 605, 100,
-                                                                                    100))).to eq([30, 36, 37])
+                                                                                    100))).to be_greyish
       end
     end
 
@@ -430,32 +443,5 @@ RSpec.describe Morandi, '#process' do
     it 'creates files of increasing size' do
       expect(created_file_sizes.sort).to eq(files_in_increasing_quality_order)
     end
-  end
-
-  def generate_test_image(at_file_path, width = 600, height = 300)
-    system(
-      'convert',
-      '-size',
-      "#{width}x#{height}",
-      '-seed',
-      '5432',
-      'plasma:red-blue',
-      at_file_path
-    )
-  end
-
-  def crude_average_colour(pixbuf)
-    get_pixels = lambda do |pb|
-      pb.pixels.each_slice(pb.rowstride).map do |row|
-        row.each_slice(3).to_a[0...pb.width]
-      end.to_a[0...pb.height].flatten(1)
-    end
-    avg_color = lambda do |pixels|
-      list = pixels.inject([0, 0, 0]) do |(br, bg, bb), (r, g, b)|
-        [br + r, bg + g, bb + b]
-      end
-      list.map { |a| (a / pixels.size.to_f).to_i }
-    end
-    avg_color.call(get_pixels.call(pixbuf))
   end
 end
