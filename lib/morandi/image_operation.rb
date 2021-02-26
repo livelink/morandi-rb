@@ -10,10 +10,24 @@ module Morandi
       def new_from_hash(hash)
         op = allocate
         hash.each_pair do |key, val|
-          op.instance_variable_set("@#{key}", val) if op.respond_to?(key.intern)
+          op.respond_to?(key.intern) && op.instance_variable_set("@#{key}", val)
         end
         op
       end
+    end
+
+    private
+
+    def create_pixbuf_from_image_surface(type, width, height)
+      surface = Cairo::ImageSurface.new(type, width, height)
+      cr = Cairo::Context.new(surface)
+
+      yield(cr)
+
+      final_pb = surface.to_gdk_pixbuf
+      cr.destroy
+      surface.destroy
+      final_pb
     end
   end
 
@@ -24,11 +38,9 @@ module Morandi
     attr_accessor :angle
 
     def call(_image, pixbuf)
-      return pixbuf if @angle.zero?
+      return pixbuf if angle.zero?
 
-      surface = Cairo::ImageSurface.new(:rgb24, pixbuf.width, pixbuf.height)
-
-      rotation_value_rad = @angle * (Math::PI / 180)
+      rotation_value_rad = angle * (Math::PI / 180)
 
       ratio = pixbuf.width.to_f / pixbuf.height
       rh = pixbuf.height / ((ratio * Math.sin(rotation_value_rad.abs)) + Math.cos(rotation_value_rad.abs))
@@ -40,20 +52,16 @@ module Morandi
 
       scale = a_scale if a_scale > scale
 
-      cr = Cairo::Context.new(surface)
+      create_pixbuf_from_image_surface(:rgb24, pixbuf.width, pixbuf.height) do |cr|
+        cr.translate(pixbuf.width / 2.0, pixbuf.height / 2.0)
+        cr.rotate(rotation_value_rad)
+        cr.scale(scale, scale)
+        cr.translate(pixbuf.width / -2.0, pixbuf.height / - 2.0)
+        cr.set_source_pixbuf(pixbuf)
 
-      cr.translate(pixbuf.width / 2.0, pixbuf.height / 2.0)
-      cr.rotate(rotation_value_rad)
-      cr.scale(scale, scale)
-      cr.translate(pixbuf.width / -2.0, pixbuf.height / - 2.0)
-      cr.set_source_pixbuf(pixbuf)
-
-      cr.rectangle(0, 0, pixbuf.width, pixbuf.height)
-      cr.paint(1.0)
-      final_pb = surface.to_gdk_pixbuf
-      cr.destroy
-      surface.destroy
-      final_pb
+        cr.rectangle(0, 0, pixbuf.width, pixbuf.height)
+        cr.paint(1.0)
+      end
     end
   end
 
@@ -100,18 +108,6 @@ module Morandi
     end
 
     private
-
-    def create_pixbuf_from_image_surface(type, width, height)
-      surface = Cairo::ImageSurface.new(type, width, height)
-      cr = Cairo::Context.new(surface)
-
-      yield(cr)
-
-      final_pb = surface.to_gdk_pixbuf
-      cr.destroy
-      surface.destroy
-      final_pb
-    end
 
     # Width is proportional to output size
     def border_width
