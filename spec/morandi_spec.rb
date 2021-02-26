@@ -72,6 +72,15 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
+    describe 'when given a invalid file format' do
+      it 'should fail' do
+        File.open(file_in, 'wb') { |fp| fp << 'INVALID' }
+        expect { process_image }.to raise_exception(GdkPixbuf::PixbufError::UnknownType)
+        expect(File).not_to exist(file_out)
+      end
+    end
+
+
     describe 'with a big image and a bigger cropped area to fill' do
       let(:options) do
         {
