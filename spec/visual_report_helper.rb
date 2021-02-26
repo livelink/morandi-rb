@@ -72,7 +72,7 @@ module VisualReportHelper
             FileUtils.cp(filename, "spec/reports/#{base}")
             fp << %(<div class="img-block"><img src="#{base}" style="max-width: 300px; height: auto;"><br>)
             type, width, height = GdkPixbuf::Pixbuf.get_file_info(filename)
-            fp << "w: #{width}, h: #{height}, t: #{type.name},<br>" \
+            fp << "w: #{width}, h: #{height}, t: #{type&.name},<br>" \
               "f: #{File.basename(filename)}, s: #{File.size(filename)}</div>"
           end
           fp.puts %(</td></tr>)
