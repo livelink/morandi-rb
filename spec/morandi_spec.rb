@@ -252,6 +252,7 @@ RSpec.describe Morandi, '#process' do
     describe 'when applying a border and maintaining the original size' do
       let(:options) do
         {
+          'crop' => [10, -10, original_image_width, original_image_height],
           'border-style' => 'square',
           'background-style' => 'dominant',
           'border-size-mm' => 5,
@@ -297,6 +298,28 @@ RSpec.describe Morandi, '#process' do
         expect(processed_image_width).to eq(desired_image_width)
         expect(processed_image_height).to eq(desired_image_height)
       end
+    end
+  end
+
+  describe 'when applying shrink to fit', focus: true do
+    let(:cropped_width) { 750 }
+    let(:cropped_height) { 500 }
+
+    let(:options) do
+      {
+        'crop' => [10, -10, original_image_width, original_image_height],
+        'output.width' => original_image_width,
+        'output.height' => original_image_height
+      }
+    end
+
+    it 'should maintain the target size' do
+      process_image
+
+      expect(File).to exist(file_out)
+      expect(processed_image_type).to eq('jpeg')
+      expect(processed_image_width).to eq(original_image_width)
+      expect(processed_image_height).to eq(original_image_height)
     end
   end
 

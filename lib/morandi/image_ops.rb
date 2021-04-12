@@ -315,4 +315,56 @@ module Morandi
       end
     end
   end
+
+  class ShrinkToFit < ImageOp
+    attr_accessor :crop, :size, :print_size, :shrink
+
+    def initialize()
+      super()
+    end
+
+    def call(_image, pixbuf)
+      surface = Cairo::ImageSurface.new(:rgb24, pixbuf.width, pixbuf.height)
+      cr = Cairo::Context.new(surface)
+
+      height = 250
+      width = 180
+
+      # Apply White background
+      cr.save do
+        cr.set_operator :source
+        cr.set_source_rgb 255, 255, 255
+        cr.paint
+        cr.fill
+      end
+
+      img_height = pixbuf.height
+      img_width = pixbuf.width
+      width_ratio = width.to_f / img_width.to_f
+      height_ratio = height.to_f / img_height.to_f
+      scale_xy = [height_ratio, width_ratio].max
+
+      if @crop && ((@crop[0]).negative? || (@crop[1]).negative?)
+        img_width = size[0]
+        img_height = size[1]
+        cr.translate(- @crop[0], - @crop[1])
+      end
+
+      cr.translate(0, 0)
+      # left, top translate moves image
+
+      cr.scale(width_ratio, height_ratio)
+      #stretches the image top to bottom or left to right
+
+      cr.set_source_pixbuf(pixbuf)
+
+      cr.paint(1.0)
+      final_pb = surface.to_pixbuf
+
+      # Clean up
+      cr.destroy
+      surface.destroy
+      final_pb
+    end
+  end
 end

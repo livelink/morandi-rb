@@ -53,6 +53,9 @@ module Morandi
       # add border
       apply_decorations!
 
+      # shrink to fit
+      apply_shrink_to_fit!
+
       @pb = @pb.scale_max([@width, @height].max) if @options['output.limit'] && @width && @height
 
       @pb
@@ -171,6 +174,8 @@ module Morandi
     end
 
     def apply_crop!
+      return if negative_crop?
+
       crop = options['crop']
 
       return if crop.nil? && config_for('image.auto-crop').eql?(false)
@@ -228,10 +233,30 @@ module Morandi
       @pb = op.call(nil, @pb)
     end
 
+    def apply_shrink_to_fit!
+      return unless negative_crop?
+
+      crop = options['crop']
+
+      op = Morandi::ShrinkToFit.new_from_hash(
+        'crop' => crop,
+        'size' => [@image_width, @image_height],
+        'print_size' => [@width, @height],
+        'shrink' => true,
+      )
+
+      @pb = op.call(nil, @pb)
+    end
+
     private
 
     def not_equal_to_one(float)
       (float - 1.0) >= Float::EPSILON
+    end
+
+    def negative_crop?
+      crop = options['crop']
+      crop && ((crop[0]).to_i.negative? || (crop[1]).to_i.negative?)
     end
   end
 end
