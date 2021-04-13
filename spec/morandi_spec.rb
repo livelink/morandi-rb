@@ -305,6 +305,10 @@ RSpec.describe Morandi, '#process' do
     let(:cropped_width) { 750 }
     let(:cropped_height) { 500 }
 
+    
+  # let(:original_image_width) { 800 }
+  # let(:original_image_height) { 650 }
+
     let(:options) do
       {
         'crop' => [10, -10, original_image_width, original_image_height],
@@ -320,6 +324,74 @@ RSpec.describe Morandi, '#process' do
       expect(processed_image_type).to eq('jpeg')
       expect(processed_image_width).to eq(original_image_width)
       expect(processed_image_height).to eq(original_image_height)
+    end
+
+    it 'should when given a print size of 400 by 325 half the size of the input image' do
+      let(:options) do
+        {
+          'crop' => [10, -10, original_image_width, original_image_height],
+          'output.width' => 400,
+          'output.height' => 325
+        }
+      end
+
+      process_image
+
+      expect(File).to exist(file_out)
+      expect(processed_image_type).to eq('jpeg')
+      expect(processed_image_width).to eq(400)
+      expect(processed_image_height).to eq(325)
+    end
+
+    it 'when given a print size larger than the image not alter the image' do
+      let(:options) do
+        {
+          'crop' => [10, -10, original_image_width, original_image_height],
+          'output.width' => 900,
+          'output.height' => 700
+        }
+      end
+
+      process_image
+
+      expect(File).to exist(file_out)
+      expect(processed_image_type).to eq('jpeg')
+      expect(processed_image_width).to eq(original_image_width)
+      expect(processed_image_height).to eq(original_image_height)
+    end
+
+    it 'when given a print size that has a smaller width still adjust the height to maintain the aspect ratio' do
+      let(:options) do
+        {
+          'crop' => [10, -10, original_image_width, original_image_height],
+          'output.width' => 600,
+          'output.height' => 650
+        }
+      end
+
+      process_image
+
+      expect(File).to exist(file_out)
+      expect(processed_image_type).to eq('jpeg')
+      expect(processed_image_width).to eq(600)
+      expect(processed_image_height).to eq(488)
+    end
+
+    it 'when given a print size that has a smaller height still adjust the width to maintain the aspect ratio' do
+      let(:options) do
+        {
+          'crop' => [10, -10, original_image_width, original_image_height],
+          'output.width' => 800,
+          'output.height' => 600
+        }
+      end
+
+      process_image
+
+      expect(File).to exist(file_out)
+      expect(processed_image_type).to eq('jpeg')
+      expect(processed_image_width).to eq(738)
+      expect(processed_image_height).to eq(600)
     end
   end
 

@@ -240,7 +240,7 @@ module Morandi
 
       op = Morandi::ShrinkToFit.new_from_hash(
         'crop' => crop,
-        'size' => [@image_width, @image_height],
+        'size' => largest_shrink_option,
         'print_size' => [@width, @height],
         'shrink' => true,
       )
@@ -257,6 +257,18 @@ module Morandi
     def negative_crop?
       crop = options['crop']
       crop && ((crop[0]).to_i.negative? || (crop[1]).to_i.negative?)
+    end
+
+    def largest_shrink_option
+      proportional_width = @width.to_f / @image_width.to_f
+      proportional_height = @height.to_f / @image_height.to_f
+      if proportional_height >= 1 && proportional_width >= 1
+        return [@image_width, @image_height]
+      end
+      options = [[(@image_width*proportional_width).round, (@image_height*proportional_width).round],
+                [(@image_width*proportional_height).round, (@image_height*proportional_height).round]]
+      
+      options.select { |option| option[0] <= @width && option[1] <= @height }.max
     end
   end
 end
