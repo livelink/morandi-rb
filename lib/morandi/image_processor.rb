@@ -53,7 +53,7 @@ module Morandi
       # add border
       apply_decorations!
 
-      # shrink to fit
+      # apply shrink to fit
       apply_shrink_to_fit!
 
       @pb = @pb.scale_max([@width, @height].max) if @options['output.limit'] && @width && @height
@@ -174,8 +174,6 @@ module Morandi
     end
 
     def apply_crop!
-      return if negative_crop?
-
       crop = options['crop']
 
       return if crop.nil? && config_for('image.auto-crop').eql?(false)
@@ -188,6 +186,8 @@ module Morandi
 
       # can't crop, won't crop
       return if @width.nil? && @height.nil? && crop.nil?
+
+      crop = [0, 0, crop[2], crop[3]] if negative_crop? # X and Y crops are 0 so the original image is still in tack for Shrink to fit.
 
       crop = crop.map { |s| (s.to_f * @scale).floor } if crop && not_equal_to_one(@scale)
 
@@ -236,10 +236,8 @@ module Morandi
     def apply_shrink_to_fit!
       return unless negative_crop?
 
-      crop = options['crop']
-
       op = Morandi::ShrinkToFit.new_from_hash(
-        'crop' => crop,
+        'crop' => options['crop'],
         'size' => [@image_width, @image_height],
         'print_size' => [@width, @height],
         'shrink' => true,
@@ -255,8 +253,9 @@ module Morandi
     end
 
     def negative_crop?
-      crop = options['crop']
-      crop && ((crop[0]).to_i.negative? || (crop[1]).to_i.negative?)
+      # Pretty sure this can be incorporated into the apply_crop! incase it comes as a string.
+      return unless crop = options['crop']
+      crop[0].to_i.negative? || crop[1].to_i.negative?
     end
   end
 end
