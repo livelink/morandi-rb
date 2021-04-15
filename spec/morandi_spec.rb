@@ -18,13 +18,13 @@ RSpec.describe Morandi, '#process' do
   let(:processed_image_width) { processed_image_info[1] }
   let(:processed_image_height) { processed_image_info[2] }
 
-  before(:all) do
-    Dir.mkdir('sample/')
-  end
+  # before(:all) do
+  #   Dir.mkdir('sample/')
+  # end
 
-  before do
-    generate_test_image(file_in, original_image_width, original_image_height)
-  end
+  # before do
+  #   generate_test_image(file_in, original_image_width, original_image_height)
+  # end
 
   after do
     FileUtils.rm_rf(Dir['sample/*'])
@@ -252,7 +252,6 @@ RSpec.describe Morandi, '#process' do
     describe 'when applying a border and maintaining the original size' do
       let(:options) do
         {
-          'crop' => [10, -10, original_image_width, original_image_height],
           'border-style' => 'square',
           'background-style' => 'dominant',
           'border-size-mm' => 5,
@@ -302,8 +301,14 @@ RSpec.describe Morandi, '#process' do
   end
 
   describe 'when applying shrink to fit', focus: true do
-    let(:cropped_width) { 750 }
-    let(:cropped_height) { 500 }
+    let(:cropped_width) { 1767 }
+    let(:cropped_height) { 1414 }
+
+    #   Example's of crops if it helps
+    # 	4x4 =   {"crop”:”0,-393.8, 1414, 1414"}
+    # 	4x6 =   {"crop”:”0, -31, 2121, 1414"}
+    #   8x10 =  {"crop”:”0, 172.9338582677165, 1767, 1414"}
+
 
     
   # let(:original_image_width) { 800 }
@@ -311,9 +316,9 @@ RSpec.describe Morandi, '#process' do
 
     let(:options) do
       {
-        'crop' => [10, -10, original_image_width, original_image_height],
-        'output.width' => original_image_width,
-        'output.height' => original_image_height
+        'crop' => [0, -172.9338582677165, cropped_width, cropped_height],
+        'output.width' => cropped_width,
+        'output.height' => cropped_height,
       }
     end
 
@@ -322,8 +327,8 @@ RSpec.describe Morandi, '#process' do
 
       expect(File).to exist(file_out)
       expect(processed_image_type).to eq('jpeg')
-      expect(processed_image_width).to eq(original_image_width)
-      expect(processed_image_height).to eq(original_image_height)
+      expect(processed_image_width).to eq(cropped_width)
+      expect(processed_image_height).to eq(cropped_height)
     end
 
     it 'should when given a print size of 400 by 325 half the size of the input image' do
@@ -427,15 +432,15 @@ RSpec.describe Morandi, '#process' do
     end
   end
 
-  def generate_test_image(at_file_path, width = 600, height = 300)
-    system(
-      'convert',
-      '-size',
-      "#{width}x#{height}",
-      '-seed',
-      '5432',
-      'plasma:red-blue',
-      at_file_path
-    )
-  end
+  # def generate_test_image(at_file_path, width = 600, height = 300)
+  #   system(
+  #     'convert',
+  #     '-size',
+  #     "#{width}x#{height}",
+  #     '-seed',
+  #     '5432',
+  #     'plasma:red-blue',
+  #     at_file_path
+  #   )
+  # end
 end

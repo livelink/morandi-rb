@@ -317,44 +317,50 @@ module Morandi
   end
 
   class ShrinkToFit < ImageOp
-    attr_accessor :crop, :size, :print_size, :shrink
+    attr_accessor :size, :print_size, :shrink, :crop
 
-    def initialize()
+    def initialize
       super()
     end
 
     def call(_image, pixbuf)
-      surface = Cairo::ImageSurface.new(:rgb24, pixbuf.width, pixbuf.height)
-      cr = Cairo::Context.new(surface)
+      return unless shrink
 
-      height = 250
-      width = 180
+      original_img_height = pixbuf.height # Original size
+      original_img_width = pixbuf.width # Original size
+
+      shrink_x, shrink_y, print_width, print_height = crop
+
+      surface = Cairo::ImageSurface.new(:rgb24, original_img_width, original_img_height)
+      cr = Cairo::Context.new(surface)
 
       # Apply White background
       cr.save do
-        cr.set_operator :source
-        cr.set_source_rgb 255, 255, 255
-        cr.paint
-        cr.fill
+          cr.set_operator :source
+          cr.set_source_rgb 1, 1, 1
+          cr.paint
+          cr.fill
+        # end
       end
 
-      img_height = pixbuf.height
-      img_width = pixbuf.width
-      width_ratio = width.to_f / img_width.to_f
-      height_ratio = height.to_f / img_height.to_f
-      scale_xy = [height_ratio, width_ratio].max
+      # Switch values X and Y from negative to positive
+      size = if shrink_x.negative?
+               shrink_x * -1
+             else
+               shrink_y * -1
+             end
 
-      if @crop && ((@crop[0]).negative? || (@crop[1]).negative?)
-        img_width = size[0]
-        img_height = size[1]
-        cr.translate(- @crop[0], - @crop[1])
+      if shrink_x.negative?
+        width_ratio = (print_width.to_f - (size * 2)) / original_img_width.to_f
+        height_ratio = print_height.to_f / original_img_height.to_f
+        cr.translate(- shrink_x, 0)
+      else
+        width_ratio = print_width.to_f / original_img_width.to_f
+        height_ratio = (print_height.to_f - (size * 2)) / original_img_height.to_f
+        cr.translate(0, - shrink_y)
       end
-
-      cr.translate(0, 0)
-      # left, top translate moves image
 
       cr.scale(width_ratio, height_ratio)
-      #stretches the image top to bottom or left to right
 
       cr.set_source_pixbuf(pixbuf)
 
