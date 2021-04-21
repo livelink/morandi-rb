@@ -238,7 +238,7 @@ module Morandi
 
       op = Morandi::ShrinkToFit.new_from_hash(
         'crop' => options['crop'],
-        'size' => [@image_width, @image_height],
+        'size' => largest_shrink_option,
         'print_size' => [@width, @height],
         'shrink' => true,
       )
