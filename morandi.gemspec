@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'cairo'
   spec.add_dependency 'colorscore'
   spec.add_dependency 'gdk_pixbuf2', '~> 3.4.0'
-  spec.add_dependency 'gtk2'
+  spec.add_dependency 'gtk2', '>= 3.2.7'
   spec.add_dependency 'pango'
   spec.add_dependency 'pixbufutils'
   spec.add_dependency 'redeye'
