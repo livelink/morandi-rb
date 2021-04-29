@@ -331,9 +331,6 @@ module Morandi
       surface = Cairo::ImageSurface.new(:rgb24, output_width, output_height)
       cr = Cairo::Context.new(surface)
 
-      height = 250
-      width = 180
-
       # Apply White background
       cr.save do
         cr.set_operator :source

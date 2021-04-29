@@ -259,7 +259,7 @@ module Morandi
     def negative_crop?
       # Pretty sure this can be incorporated into the apply_crop! incase it comes as a string.
       return unless crop = options['crop']
-      
+
       crop[0].to_i.negative? || crop[1].to_i.negative?
     end
   end
