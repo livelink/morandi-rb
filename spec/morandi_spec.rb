@@ -300,7 +300,7 @@ RSpec.describe Morandi, '#process' do
     end
   end
 
-  describe 'when applying shrink to fit', focus: true do
+  describe 'when applying shrink to fit' do
     let(:cropped_width) { 1767 }
     let(:cropped_height) { 1414 }
 
