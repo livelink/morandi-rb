@@ -315,4 +315,65 @@ module Morandi
       end
     end
   end
+
+  class ShrinkToFit < ImageOp
+    attr_accessor :size, :print_size, :shrink, :crop
+
+    def initialize
+      super()
+    end
+
+    def call(_image, pixbuf)
+      return unless shrink
+
+      original_img_height = pixbuf.height # Original size
+      original_img_width = pixbuf.width # Original size
+
+      shrink_x, shrink_y, print_width, print_height = crop
+      output_width, output_height = print_size
+
+      surface = Cairo::ImageSurface.new(:rgb24, output_width, output_height)
+      cr = Cairo::Context.new(surface)
+
+      # Apply White background
+      cr.save do
+          cr.set_operator :source
+          cr.set_source_rgb 1, 1, 1
+          cr.paint
+          cr.fill
+        # end
+      end
+
+      # Switch values X and Y from negative to positive
+      if shrink_x.negative?
+        cr.translate(shrink_x.abs, 0)
+      else
+        cr.translate(0, shrink_y.abs)
+      end
+
+      scale_by = largest_shrink_ratio(output_width, output_height, original_img_width, original_img_height)
+      cr.scale(scale_by, scale_by)
+      cr.set_source_pixbuf(pixbuf)
+      cr.paint(1.0)
+      final_pb = surface.to_pixbuf
+
+      # Clean up
+      cr.destroy
+      surface.destroy
+      final_pb
+    end
+
+    private
+
+    def largest_shrink_ratio(print_width, print_height, image_width, image_height)
+      proportional_width = print_width.to_f / image_width.to_f
+      proportional_height = print_height.to_f / image_height.to_f
+      if proportional_height >= 1 && proportional_width >= 1
+        return 1
+      end
+      options = {proportional_width =>[(image_width*proportional_width).round, (image_height*proportional_width).round],
+                proportional_height => [(image_width*proportional_height).round, (image_height*proportional_height).round]}
+      options.key(options.values.select { |option| option[0] <= print_width && option[1] <= print_height }.max)
+    end
+  end
 end
