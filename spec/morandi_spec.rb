@@ -361,7 +361,7 @@ RSpec.describe Morandi, '#process' do
       expect(File).to exist(file_out)
       expect(processed_image_type).to eq('jpeg')
       expect(processed_image_width).to eq(600)
-      expect(processed_image_height).to eq(488)
+      expect(processed_image_height).to eq(650)
     end
 
     it 'when given a print size that has a smaller height still adjust the width to maintain the aspect ratio' do
@@ -371,7 +371,7 @@ RSpec.describe Morandi, '#process' do
 
       expect(File).to exist(file_out)
       expect(processed_image_type).to eq('jpeg')
-      expect(processed_image_width).to eq(738)
+      expect(processed_image_width).to eq(800)
       expect(processed_image_height).to eq(600)
     end
   end
