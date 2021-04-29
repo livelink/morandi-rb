@@ -330,8 +330,9 @@ module Morandi
       original_img_width = pixbuf.width # Original size
 
       shrink_x, shrink_y, print_width, print_height = crop
+      output_width, output_height = print_size
 
-      surface = Cairo::ImageSurface.new(:rgb24, original_img_width, original_img_height)
+      surface = Cairo::ImageSurface.new(:rgb24, output_width, output_height)
       cr = Cairo::Context.new(surface)
 
       # Apply White background
@@ -344,26 +345,15 @@ module Morandi
       end
 
       # Switch values X and Y from negative to positive
-      size = if shrink_x.negative?
-               shrink_x * -1
-             else
-               shrink_y * -1
-             end
-
       if shrink_x.negative?
-        width_ratio = (print_width.to_f - (size * 2)) / original_img_width.to_f
-        height_ratio = print_height.to_f / original_img_height.to_f
-        cr.translate(- shrink_x, 0)
+        cr.translate(shrink_x.abs, 0)
       else
-        width_ratio = print_width.to_f / original_img_width.to_f
-        height_ratio = (print_height.to_f - (size * 2)) / original_img_height.to_f
-        cr.translate(0, - shrink_y)
+        cr.translate(0, shrink_y.abs)
       end
 
-      cr.scale(width_ratio, height_ratio)
-
+      scale_by = largest_shrink_ratio(output_width, output_height, original_img_width, original_img_height)
+      cr.scale(scale_by, scale_by)
       cr.set_source_pixbuf(pixbuf)
-
       cr.paint(1.0)
       final_pb = surface.to_pixbuf
 
@@ -371,6 +361,19 @@ module Morandi
       cr.destroy
       surface.destroy
       final_pb
+    end
+
+    private
+
+    def largest_shrink_ratio(print_width, print_height, image_width, image_height)
+      proportional_width = print_width.to_f / image_width.to_f
+      proportional_height = print_height.to_f / image_height.to_f
+      if proportional_height >= 1 && proportional_width >= 1
+        return 1
+      end
+      options = {proportional_width =>[(image_width*proportional_width).round, (image_height*proportional_width).round],
+                proportional_height => [(image_width*proportional_height).round, (image_height*proportional_height).round]}
+      options.key(options.values.select { |option| option[0] <= print_width && option[1] <= print_height }.max)
     end
   end
 end

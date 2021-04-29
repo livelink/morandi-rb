@@ -18,13 +18,13 @@ RSpec.describe Morandi, '#process' do
   let(:processed_image_width) { processed_image_info[1] }
   let(:processed_image_height) { processed_image_info[2] }
 
-  # before(:all) do
-  #   Dir.mkdir('sample/')
-  # end
+  before(:all) do
+    Dir.mkdir('sample/')
+  end
 
-  # before do
-  #   generate_test_image(file_in, original_image_width, original_image_height)
-  # end
+  before do
+    generate_test_image(file_in, original_image_width, original_image_height)
+  end
 
   after do
     FileUtils.rm_rf(Dir['sample/*'])
@@ -332,15 +332,9 @@ RSpec.describe Morandi, '#process' do
     end
 
     it 'should when given a print size of 400 by 325 half the size of the input image' do
-      let(:options) do
-        {
-          'crop' => [10, -10, original_image_width, original_image_height],
-          'output.width' => 400,
-          'output.height' => 325
-        }
-      end
+      shrink_to_fit_options = { 'crop' => [10, -10, original_image_width, original_image_height], 'output.width' => 400, 'output.height' => 325 }
 
-      process_image
+      Morandi.process(file_in, shrink_to_fit_options, file_out)
 
       expect(File).to exist(file_out)
       expect(processed_image_type).to eq('jpeg')
@@ -348,33 +342,21 @@ RSpec.describe Morandi, '#process' do
       expect(processed_image_height).to eq(325)
     end
 
-    it 'when given a print size larger than the image not alter the image' do
-      let(:options) do
-        {
-          'crop' => [10, -10, original_image_width, original_image_height],
-          'output.width' => 900,
-          'output.height' => 700
-        }
-      end
+    it 'when given a print size larger than the image not alter the image but still have a larger output print' do
+      shrink_to_fit_options = { 'crop' => [10, -10, original_image_width, original_image_height], 'output.width' => 900, 'output.height' => 700 }
 
-      process_image
+      Morandi.process(file_in, shrink_to_fit_options, file_out)
 
       expect(File).to exist(file_out)
       expect(processed_image_type).to eq('jpeg')
-      expect(processed_image_width).to eq(original_image_width)
-      expect(processed_image_height).to eq(original_image_height)
+      expect(processed_image_width).to eq(900)
+      expect(processed_image_height).to eq(700)
     end
 
     it 'when given a print size that has a smaller width still adjust the height to maintain the aspect ratio' do
-      let(:options) do
-        {
-          'crop' => [10, -10, original_image_width, original_image_height],
-          'output.width' => 600,
-          'output.height' => 650
-        }
-      end
+      shrink_to_fit_options = { 'crop' => [10, -10, original_image_width, original_image_height], 'output.width' => 600, 'output.height' => 650 }
 
-      process_image
+      Morandi.process(file_in, shrink_to_fit_options, file_out)
 
       expect(File).to exist(file_out)
       expect(processed_image_type).to eq('jpeg')
@@ -383,15 +365,9 @@ RSpec.describe Morandi, '#process' do
     end
 
     it 'when given a print size that has a smaller height still adjust the width to maintain the aspect ratio' do
-      let(:options) do
-        {
-          'crop' => [10, -10, original_image_width, original_image_height],
-          'output.width' => 800,
-          'output.height' => 600
-        }
-      end
+      shrink_to_fit_options = { 'crop' => [10, -10, original_image_width, original_image_height], 'output.width' => 800, 'output.height' => 600 }
 
-      process_image
+      Morandi.process(file_in, shrink_to_fit_options, file_out)
 
       expect(File).to exist(file_out)
       expect(processed_image_type).to eq('jpeg')
@@ -432,15 +408,15 @@ RSpec.describe Morandi, '#process' do
     end
   end
 
-  # def generate_test_image(at_file_path, width = 600, height = 300)
-  #   system(
-  #     'convert',
-  #     '-size',
-  #     "#{width}x#{height}",
-  #     '-seed',
-  #     '5432',
-  #     'plasma:red-blue',
-  #     at_file_path
-  #   )
-  # end
+  def generate_test_image(at_file_path, width = 600, height = 300)
+    system(
+      'convert',
+      '-size',
+      "#{width}x#{height}",
+      '-seed',
+      '5432',
+      'plasma:red-blue',
+      at_file_path
+    )
+  end
 end
