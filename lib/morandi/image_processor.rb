@@ -239,8 +239,6 @@ module Morandi
     def apply_shrink_to_fit!
       return unless negative_crop?
 
-      crop = options['crop']
-
       op = Morandi::ShrinkToFit.new_from_hash(
         'crop' => options['crop'],
         'print_size' => [@width, @height],
@@ -258,9 +256,9 @@ module Morandi
 
     def negative_crop?
       # Pretty sure this can be incorporated into the apply_crop! incase it comes as a string.
-      return unless crop = options['crop']
+      return unless options.has_key?('crop')
 
-      crop[0].to_i.negative? || crop[1].to_i.negative?
+      options['crop'][0].to_i.negative? || options['crop'][1].to_i.negative?
     end
   end
 end
