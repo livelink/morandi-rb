@@ -176,25 +176,18 @@ module Morandi
     def apply_crop!
       return if negative_crop?
 
-      crop = options['crop']
+      return if options['crop'].nil? && config_for('image.auto-crop').eql?(false)
 
-      return if crop.nil? && config_for('image.auto-crop').eql?(false)
-
-      crop = crop.split(/,/).map(&:to_i) if crop.is_a?(String) && crop =~ /^\d+,\d+,\d+,\d+/
-
-      crop = nil unless crop.is_a?(Array) && crop.size.eql?(4) && crop.all? do |i|
-        i.is_a?(Numeric)
-      end
+      crop = unpack_crop_options
 
       # can't crop, won't crop
       return if @width.nil? && @height.nil? && crop.nil?
 
-      crop = [0, 0, crop[2], crop[3]] if negative_crop?
-      # X and Y crops are 0 so the original image is still in tack for Shrink to fit.
-
-      crop = crop.map { |s| (s.to_f * @scale).floor } if crop && not_equal_to_one(@scale)
-
-      crop ||= Morandi::Utils.autocrop_coords(@pb.width, @pb.height, @width, @height)
+      if crop.nil?
+        crop ||= Morandi::Utils.autocrop_coords(@pb.width, @pb.height, @width, @height)
+      elsif not_equal_to_one(@scale)
+        crop.map! { |s| (s.to_f * @scale).floor }
+      end
 
       @pb = Morandi::Utils.apply_crop(@pb, crop[0], crop[1], crop[2], crop[3])
     end
@@ -254,9 +247,19 @@ module Morandi
       (float - 1.0) >= Float::EPSILON
     end
 
+    def unpack_crop_options
+      if options['crop'].is_a?(String) && crop =~ /^\d+,\d+,\d+,\d+/
+        options['crop'].split(/,/).map(&:to_i)
+      elsif options['crop'].is_a?(Array) && options['crop'].length.eql?(4) && options['crop'].all? { |i| i.is_a?(Numeric) }
+        options['crop']
+      else
+        nil
+      end
+    end
+
     def negative_crop?
       # Pretty sure this can be incorporated into the apply_crop! incase it comes as a string.
-      return unless options.has_key?('crop')
+      return unless options.key?('crop')
 
       options['crop'][0].to_i.negative? || options['crop'][1].to_i.negative?
     end

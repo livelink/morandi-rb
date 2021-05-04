@@ -308,7 +308,7 @@ RSpec.describe Morandi, '#process' do
       {
         'crop' => [0, -172.9338582677165, cropped_width, cropped_height],
         'output.width' => cropped_width,
-        'output.height' => cropped_height,
+        'output.height' => cropped_height
       }
     end
 
