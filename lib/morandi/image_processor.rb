@@ -248,7 +248,7 @@ module Morandi
     end
 
     def unpack_crop_options
-      if options['crop'].is_a?(String) && crop =~ /^\d+,\d+,\d+,\d+/
+      if options['crop'].is_a?(String) && options['crop'] =~ /^\d+,\d+,\d+,\d+/
         options['crop'].split(/,/).map(&:to_i)
       elsif options['crop'].is_a?(Array) && options['crop'].length.eql?(4) && options['crop'].all? { |i| i.is_a?(Numeric) }
         options['crop']
