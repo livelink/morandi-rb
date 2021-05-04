@@ -252,8 +252,6 @@ module Morandi
         options['crop'].split(/,/).map(&:to_i)
       elsif options['crop'].is_a?(Array) && options['crop'].length.eql?(4) && options['crop'].all? { |i| i.is_a?(Numeric) }
         options['crop']
-      else
-        nil
       end
     end
 
