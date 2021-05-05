@@ -317,38 +317,34 @@ module Morandi
   end
 
   class ShrinkToFit < ImageOp
+    BACKGROUND_COLOUR = Cairo::Color::WHITE
+    
     attr_accessor :crop, :size, :print_size, :shrink
 
     def call(_image, pixbuf)
       return unless shrink
-
-      original_img_height = pixbuf.height # Original size
-      original_img_width = pixbuf.width # Original size
-
+      
       shrink_x, shrink_y, _width, _height = crop
       output_width, output_height = print_size
 
       surface = Cairo::ImageSurface.new(:rgb24, output_width, output_height)
       cr = Cairo::Context.new(surface)
 
-      # Apply White background
       cr.save do
         cr.set_operator :source
-        cr.set_source_rgb 1, 1, 1
+        cr.set_source_color BACKGROUND_COLOUR
         cr.paint
         cr.fill
       end
-      # end
 
       cr.translate(shrink_x.abs, shrink_y.abs)
-      scale_by = largest_shrink_ratio(output_width, output_height, original_img_width, original_img_height)
+      scale_by = largest_shrink_ratio(output_width, output_height, pixbuf.width, pixbuf.height)
       cr.scale(scale_by, scale_by)
       cr.set_source_pixbuf(pixbuf)
 
       cr.paint(1.0)
       final_pb = surface.to_pixbuf
 
-      # Clean up
       cr.destroy
       surface.destroy
 

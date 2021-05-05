@@ -300,7 +300,7 @@ RSpec.describe Morandi, '#process' do
     end
   end
 
-  describe 'when applying shrink to fit' do
+  context 'when applying shrink to fit' do
     let(:cropped_width) { 1767 }
     let(:cropped_height) { 1414 }
 
@@ -321,48 +321,76 @@ RSpec.describe Morandi, '#process' do
       expect(processed_image_height).to eq(cropped_height)
     end
 
-    it 'should when given a print size of 400 by 325 half the size of the input image' do
-      shrink_to_fit_options = { 'crop' => [10, -10, original_image_width, original_image_height], 'output.width' => 400, 'output.height' => 325 }
+    describe 'when given a print size of 400 by 325' do
+      let(:options) do
+        { 'crop' => [10, -10, original_image_width, original_image_height],
+          'output.width' => 400,
+          'output.height' => 325
+        }
+      end
 
-      Morandi.process(file_in, shrink_to_fit_options, file_out)
+      it 'halves the size of the input image' do
+        process_image
 
-      expect(File).to exist(file_out)
-      expect(processed_image_type).to eq('jpeg')
-      expect(processed_image_width).to eq(400)
-      expect(processed_image_height).to eq(325)
+        expect(File).to exist(file_out)
+        expect(processed_image_type).to eq('jpeg')
+        expect(processed_image_width).to eq(400)
+        expect(processed_image_height).to eq(325)
+      end
     end
 
-    it 'when given a print size larger than the image not alter the image but still have a larger output print' do
-      shrink_to_fit_options = { 'crop' => [10, -10, original_image_width, original_image_height], 'output.width' => 900, 'output.height' => 700 }
+    describe 'when given a print size larger than the image' do 
+      let(:options) do
+        { 'crop' => [10, -10, original_image_width, original_image_height],
+          'output.width' => 900,
+          'output.height' => 700
+        }
+      end
 
-      Morandi.process(file_in, shrink_to_fit_options, file_out)
-
-      expect(File).to exist(file_out)
-      expect(processed_image_type).to eq('jpeg')
-      expect(processed_image_width).to eq(900)
-      expect(processed_image_height).to eq(700)
+      it 'does not alter the image (though print size remains the same)' do
+        process_image
+        
+        expect(File).to exist(file_out)
+        expect(processed_image_type).to eq('jpeg')
+        expect(processed_image_width).to eq(900)
+        expect(processed_image_height).to eq(700)
+      end
     end
 
-    it 'when given a print size that has a smaller width still adjust the height to maintain the aspect ratio' do
-      shrink_to_fit_options = { 'crop' => [10, -10, original_image_width, original_image_height], 'output.width' => 600, 'output.height' => 650 }
+    describe 'when given an image with the same height as the print but still too wide' do
+      let(:options) do
+        { 'crop' => [10, -10, original_image_width, original_image_height],
+          'output.width' => 600,
+          'output.height' => 650
+        }
+      end
 
-      Morandi.process(file_in, shrink_to_fit_options, file_out)
+      it 'shrinks the image by both width and height to maintain the ratio (print size remains the same)' do
+        process_image
 
-      expect(File).to exist(file_out)
-      expect(processed_image_type).to eq('jpeg')
-      expect(processed_image_width).to eq(600)
-      expect(processed_image_height).to eq(650)
+        expect(File).to exist(file_out)
+        expect(processed_image_type).to eq('jpeg')
+        expect(processed_image_width).to eq(600)
+        expect(processed_image_height).to eq(650)
+      end
     end
 
-    it 'when given a print size that has a smaller height still adjust the width to maintain the aspect ratio' do
-      shrink_to_fit_options = { 'crop' => [10, -10, original_image_width, original_image_height], 'output.width' => 800, 'output.height' => 600 }
+    describe 'when given an image with the same width as the print but still too tall' do
+      let(:options) do
+        { 'crop' => [10, -10, original_image_width, original_image_height],
+          'output.width' => 800,
+          'output.height' => 600
+        }
+      end
 
-      Morandi.process(file_in, shrink_to_fit_options, file_out)
+      it 'shrinks the image by both width and height to maintain the ratio (print size remains the same)' do
+        process_image
 
-      expect(File).to exist(file_out)
-      expect(processed_image_type).to eq('jpeg')
-      expect(processed_image_width).to eq(800)
-      expect(processed_image_height).to eq(600)
+        expect(File).to exist(file_out)
+        expect(processed_image_type).to eq('jpeg')
+        expect(processed_image_width).to eq(800)
+        expect(processed_image_height).to eq(600)
+      end
     end
   end
 
