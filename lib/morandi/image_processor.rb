@@ -184,7 +184,7 @@ module Morandi
       return if @width.nil? && @height.nil? && crop.nil?
 
       if crop.nil?
-        crop ||= Morandi::Utils.autocrop_coords(@pb.width, @pb.height, @width, @height)
+        crop = Morandi::Utils.autocrop_coords(@pb.width, @pb.height, @width, @height)
       elsif not_equal_to_one(@scale)
         crop.map! { |s| (s.to_f * @scale).floor }
       end
