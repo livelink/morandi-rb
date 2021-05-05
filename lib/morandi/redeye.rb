@@ -18,10 +18,10 @@ module Morandi
 
       def tap_on(pixbuf, x_coord, y_coord)
         n = ([pixbuf.height, pixbuf.width].max / 10)
-        x1  = [x_coord - n, 0].max
-        x2  = [x_coord + n, pixbuf.width].min
-        y1  = [y_coord - n, 0].max
-        y2  = [y_coord + n, pixbuf.height].min
+        x1 = [x_coord - n, 0].max
+        x2 = [x_coord + n, pixbuf.width].min
+        y1 = [y_coord - n, 0].max
+        y2 = [y_coord + n, pixbuf.height].min
         return pixbuf unless (x1 >= 0) && (x2 > x1) && (y1 >= 0) && (y2 > y1)
 
         redeye = ::RedEye.new(pixbuf, x1, y1, x2, y2)

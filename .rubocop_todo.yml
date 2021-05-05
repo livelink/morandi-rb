@@ -22,7 +22,10 @@ Metrics/AbcSize:
 # Configuration parameters: CountComments, CountAsOne, ExcludedMethods, IgnoredMethods.
 # IgnoredMethods: refine
 Metrics/BlockLength:
-  Max: 319
+  # Max: 120
+  Exclude:
+    - 'spec/**/*'
+    - '*.gemspec'
 
 # Offense count: 1
 # Configuration parameters: CountComments, CountAsOne.

@@ -177,38 +177,29 @@ module Morandi
       img_height = pixbuf.height
 
       cr.save do
-        if @crop && ((@crop[0]).negative? || (@crop[1]).negative?)
+        if @crop && (@crop[0].negative? || @crop[1].negative?)
           img_width = size[0]
           img_height = size[1]
           cr.translate(- @crop[0], - @crop[1])
         end
 
-        cr.save do
-          cr.set_operator :source
-          cr.set_source_rgb 1, 1, 1
-          cr.paint
+        cr.set_operator :source
+        cr.set_source_rgb 1, 1, 1
+        cr.paint
 
-          cr.rectangle(0, 0, img_width, img_height)
-          case colour
-          when 'dominant'
-            pixbuf.scale_max(400).save(fn = "/tmp/hist-#{$PROCESS_ID}.#{Time.now.to_i}", 'jpeg')
-            hgram = Colorscore::Histogram.new(fn)
-            begin
-              File.unlink(fn)
-            rescue StandardError
-              nil
-            end
-            col = hgram.scores.first[1]
-            cr.set_source_rgb col.red / 256.0, col.green / 256.0, col.blue / 256.0
-          when 'retro'
-            cr.set_source_rgb 1, 1, 0.8
-          when 'black'
-            cr.set_source_rgb 0, 0, 0
-          else
-            cr.set_source_rgb 1, 1, 1
-          end
-          cr.fill
+        cr.rectangle(0, 0, img_width, img_height)
+        case colour
+        when 'dominant'
+          col = dominant_colour(pixbuf)
+          cr.set_source_rgb col.red / 256.0, col.green / 256.0, col.blue / 256.0
+        when 'retro'
+          cr.set_source_rgb 1, 1, 0.8
+        when 'black'
+          cr.set_source_rgb 0, 0, 0
+        else
+          cr.set_source_rgb 1, 1, 1
         end
+        cr.fill
       end
 
       border_scale = [img_width, img_height].max.to_f / print_size.max.to_i
@@ -251,6 +242,20 @@ module Morandi
       cr.destroy
       surface.destroy
       final_pb
+    end
+
+    private
+
+    def dominant_colour(pixbuf)
+      filename = "/tmp/hist-#{$PROCESS_ID}.#{Time.now.to_i}"
+      pixbuf.scale_max(400).save(filename, 'jpeg')
+      hgram = Colorscore::Histogram.new(filename)
+      begin
+        File.unlink(filename)
+      rescue StandardError
+        nil
+      end
+      hgram.scores.first[1]
     end
   end
 
