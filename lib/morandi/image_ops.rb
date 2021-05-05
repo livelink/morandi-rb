@@ -318,12 +318,12 @@ module Morandi
 
   class ShrinkToFit < ImageOp
     BACKGROUND_COLOUR = Cairo::Color::WHITE
-    
+
     attr_accessor :crop, :size, :print_size, :shrink
 
     def call(_image, pixbuf)
       return unless shrink
-      
+
       shrink_x, shrink_y, _width, _height = crop
       output_width, output_height = print_size
 

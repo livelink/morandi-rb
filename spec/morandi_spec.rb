@@ -323,7 +323,8 @@ RSpec.describe Morandi, '#process' do
 
     describe 'when given a print size of 400 by 325' do
       let(:options) do
-        { 'crop' => [10, -10, original_image_width, original_image_height],
+        {
+          'crop' => [10, -10, original_image_width, original_image_height],
           'output.width' => 400,
           'output.height' => 325
         }
@@ -339,9 +340,10 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when given a print size larger than the image' do 
+    describe 'when given a print size larger than the image' do
       let(:options) do
-        { 'crop' => [10, -10, original_image_width, original_image_height],
+        {
+          'crop' => [10, -10, original_image_width, original_image_height],
           'output.width' => 900,
           'output.height' => 700
         }
@@ -349,7 +351,7 @@ RSpec.describe Morandi, '#process' do
 
       it 'does not alter the image (though print size remains the same)' do
         process_image
-        
+
         expect(File).to exist(file_out)
         expect(processed_image_type).to eq('jpeg')
         expect(processed_image_width).to eq(900)
@@ -359,7 +361,8 @@ RSpec.describe Morandi, '#process' do
 
     describe 'when given an image with the same height as the print but still too wide' do
       let(:options) do
-        { 'crop' => [10, -10, original_image_width, original_image_height],
+        {
+          'crop' => [10, -10, original_image_width, original_image_height],
           'output.width' => 600,
           'output.height' => 650
         }
@@ -377,7 +380,8 @@ RSpec.describe Morandi, '#process' do
 
     describe 'when given an image with the same width as the print but still too tall' do
       let(:options) do
-        { 'crop' => [10, -10, original_image_width, original_image_height],
+        {
+          'crop' => [10, -10, original_image_width, original_image_height],
           'output.width' => 800,
           'output.height' => 600
         }
