@@ -351,6 +351,7 @@ module Morandi
       # Clean up
       cr.destroy
       surface.destroy
+
       final_pb
     end
 
