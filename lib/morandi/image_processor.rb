@@ -24,6 +24,7 @@ module Morandi
       @scale_to = @options['output.max']
       @width = @options['output.width']
       @height = @options['output.height']
+      @crop = unpack_crop_options
 
       case @file
       when String
@@ -176,18 +177,16 @@ module Morandi
     def apply_crop!
       return if negative_crop?
 
-      return if options['crop'].nil? && config_for('image.auto-crop').eql?(false)
-
-      crop = unpack_crop_options
+      return if @crop.nil? && config_for('image.auto-crop').eql?(false)
 
       # can't crop, won't crop
-      return if @width.nil? && @height.nil? && crop.nil?
+      return if @width.nil? && @height.nil? && @crop.nil?
 
-      if crop.nil?
-        crop = Morandi::Utils.autocrop_coords(@pb.width, @pb.height, @width, @height)
-      elsif not_equal_to_one(@scale)
-        crop.map! { |s| (s.to_f * @scale).floor }
-      end
+      crop = if @crop.nil?
+               Morandi::Utils.autocrop_coords(@pb.width, @pb.height, @width, @height)
+             elsif not_equal_to_one(@scale)
+               @crop.map { |s| (s.to_f * @scale).floor }
+             end
 
       @pb = Morandi::Utils.apply_crop(@pb, crop[0], crop[1], crop[2], crop[3])
     end
@@ -213,8 +212,7 @@ module Morandi
 
       colour ||= 'black'
 
-      crop = options['crop']
-      crop = crop.map { |s| (s.to_f * @scale).floor } if crop && not_equal_to_one(@scale)
+      crop = @crop.map { |s| (s.to_f * @scale).floor } if @crop && not_equal_to_one(@scale)
 
       op = Morandi::ImageBorder.new_from_hash(
         'style' => style,
@@ -233,7 +231,7 @@ module Morandi
       return unless negative_crop?
 
       op = Morandi::ShrinkToFit.new_from_hash(
-        'crop' => options['crop'],
+        'crop' => unpack_crop_options,
         'print_size' => [@width, @height],
         'shrink' => true
       )
@@ -257,9 +255,9 @@ module Morandi
 
     def negative_crop?
       # Pretty sure this can be incorporated into the apply_crop! incase it comes as a string.
-      return unless options.key?('crop')
+      return unless @crop
 
-      options['crop'][0].to_i.negative? || options['crop'][1].to_i.negative?
+      @crop[0].to_i.negative? || @crop[1].to_i.negative?
     end
   end
 end
