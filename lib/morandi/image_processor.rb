@@ -176,10 +176,7 @@ module Morandi
 
     def apply_crop!
       return if negative_crop?
-
       return if @crop.nil? && config_for('image.auto-crop').eql?(false)
-
-      # can't crop, won't crop
       return if @width.nil? && @height.nil? && @crop.nil?
 
       crop = if @crop.nil?
@@ -207,18 +204,16 @@ module Morandi
 
     def apply_decorations!
       style = options['border-style']
-      colour = options['background-style']
+      colour = options['background-style'] || 'black'
 
       return if style.nil? || style.eql?('none')
       return if colour.eql?('none')
-
-      colour ||= 'black'
 
       crop = @crop.map { |s| (s.to_f * @scale).floor } if @crop && not_equal_to_one(@scale)
 
       op = Morandi::ImageBorder.new_from_hash(
         'style' => style,
-        'colour' => colour || '#000000',
+        'colour' => colour,
         'crop' => crop,
         'size' => [@image_width, @image_height],
         'print_size' => [@width, @height],
