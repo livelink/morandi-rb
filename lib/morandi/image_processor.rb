@@ -231,7 +231,7 @@ module Morandi
       return unless negative_crop?
 
       op = Morandi::ShrinkToFit.new_from_hash(
-        'crop' => unpack_crop_options,
+        'crop' => @crop,
         'print_size' => [@width, @height],
         'shrink' => true
       )
