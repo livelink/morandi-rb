@@ -186,6 +186,8 @@ module Morandi
                Morandi::Utils.autocrop_coords(@pb.width, @pb.height, @width, @height)
              elsif not_equal_to_one(@scale)
                @crop.map { |s| (s.to_f * @scale).floor }
+             else
+               @crop
              end
 
       @pb = Morandi::Utils.apply_crop(@pb, crop[0], crop[1], crop[2], crop[3])
