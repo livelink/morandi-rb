@@ -344,6 +344,9 @@ module Morandi
 
       cr.translate(shrink_x.abs, shrink_y.abs)
       scale_by = largest_shrink_ratio(output_width, output_height, pixbuf.width, pixbuf.height)
+      width_difference = output_width - (pixbuf.width * scale_by)
+      height_difference = output_height - (pixbuf.height * scale_by)
+      cr.translate(width_difference/2, height_difference/2)
       cr.scale(scale_by, scale_by)
       cr.set_source_pixbuf(pixbuf)
 
