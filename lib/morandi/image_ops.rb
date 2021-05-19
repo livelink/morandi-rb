@@ -329,9 +329,7 @@ module Morandi
     def call(_image, pixbuf)
       return unless shrink
 
-      shrink_x, shrink_y, _width, _height = crop
       output_width, output_height = print_size
-
       surface = Cairo::ImageSurface.new(:rgb24, output_width, output_height)
       cr = Cairo::Context.new(surface)
 
@@ -342,11 +340,10 @@ module Morandi
         cr.fill
       end
 
-      cr.translate(shrink_x.abs, shrink_y.abs)
       scale_by = largest_shrink_ratio(output_width, output_height, pixbuf.width, pixbuf.height)
       width_difference = output_width - (pixbuf.width * scale_by)
       height_difference = output_height - (pixbuf.height * scale_by)
-      cr.translate(width_difference/2, height_difference/2)
+      cr.translate(width_difference / 2, height_difference / 2)
       cr.scale(scale_by, scale_by)
       cr.set_source_pixbuf(pixbuf)
 
@@ -364,8 +361,6 @@ module Morandi
     def largest_shrink_ratio(print_width, print_height, image_width, image_height)
       proportional_width = print_width / image_width.to_f
       proportional_height = print_height / image_height.to_f
-
-      return 1 if proportional_height >= 1 && proportional_width >= 1
 
       options = { proportional_width => [(image_width * proportional_width).round, (image_height * proportional_width).round],
                   proportional_height => [(image_width * proportional_height).round, (image_height * proportional_height).round] }
