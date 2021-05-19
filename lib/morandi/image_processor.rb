@@ -24,6 +24,7 @@ module Morandi
       @scale_to = @options['output.max']
       @width = @options['output.width']
       @height = @options['output.height']
+      @crop = unpack_crop_options
 
       case @file
       when String
@@ -52,6 +53,9 @@ module Morandi
 
       # add border
       apply_decorations!
+
+      # shrink to fit
+      apply_shrink_to_fit!
 
       @pb = @pb.scale_max([@width, @height].max) if @options['output.limit'] && @width && @height
 
@@ -171,22 +175,17 @@ module Morandi
     end
 
     def apply_crop!
-      crop = options['crop']
+      return if negative_crop?
+      return if @crop.nil? && config_for('image.auto-crop').eql?(false)
+      return if @width.nil? && @height.nil? && @crop.nil?
 
-      return if crop.nil? && config_for('image.auto-crop').eql?(false)
-
-      crop = crop.split(/,/).map(&:to_i) if crop.is_a?(String) && crop =~ /^\d+,\d+,\d+,\d+/
-
-      crop = nil unless crop.is_a?(Array) && crop.size.eql?(4) && crop.all? do |i|
-        i.is_a?(Numeric)
-      end
-
-      # can't crop, won't crop
-      return if @width.nil? && @height.nil? && crop.nil?
-
-      crop = crop.map { |s| (s.to_f * @scale).floor } if crop && not_equal_to_one(@scale)
-
-      crop ||= Morandi::Utils.autocrop_coords(@pb.width, @pb.height, @width, @height)
+      crop = if @crop.nil?
+               Morandi::Utils.autocrop_coords(@pb.width, @pb.height, @width, @height)
+             elsif not_equal_to_one(@scale)
+               @crop.map { |s| (s.to_f * @scale).floor }
+             else
+               @crop
+             end
 
       @pb = Morandi::Utils.apply_crop(@pb, crop[0], crop[1], crop[2], crop[3])
     end
@@ -205,19 +204,16 @@ module Morandi
 
     def apply_decorations!
       style = options['border-style']
-      colour = options['background-style']
+      colour = options['background-style'] || 'black'
 
       return if style.nil? || style.eql?('none')
       return if colour.eql?('none')
 
-      colour ||= 'black'
-
-      crop = options['crop']
-      crop = crop.map { |s| (s.to_f * @scale).floor } if crop && not_equal_to_one(@scale)
+      crop = @crop.map { |s| (s.to_f * @scale).floor } if @crop && not_equal_to_one(@scale)
 
       op = Morandi::ImageBorder.new_from_hash(
         'style' => style,
-        'colour' => colour || '#000000',
+        'colour' => colour,
         'crop' => crop,
         'size' => [@image_width, @image_height],
         'print_size' => [@width, @height],
@@ -228,10 +224,37 @@ module Morandi
       @pb = op.call(nil, @pb)
     end
 
+    def apply_shrink_to_fit!
+      return unless negative_crop?
+
+      op = Morandi::ShrinkToFit.new_from_hash(
+        'crop' => @crop,
+        'print_size' => [@width, @height],
+        'shrink' => true
+      )
+
+      @pb = op.call(nil, @pb)
+    end
+
     private
 
     def not_equal_to_one(float)
       (float - 1.0) >= Float::EPSILON
+    end
+
+    def unpack_crop_options
+      if options['crop'].is_a?(String) && options['crop'] =~ /^-?\d+,-?\d+,\d+,\d+/
+        options['crop'].split(/,/).map(&:to_i)
+      elsif options['crop'].is_a?(Array) && options['crop'].length.eql?(4) && options['crop'].all? { |i| i.is_a?(Numeric) }
+        options['crop']
+      end
+    end
+
+    def negative_crop?
+      # Pretty sure this can be incorporated into the apply_crop! incase it comes as a string.
+      return unless @crop
+
+      @crop[0].to_i.negative? || @crop[1].to_i.negative?
     end
   end
 end

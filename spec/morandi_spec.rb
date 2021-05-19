@@ -77,7 +77,7 @@ RSpec.describe Morandi, '#process' do
         Morandi.process(pixbuf, options, file_out)
       end
 
-      let(:pixbuf) { GdkPixbuf::Pixbuf.new(file_in) }
+      let(:pixbuf) { GdkPixbuf::Pixbuf.new(file: file_in) }
 
       it 'should process the file' do
         process_image
@@ -296,6 +296,104 @@ RSpec.describe Morandi, '#process' do
         expect(processed_image_type).to eq('jpeg')
         expect(processed_image_width).to eq(desired_image_width)
         expect(processed_image_height).to eq(desired_image_height)
+      end
+    end
+  end
+
+  context 'when applying shrink to fit' do
+    let(:cropped_width) { 1767 }
+    let(:cropped_height) { 1414 }
+
+    let(:options) do
+      {
+        'crop' => [0, -172.9338582677165, cropped_width, cropped_height],
+        'output.width' => cropped_width,
+        'output.height' => cropped_height
+      }
+    end
+
+    it 'should maintain the target size' do
+      process_image
+
+      expect(File).to exist(file_out)
+      expect(processed_image_type).to eq('jpeg')
+      expect(processed_image_width).to eq(cropped_width)
+      expect(processed_image_height).to eq(cropped_height)
+    end
+
+    describe 'when given a print size of 400 by 325' do
+      let(:options) do
+        {
+          'crop' => [10, -10, original_image_width, original_image_height],
+          'output.width' => 400,
+          'output.height' => 325
+        }
+      end
+
+      it 'halves the size of the input image' do
+        process_image
+
+        expect(File).to exist(file_out)
+        expect(processed_image_type).to eq('jpeg')
+        expect(processed_image_width).to eq(400)
+        expect(processed_image_height).to eq(325)
+      end
+    end
+
+    describe 'when given a print size larger than the image' do
+      let(:options) do
+        {
+          'crop' => [10, -10, original_image_width, original_image_height],
+          'output.width' => 900,
+          'output.height' => 700
+        }
+      end
+
+      it 'does not alter the image (though print size remains the same)' do
+        process_image
+
+        expect(File).to exist(file_out)
+        expect(processed_image_type).to eq('jpeg')
+        expect(processed_image_width).to eq(900)
+        expect(processed_image_height).to eq(700)
+      end
+    end
+
+    describe 'when given an image with the same height as the print but still too wide' do
+      let(:options) do
+        {
+          'crop' => [10, -10, original_image_width, original_image_height],
+          'output.width' => 600,
+          'output.height' => 650
+        }
+      end
+
+      it 'shrinks the image by both width and height to maintain the ratio (print size remains the same)' do
+        process_image
+
+        expect(File).to exist(file_out)
+        expect(processed_image_type).to eq('jpeg')
+        expect(processed_image_width).to eq(600)
+        expect(processed_image_height).to eq(650)
+      end
+    end
+
+    describe 'when given an image with the same width as the print but still too tall' do
+      let(:options) do
+        {
+          'crop' => [10, -10, original_image_width, original_image_height],
+          'output.width' => 800,
+          'output.height' => 600
+        }
+      end
+
+      it 'shrinks the image by both width and height to maintain the ratio (print size remains the same)' do
+        process_image
+
+        expect(File).to exist(file_out)
+        expect(processed_image_type).to eq('jpeg')
+        expect(processed_image_width).to eq(800)
+        expect(processed_image_height).to eq(600)
       end
     end
   end

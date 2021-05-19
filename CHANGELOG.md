@@ -4,7 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## Last updated 16.12.2020
+## Last updated 2021-05-19
+
+## [0.14.0] 2021-05-19
+### Added
+- Shrink-to-Fit operation [TECH-13938 / Kbz 831]
 
 ## [0.13.0] 16.12.2020
 ### Fixed

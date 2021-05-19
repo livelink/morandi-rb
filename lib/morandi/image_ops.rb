@@ -177,38 +177,29 @@ module Morandi
       img_height = pixbuf.height
 
       cr.save do
-        if @crop && ((@crop[0]).negative? || (@crop[1]).negative?)
+        if @crop && (@crop[0].negative? || @crop[1].negative?)
           img_width = size[0]
           img_height = size[1]
           cr.translate(- @crop[0], - @crop[1])
         end
 
-        cr.save do
-          cr.set_operator :source
-          cr.set_source_rgb 1, 1, 1
-          cr.paint
+        cr.set_operator :source
+        cr.set_source_rgb 1, 1, 1
+        cr.paint
 
-          cr.rectangle(0, 0, img_width, img_height)
-          case colour
-          when 'dominant'
-            pixbuf.scale_max(400).save(fn = "/tmp/hist-#{$PROCESS_ID}.#{Time.now.to_i}", 'jpeg')
-            hgram = Colorscore::Histogram.new(fn)
-            begin
-              File.unlink(fn)
-            rescue StandardError
-              nil
-            end
-            col = hgram.scores.first[1]
-            cr.set_source_rgb col.red / 256.0, col.green / 256.0, col.blue / 256.0
-          when 'retro'
-            cr.set_source_rgb 1, 1, 0.8
-          when 'black'
-            cr.set_source_rgb 0, 0, 0
-          else
-            cr.set_source_rgb 1, 1, 1
-          end
-          cr.fill
+        cr.rectangle(0, 0, img_width, img_height)
+        case colour
+        when 'dominant'
+          col = dominant_colour(pixbuf)
+          cr.set_source_rgb col.red / 256.0, col.green / 256.0, col.blue / 256.0
+        when 'retro'
+          cr.set_source_rgb 1, 1, 0.8
+        when 'black'
+          cr.set_source_rgb 0, 0, 0
+        else
+          cr.set_source_rgb 1, 1, 1
         end
+        cr.fill
       end
 
       border_scale = [img_width, img_height].max.to_f / print_size.max.to_i
@@ -251,6 +242,20 @@ module Morandi
       cr.destroy
       surface.destroy
       final_pb
+    end
+
+    private
+
+    def dominant_colour(pixbuf)
+      filename = "/tmp/hist-#{$PROCESS_ID}.#{Time.now.to_i}"
+      pixbuf.scale_max(400).save(filename, 'jpeg')
+      hgram = Colorscore::Histogram.new(filename)
+      begin
+        File.unlink(filename)
+      rescue StandardError
+        nil
+      end
+      hgram.scores.first[1]
     end
   end
 
@@ -313,6 +318,59 @@ module Morandi
       else
         pixbuf # Default is nothing
       end
+    end
+  end
+
+  class ShrinkToFit < ImageOp
+    BACKGROUND_COLOUR = Cairo::Color::WHITE
+
+    attr_accessor :crop, :size, :print_size, :shrink
+
+    def call(_image, pixbuf)
+      return unless shrink
+
+      output_width, output_height = autorotated_print_size(pixbuf)
+      surface = Cairo::ImageSurface.new(:rgb24, output_width, output_height)
+      cr = Cairo::Context.new(surface)
+
+      cr.save do
+        cr.set_operator :source
+        cr.set_source_color BACKGROUND_COLOUR
+        cr.paint
+        cr.fill
+      end
+
+      scale_by = largest_shrink_ratio(output_width, output_height, pixbuf.width, pixbuf.height)
+      width_difference = output_width - (pixbuf.width * scale_by)
+      height_difference = output_height - (pixbuf.height * scale_by)
+      cr.translate(width_difference / 2, height_difference / 2)
+      cr.scale(scale_by, scale_by)
+      cr.set_source_pixbuf(pixbuf)
+
+      cr.paint(1.0)
+      final_pb = surface.to_pixbuf
+
+      cr.destroy
+      surface.destroy
+
+      final_pb
+    end
+
+    private
+
+    def autorotated_print_size(pixbuf)
+      return print_size.reverse if pixbuf.width < pixbuf.height
+
+      print_size
+    end
+
+    def largest_shrink_ratio(print_width, print_height, image_width, image_height)
+      proportional_width = print_width / image_width.to_f
+      proportional_height = print_height / image_height.to_f
+
+      options = { proportional_width => [(image_width * proportional_width).round, (image_height * proportional_width).round],
+                  proportional_height => [(image_width * proportional_height).round, (image_height * proportional_height).round] }
+      options.key(options.values.select { |option| option[0] <= print_width && option[1] <= print_height }.max)
     end
   end
 end
