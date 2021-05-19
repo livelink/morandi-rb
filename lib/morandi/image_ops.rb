@@ -329,7 +329,7 @@ module Morandi
     def call(_image, pixbuf)
       return unless shrink
 
-      output_width, output_height = print_size
+      output_width, output_height = autorotated_print_size(pixbuf)
       surface = Cairo::ImageSurface.new(:rgb24, output_width, output_height)
       cr = Cairo::Context.new(surface)
 
@@ -357,6 +357,12 @@ module Morandi
     end
 
     private
+
+    def autorotated_print_size(pixbuf)
+      return print_size.reverse if pixbuf.width < pixbuf.height
+
+      print_size
+    end
 
     def largest_shrink_ratio(print_width, print_height, image_width, image_height)
       proportional_width = print_width / image_width.to_f
