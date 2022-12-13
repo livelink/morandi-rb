@@ -36,6 +36,7 @@ contrast     | Integer -20..20  | Change image contrast
 sharpen      | Integer -5..5  | Sharpen / Blur (negative value)
 redeye       | Array[[Integer,Integer],...]  | Apply redeye correction at point
 angle        | Integer 0,90,180,270  | Rotate image
+straighten   | Float | Rotate by N degrees and zoom
 crop         | Array[Integer,Integer,Integer,Integer] | Crop image
 fx           | String greyscale,sepia,bluetone | Apply colour filters
 border-style  | String square,retro | Set border style
