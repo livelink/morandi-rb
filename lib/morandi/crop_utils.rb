@@ -85,8 +85,8 @@ module Morandi
           dest_height: copy_h,
           offset_x: paste_x - offset_x,
           offset_y: paste_y - offset_y,
-          scale_x: x_coord,
-          scale_y: y_coord,
+          scale_x: 1,
+          scale_y: 1,
           interpolation_type: :hyper,
           overall_alpha: 255
         )
