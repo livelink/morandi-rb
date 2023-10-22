@@ -15,17 +15,16 @@ Gem::Specification.new do |spec|
   spec.license       = 'MIT'
 
   spec.required_ruby_version = '>= 2.0'
-  spec.files         = Dir['CHANGELOG.md', 'LICENSE.txt', 'README.md', 'lib/**/*']
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
+  spec.files         = Dir['CHANGELOG.md', 'LICENSE.txt', 'README.md', 'ext/**/*', 'lib/**/*']
   spec.require_paths = ['lib']
 
   spec.extensions    = %w[ext/morandi_native/extconf.rb ext/gdk_pixbuf_cairo/extconf.rb]
 
-  spec.add_dependency 'atk'
+  spec.add_dependency 'atk', '> 4.0.0'
   spec.add_dependency 'cairo'
   spec.add_dependency 'colorscore'
-  spec.add_dependency 'gdk_pixbuf2', '> 3.4.0'
-  spec.add_dependency 'pango'
+  spec.add_dependency 'gdk_pixbuf2', '> 4.0.0'
+  spec.add_dependency 'pango', '> 4.0.0'
   spec.add_dependency 'rake-compiler'
 
   spec.add_development_dependency 'guard'

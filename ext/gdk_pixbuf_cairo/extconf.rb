@@ -6,7 +6,33 @@ require 'mkmf'
 require 'English'
 require 'rubygems'
 gem 'glib2'
-require 'mkmf-gnome2'
+require 'mkmf-gnome'
+
+def macos?
+  !!(RUBY_PLATFORM =~ /darwin/)
+end
+
+def clang?
+  cc_version = `#{RbConfig.expand('$(CC) --version' + '')}`
+  cc_version.match?(/clang/i)
+end
+
+# XCode 14 warns if `-Wl,-undefined dynamic_lookup` is specified, and as
+# a result Ruby interpreters compiled under XCode 14 no longer specify
+# this flag by default in DLDFLAGS. Let's specify the list of dynamic symbols
+# here to avoid compilation failures.
+if clang? && macos?
+  dynamic_symbols = %w[
+    _rb_cairo_surface_from_ruby_object
+    _rb_cairo_surface_to_ruby_object_with_destroy
+    _rbgobj_instance_from_ruby_object
+    _rbgobj_ruby_object_from_instance
+  ]
+  dynamic_symbols.each do |sym|
+    $DLDFLAGS << " -Wl,-U,#{sym.strip}"
+  end
+end
+
 %w[rbglib.h rbpango.h rcairo.h].each do |header|
   Gem.find_files(header).each do |f|
     $CFLAGS += " '-I#{File.dirname(f)}'"
@@ -33,7 +59,7 @@ $CFLAGS += " -I#{RbConfig::CONFIG['rubyhdrdir']}/ruby" if RbConfig::CONFIG.key?(
 $CFLAGS += ' -I.'
 have_func('rb_errinfo')
 PKGConfig.have_package('gdk-pixbuf-2.0') or exit(-1)
-PKGConfig.have_package('gdk-2.0') or exit(-1)
+# PKGConfig.have_package('gdk-2.0') or exit(-1)
 PKGConfig.have_package('cairo') or exit(-1)
 
 unless have_header('gdk-pixbuf/gdk-pixbuf.h')
