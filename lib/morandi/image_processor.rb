@@ -182,7 +182,7 @@ module Morandi
 
       return if crop.nil? && config_for('image.auto-crop').eql?(false)
 
-      crop = crop.split(/,/).map(&:to_i) if crop.is_a?(String) && crop =~ /^\d+,\d+,\d+,\d+/
+      crop = crop.split(',').map(&:to_i) if crop.is_a?(String) && crop =~ /^\d+,\d+,\d+,\d+/
 
       crop = nil unless crop.is_a?(Array) && crop.size.eql?(4) && crop.all? do |i|
         i.is_a?(Numeric)
@@ -238,7 +238,7 @@ module Morandi
     private
 
     def not_equal_to_one(float)
-      (float - 1.0) >= Float::EPSILON
+      (float - 1.0).abs >= Float::EPSILON
     end
   end
   # rubocop:enable Metrics/ClassLength
