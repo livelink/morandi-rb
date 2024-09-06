@@ -69,6 +69,8 @@ PixbufUtils_CLASS_gamma(VALUE self OPTIONAL_ATTR, VALUE __v_src OPTIONAL_ATTR, V
 static VALUE
 PixbufUtils_CLASS_tint(int __p_argc, VALUE *__p_argv, VALUE self);
 
+static VALUE
+PixbufUtils_CLASS_mask(VALUE self OPTIONAL_ATTR, VALUE __v_src OPTIONAL_ATTR, VALUE __v_mask OPTIONAL_ATTR);
 
 /* Inline C code */
 
@@ -89,6 +91,7 @@ extern void Init_morandi_c(void);
 
 #include "rotate.h"
 #include "gamma.h"
+#include "mask.h"
 #include "tint.h"
 #include "filter.h"
 
@@ -720,6 +723,26 @@ PixbufUtils_CLASS_tint(int __p_argc, VALUE *__p_argv, VALUE self) {
 }
 
 static VALUE
+PixbufUtils_CLASS_mask(VALUE self OPTIONAL_ATTR, VALUE __v_src OPTIONAL_ATTR, VALUE __v_mask OPTIONAL_ATTR) {
+    VALUE __p_retval OPTIONAL_ATTR = Qnil;
+    GdkPixbuf *src;
+    GdkPixbuf *__orig_src;
+    GdkPixbuf *mask;
+    GdkPixbuf *__orig_mask;
+    __orig_src = src = GDK_PIXBUF(RVAL2GOBJ(__v_src));
+    __orig_mask = mask = GDK_PIXBUF(RVAL2GOBJ(__v_mask));
+
+    IGNORE(self);
+    do {
+        __p_retval = unref_pixbuf((pixbuf_mask(src, mask)));
+        goto out;
+    }
+    while (0);
+    out:;
+    return __p_retval;
+}
+
+static VALUE
 RedEye___alloc__(VALUE self OPTIONAL_ATTR) {
     VALUE __p_retval OPTIONAL_ATTR = Qnil;
 
@@ -1081,6 +1104,7 @@ Init_morandi_native(void) {
     rb_define_singleton_method(mPixbufUtils, "rotate", PixbufUtils_CLASS_rotate, 2);
     rb_define_singleton_method(mPixbufUtils, "gamma", PixbufUtils_CLASS_gamma, 2);
     rb_define_singleton_method(mPixbufUtils, "tint", PixbufUtils_CLASS_tint, -1);
+    rb_define_singleton_method(mPixbufUtils, "mask", PixbufUtils_CLASS_mask, 2);
 
 
 
