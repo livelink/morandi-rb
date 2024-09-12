@@ -13,6 +13,8 @@ RUN apt-get update && apt-get install -yyq --no-install-recommends \
   && apt-get clean \
   && rm -rf /va/lib/apt/lists/*
 
+RUN gem update --system 3.4.22
+
 COPY Gemfile* /app/
 WORKDIR /app/
 RUN bundle config --local gemfile Gemfile.docker
