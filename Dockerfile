@@ -15,9 +15,9 @@ RUN apt-get update && apt-get install -yyq --no-install-recommends \
 
 RUN gem update --system 3.4.22
 
-COPY Gemfile* /app/
-WORKDIR /app/
-RUN bundle config --local gemfile Gemfile.docker
+WORKDIR /app
+COPY morandi.gemspec Gemfile ./
+COPY lib/morandi/version.rb lib/morandi/version.rb
 RUN bundle install
 COPY . /app
 
