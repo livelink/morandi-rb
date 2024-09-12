@@ -37,16 +37,12 @@ jobs:
       - name: install image processing dependencies
         run: |
           sudo apt-get install -yqq liblcms2-utils libglib2.0-dev libgtk2.0-dev libgdk-pixbuf2.0-dev
+      - name: checkout repo
+        uses: actions/checkout@v2
       - name: set up ruby environment
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
-      - name: checkout repo
-        uses: actions/checkout@v2
-      - name: install ruby dependencies
-        run: |
-          gem install bundler
-          bundle install
       - name: run the tests
         run: bundle exec rspec
