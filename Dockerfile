@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -yyq --no-install-recommends \
   libgdk-pixbuf2.0-dev \
   imagemagick \
   liblcms2-utils \
+  # When girepository tries to install implicitly, there's an error due to apt being locked; details in commit message
+  libgirepository1.0-dev \
   && apt-get clean \
   && rm -rf /va/lib/apt/lists/*
 
