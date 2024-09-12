@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Unreleased
 ### Removed
 - support for Ruby 2.0 (and illusion of it being tested by CI)
+- support for Ruby 2.3
 
 ## [0.13.0] 16.12.2020
 ### Fixed
