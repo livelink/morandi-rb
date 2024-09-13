@@ -28,12 +28,4 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'gdk_pixbuf2', '> 4.0.0'
   spec.add_dependency 'pango', '> 4.0.0'
   spec.add_dependency 'rake-compiler'
-
-  spec.add_development_dependency 'guard'
-  spec.add_development_dependency 'guard-rspec'
-  spec.add_development_dependency 'rake'
-  spec.add_development_dependency 'rspec'
-  spec.add_development_dependency 'rubocop'
-  spec.add_development_dependency 'simplecov'
-  spec.add_development_dependency 'super_diff'
 end
