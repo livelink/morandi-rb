@@ -154,6 +154,42 @@ RSpec.describe Morandi, '#process' do
           expect(processed_image_height).to eq(cropped_height)
         end
       end
+
+      describe 'with negative initial coordinates' do
+        let(:options) { { 'crop' => [-50, -50, cropped_width, cropped_height] } }
+
+        it 'crops the image to desired dimensions' do
+          process_image
+
+          expect(File).to exist(file_out)
+          expect(processed_image_width).to eq(cropped_width)
+          expect(processed_image_height).to eq(cropped_height)
+        end
+      end
+
+      describe 'with desired dimensions exceeding the size of original image' do
+        let(:options) { { 'crop' => [0, 0, original_image_width + 50, original_image_height + 50] } }
+
+        it 'crops the image to desired dimensions' do
+          process_image
+
+          expect(File).to exist(file_out)
+          expect(processed_image_width).to eq(original_image_width + 50)
+          expect(processed_image_height).to eq(original_image_height + 50)
+        end
+      end
+
+      describe 'with negative dimensions' do
+        let(:options) { { 'crop' => [0, 0, -10, -10] } }
+
+        it 'crops the image to 1x1px' do
+          process_image
+
+          expect(File).to exist(file_out)
+          expect(processed_image_width).to eq(1)
+          expect(processed_image_height).to eq(1)
+        end
+      end
     end
 
     describe 'when the user supplies a path.icc in the "local_options" argument' do
