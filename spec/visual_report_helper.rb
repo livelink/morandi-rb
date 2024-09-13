@@ -58,7 +58,7 @@ module VisualReportHelper
   end
 
   def add_to_visual_report(example, files)
-    lines = IO.readlines(visual_report_path)
+    lines = File.readlines(visual_report_path)
     File.open(visual_report_path, 'w') do |fp|
       lines.each do |line|
         if line =~ /insert results/
@@ -75,7 +75,7 @@ module VisualReportHelper
             fp << %(<div class="img-block"><img src="#{base}" style="max-width: 300px; height: auto;"><br>)
             type, width, height = GdkPixbuf::Pixbuf.get_file_info(filename)
             fp << "w: #{width}, h: #{height}, t: #{type&.name},<br>" \
-              "f: #{File.basename(filename)}, s: #{File.size(filename)}</div>"
+                  "f: #{File.basename(filename)}, s: #{File.size(filename)}</div>"
           end
           fp.puts %(</td></tr>)
           VisualReportHelper.group = group
