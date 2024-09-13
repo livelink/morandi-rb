@@ -1,6 +1,46 @@
 # frozen_string_literal: true
 
 module VisualReportHelper
+  VISUAL_REPORT_TEMPLATE = <<-HTML
+    <!DOCTYPE html>
+    <html >
+    <head>
+    <title>Morandi report</title>
+    <meta charset="utf-8">
+    <style>
+    .img-block { display: inline-block; margin-right: 20px; }
+    th, td { text-align: left; vertical-align: top; }
+    </style>
+    </head>
+    <body>
+      <table width="100%" border="1">
+      <thead>
+        <tr>
+          <th width="20%">Description</th>
+          <th width="80%">Image</th>
+        </tr>
+      </thead>
+      <tbody>
+          <!-- insert results -->
+      </tbody>
+      </table>
+      <script>
+        window.onload = function () {
+          if (sessionStorage.scrollToBottom == "yes") {
+            window.scrollTo({top: document.body.offsetHeight - window.innerHeight + 50, behavior: 'smooth' })
+          }
+          setInterval(() => fetch(location.href).then(response => response.text()).then(body => {
+            if ([...body.matchAll(/[<]img /g)].length !== document.getElementsByTagName('img').length) {
+              sessionStorage.scrollToBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight ? "yes" : "no";
+              window.location.reload();
+            }
+          }), 500);
+        }
+      </script>
+    </body>
+    </html>
+  HTML
+
   class << self
     attr_accessor :group
   end
@@ -13,45 +53,7 @@ module VisualReportHelper
 
   def create_visual_report
     File.open(visual_report_path, 'w') do |fp|
-      fp << <<-HTML
-      <!DOCTYPE html>
-      <html >
-      <head>
-      <title>Morandi report</title>
-      <meta charset="utf-8">
-      <style>
-      .img-block { display: inline-block; margin-right: 20px; }
-      th, td { text-align: left; vertical-align: top; }
-      </style>
-      </head>
-      <body>
-        <table width="100%" border="1">
-        <thead>
-          <tr>
-            <th width="20%">Description</th>
-            <th width="80%">Image</th>
-          </tr>
-        </thead>
-        <tbody>
-           <!-- insert results -->
-        </tbody>
-        </table>
-        <script>
-          window.onload = function () {
-            if (sessionStorage.scrollToBottom == "yes") {
-              window.scrollTo({top: document.body.offsetHeight - window.innerHeight + 50, behavior: 'smooth' })
-            }
-            setInterval(() => fetch(location.href).then(response => response.text()).then(body => {
-              if ([...body.matchAll(/[<]img /g)].length !== document.getElementsByTagName('img').length) {
-                sessionStorage.scrollToBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight ? "yes" : "no";
-                window.location.reload();
-              }
-            }), 500);
-          }
-        </script>
-      </body>
-      </html>
-      HTML
+      fp << VISUAL_REPORT_TEMPLATE
     end
   end
 
