@@ -41,16 +41,6 @@ module Morandi
       ].map(&:to_i)
     end
 
-    def constrain(val, min, max)
-      if val < min
-        min
-      elsif val > max
-        max
-      else
-        val
-      end
-    end
-
     def apply_crop(pixbuf, x_coord, y_coord, width, height, fill_col = 0xffffffff)
       if x_coord.negative? ||
          y_coord.negative? ||
@@ -92,10 +82,10 @@ module Morandi
         )
         pixbuf = base_pixbuf
       else
-        x_coord = constrain(x_coord, 0, pixbuf.width)
-        y_coord = constrain(y_coord, 0, pixbuf.height)
-        width = constrain(width, 1, pixbuf.width - x_coord)
-        height = constrain(height, 1, pixbuf.height - y_coord)
+        x_coord = x_coord.clamp(0, pixbuf.width)
+        y_coord = y_coord.clamp(0, pixbuf.height)
+        width = width.clamp(1, pixbuf.width - x_coord)
+        height = height.clamp(1, pixbuf.height - y_coord)
 
         pixbuf = pixbuf.subpixbuf(x_coord, y_coord, width, height)
       end
