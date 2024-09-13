@@ -42,6 +42,7 @@ end
 
 module MorandiNative
   class RedEye
+    # Represents an area with a suspected red eye
     class Region
       attr_accessor :area_min_x, :area_min_y
     end
