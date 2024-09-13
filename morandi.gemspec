@@ -20,6 +20,8 @@ Gem::Specification.new do |spec|
 
   spec.extensions    = %w[ext/morandi_native/extconf.rb ext/gdk_pixbuf_cairo/extconf.rb]
 
+  spec.metadata['rubygems_mfa_required'] = 'true'
+
   spec.add_dependency 'atk', '> 4.0.0'
   spec.add_dependency 'cairo'
   spec.add_dependency 'colorscore'
