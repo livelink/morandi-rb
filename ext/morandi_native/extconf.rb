@@ -13,7 +13,7 @@ def macos?
 end
 
 def clang?
-  cc_version = `#{RbConfig.expand('$(CC) --version' + '')}`
+  cc_version = `#{RbConfig.expand('$(CC) --version'.dup)}`
   cc_version.match?(/clang/i)
 end
 
