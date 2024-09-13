@@ -114,7 +114,7 @@ module Morandi
 
     def apply_colour_manipulations!
       if options['brighten'].to_i.nonzero?
-        brighten = [[5 * options['brighten'], -100].max, 100].min
+        brighten = (5 * options['brighten']).clamp(-100, 100)
         @pb = MorandiNative::PixbufUtils.brightness(@pb, brighten)
       end
 
@@ -124,8 +124,8 @@ module Morandi
       end
 
       if options['contrast'].to_i.nonzero?
-        @pb = MorandiNative::PixbufUtils.contrast(@pb,
-                                                  [[5 * options['contrast'], -100].max, 100].min)
+        contrast = (5 * options['contrast']).clamp(-100, 100)
+        @pb = MorandiNative::PixbufUtils.contrast(@pb, contrast)
       end
 
       return unless options['sharpen'].to_i.nonzero?
