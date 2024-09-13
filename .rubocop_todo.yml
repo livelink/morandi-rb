@@ -22,7 +22,7 @@ Metrics/AbcSize:
 # Configuration parameters: CountComments, CountAsOne, ExcludedMethods, IgnoredMethods.
 # IgnoredMethods: refine
 Metrics/BlockLength:
-  IgnoredMethods:
+  AllowedMethods:
   - describe
   - context
 
@@ -71,4 +71,3 @@ Style/Documentation:
   Exclude:
     - 'spec/**/*'
     - 'test/**/*'
-
