@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['git@intersect-uk.co.uk']
   spec.summary       = 'Simple Image Edits'
   spec.description   = 'Apply simple edits to images'
-  spec.homepage      = ''
+  spec.homepage      = 'https://github.com/livelink/morandi-rb'
   spec.license       = 'MIT'
 
   spec.required_ruby_version = '>= 2.0'
@@ -20,12 +20,13 @@ Gem::Specification.new do |spec|
 
   spec.extensions    = %w[ext/morandi_native/extconf.rb ext/gdk_pixbuf_cairo/extconf.rb]
 
+  spec.metadata['source_code_uri'] = 'https://github.com/livelink/morandi-rb'
   spec.metadata['rubygems_mfa_required'] = 'true'
 
-  spec.add_dependency 'atk', '> 4.0.0'
-  spec.add_dependency 'cairo'
-  spec.add_dependency 'colorscore'
-  spec.add_dependency 'gdk_pixbuf2', '> 4.0.0'
-  spec.add_dependency 'pango', '> 4.0.0'
-  spec.add_dependency 'rake-compiler'
+  spec.add_dependency 'atk', '~> 4.0'
+  spec.add_dependency 'cairo', '~> 1.0'
+  spec.add_dependency 'colorscore', '~> 0.0'
+  spec.add_dependency 'gdk_pixbuf2', '~> 4.0'
+  spec.add_dependency 'pango', '~> 4.0'
+  spec.add_dependency 'rake-compiler', '~> 1.2'
 end
