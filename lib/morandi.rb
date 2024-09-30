@@ -6,7 +6,6 @@ require 'morandi_native'
 require 'morandi/cairo_ext'
 require 'morandi/pixbuf_ext'
 require 'morandi/image_processor'
-require 'morandi/image_operation'
 require 'morandi/redeye'
 require 'morandi/crop_utils'
 
