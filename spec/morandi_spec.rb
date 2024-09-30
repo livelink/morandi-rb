@@ -261,11 +261,34 @@ RSpec.describe Morandi, '#process' do
     describe 'when given a straighten option' do
       let(:options) { { 'straighten' => 5 } }
 
-      it 'should reduce the straighten images' do
+      it 'straightens images' do
         process_image
 
         expect(File).to exist(file_out)
         expect(processed_image_type).to eq('jpeg')
+      end
+
+      context 'with a negative straighten value' do
+        let(:options) { { 'straighten' => -20 } }
+
+        it 'straightens images' do
+          process_image
+
+          expect(File).to exist(file_out)
+          expect(processed_image_type).to eq('jpeg')
+        end
+      end
+
+      context 'with vertical image' do
+        let(:original_image_width) { 100 }
+        let(:original_image_height) { 400 }
+
+        it 'straightens images' do
+          process_image
+
+          expect(File).to exist(file_out)
+          expect(processed_image_type).to eq('jpeg')
+        end
       end
     end
 
@@ -331,7 +354,7 @@ RSpec.describe Morandi, '#process' do
                                                                                     100))).to be_greyish
       end
 
-      context 'with a black image and invalid spots' do
+      context 'with a gray image and invalid spots' do
         let(:file_arg) { solid_colour_image(800, 800, 0x666666ff) }
         let(:options) { { 'redeye' => [[540, 650], [-100, 100]] } }
 
