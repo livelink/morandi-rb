@@ -162,8 +162,7 @@ module Morandi
       @pb = @pb.rotate(a) unless (a % 360).zero?
 
       unless options['straighten'].to_f.zero?
-        @pb = Morandi::Operation::Straighten.new_from_hash(angle: options['straighten'].to_f).call(nil,
-                                                                                        @pb)
+        @pb = Morandi::Operation::Straighten.new_from_hash(angle: options['straighten'].to_f).call(@pb)
       end
 
       @image_width = @pb.width
@@ -210,7 +209,7 @@ module Morandi
       else
         return
       end
-      @pb = op.call(nil, @pb)
+      @pb = op.call(@pb)
     end
 
     def apply_decorations!
@@ -235,7 +234,7 @@ module Morandi
         'border_size' => @scale * config_for('border-size-mm').to_i * 300 / 25.4 # 5mm at 300dpi
       )
 
-      @pb = op.call(nil, @pb)
+      @pb = op.call(@pb)
     end
 
     private

@@ -10,7 +10,7 @@ module Morandi
     class Straighten < ImageOperation
       attr_accessor :angle
 
-      def call(_image, pixbuf)
+      def call(pixbuf)
         return pixbuf if angle.zero?
 
         rotation_value_rad = angle * (Math::PI / 180)

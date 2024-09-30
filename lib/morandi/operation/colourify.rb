@@ -33,7 +33,7 @@ module Morandi
       end
       alias bw greyscale # WebKiosk
 
-      def call(_image, pixbuf)
+      def call(pixbuf)
         if @filter && respond_to?(@filter)
           __send__(@filter, pixbuf)
         else
