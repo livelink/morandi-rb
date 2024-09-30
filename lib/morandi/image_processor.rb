@@ -2,6 +2,9 @@
 
 require 'morandi/profiled_pixbuf'
 require 'morandi/redeye'
+require 'morandi/operation/straighten'
+require 'morandi/operation/colourify'
+require 'morandi/operation/image_border'
 
 module Morandi
   # rubocop:disable Metrics/ClassLength
@@ -159,7 +162,7 @@ module Morandi
       @pb = @pb.rotate(a) unless (a % 360).zero?
 
       unless options['straighten'].to_f.zero?
-        @pb = Morandi::Straighten.new_from_hash(angle: options['straighten'].to_f).call(nil,
+        @pb = Morandi::Operation::Straighten.new_from_hash(angle: options['straighten'].to_f).call(nil,
                                                                                         @pb)
       end
 
@@ -203,7 +206,7 @@ module Morandi
 
       case filter
       when 'greyscale', 'sepia', 'bluetone'
-        op = Morandi::Colourify.new_from_hash('filter' => filter)
+        op = Morandi::Operation::Colourify.new_from_hash('filter' => filter)
       else
         return
       end
@@ -222,7 +225,7 @@ module Morandi
       crop = options['crop']
       crop = crop.map { |s| (s.to_f * @scale).floor } if crop && not_equal_to_one(@scale)
 
-      op = Morandi::ImageBorder.new_from_hash(
+      op = Morandi::Operation::ImageBorder.new_from_hash(
         'style' => style,
         'colour' => colour || '#000000',
         'crop' => crop,
