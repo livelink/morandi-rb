@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 ### Added
+- Better test coverage for straighten operation
+
+### Changed
+- Extracted image operations to separate files within a dedicated module
+
+## [0.99.03] 19.09.2024
+### Added
 - Copied pixbufutils and redeye gems into main gem
 - Added gdk_pixbuf_cairo C extension to convert between GdkPixbufs and ImageSurfaces
 - Added Ruby 3 support
@@ -20,7 +27,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - Refactored test suite
 - Fixed most rubocop offenses
-### Aded
+### Added
 - CI pipeline
 - rubocop
 - Development image
@@ -32,7 +39,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [0.12.0] 10.12.2020
 ### Fixed
 - Compatability with gdk_pixbuf v3.4.0+ [TECH-14001]
-### Aded
+### Added
 - .ruby-version file
 
 
