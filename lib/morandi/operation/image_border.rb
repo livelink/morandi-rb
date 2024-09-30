@@ -12,7 +12,7 @@ module Morandi
     class ImageBorder < ImageOperation
       attr_accessor :style, :colour, :crop, :size, :print_size, :shrink, :border_size
 
-      def call(_image, pixbuf)
+      def call(pixbuf)
         return pixbuf unless %w[square retro].include? @style
 
         create_pixbuf_from_image_surface(:rgb24, pixbuf.width, pixbuf.height) do |cr|
