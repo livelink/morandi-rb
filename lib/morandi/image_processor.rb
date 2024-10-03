@@ -23,7 +23,7 @@ module Morandi
       @options = (local_options || {}).merge(user_options || {})
       @local_options = local_options
 
-      @scale_to = @options['output.max']
+      @max_size_px = @options['output.max']
       @width = @options['output.width']
       @height = @options['output.height']
     end
@@ -87,10 +87,10 @@ module Morandi
 
     def get_pixbuf
       _, width, height = GdkPixbuf::Pixbuf.get_file_info(@file)
-      @pb = Morandi::ProfiledPixbuf.new(@file, @local_options, @scale_to)
+      @pb = Morandi::ProfiledPixbuf.new(@file, @local_options, @max_size_px)
       @actual_max = [@pb.width, @pb.height].max
 
-      @src_max = if @scale_to
+      @src_max = if @max_size_px
                    [width, height].max
                  else
                    [@pb.width, @pb.height].max

@@ -31,7 +31,7 @@ module Morandi
       "#{path}.icc.jpg"
     end
 
-    def initialize(file, local_options, scale_to = nil)
+    def initialize(file, local_options, max_size_px = nil)
       @local_options = local_options
       @file = file
 
@@ -41,8 +41,8 @@ module Morandi
         file = icc_file if valid_jpeg?(icc_file)
       end
 
-      if scale_to
-        super(file: file, width: scale_to, height: scale_to)
+      if max_size_px
+        super(file: file, width: max_size_px, height: max_size_px)
       else
         super(file: file)
       end
