@@ -88,15 +88,17 @@ module Morandi
     def get_pixbuf
       _, width, height = GdkPixbuf::Pixbuf.get_file_info(@file)
       @pb = Morandi::ProfiledPixbuf.new(@file, @local_options, @max_size_px)
-      @actual_max = [@pb.width, @pb.height].max
 
-      @src_max = if @max_size_px
+      # Everything below probably could be substituted with the following:
+      # @scale = @max_size_px ? @max_size_px / [width, height].max : 1.0
+      actual_max = [@pb.width, @pb.height].max
+      src_max = if @max_size_px
                    [width, height].max
                  else
                    [@pb.width, @pb.height].max
                  end
 
-      @scale = @actual_max / @src_max.to_f
+      @scale = actual_max / src_max.to_f
     end
 
     SHARPEN = [
