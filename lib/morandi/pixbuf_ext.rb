@@ -10,6 +10,7 @@ module GdkPixbuf
       GdkPixbufCairo.pixbuf_to_surface(self)
     end
 
+    # Proportionally scales down the image so that it fits within max_size*max_size square
     def scale_max(max_size, interp = GdkPixbuf::InterpType::BILINEAR, _max_scale = 1.0)
       mul = (max_size / [width, height].max.to_f)
       mul = [1.0, mul].min
