@@ -31,6 +31,10 @@ RSpec.configure do |config|
   # the seed, which is printed after each run.
   #     --seed 1234
   config.order = 'random'
+
+  # Allows to use options like --only-failures and --next-failure
+  config.example_status_persistence_file_path = 'tmp/rspec_failures.txt'
+
   config.include ColourHelper
   config.include VisualReportHelper
 
