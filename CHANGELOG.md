@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 - Extracted image operations to separate files within a dedicated module
+- [BREAKING] Introduced raising Morandi's own errors instead of bubbling Pixbuf's
 
 ## [0.99.03] 19.09.2024
 ### Added
@@ -19,8 +20,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Bumped version to 0.99.01 in preparation for a 1.0 release
 
 ### Removed
-- support for Ruby 2.0 (and illusion of it being tested by CI)
-- support for Ruby 2.3
+- [BREAKING] support for Ruby 2.0 (and illusion of it being tested by CI)
+- [BREAKING] support for Ruby 2.3
 - gtk2 dependency
 
 ## [0.13.0] 16.12.2020

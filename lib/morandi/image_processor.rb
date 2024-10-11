@@ -58,6 +58,10 @@ module Morandi
       @pb = @pb.scale_max([@width, @height].max) if @options['output.limit'] && @width && @height
 
       @pb
+    rescue GdkPixbuf::PixbufError::UnknownType => e
+      raise UnknownTypeError, e.message
+    rescue GdkPixbuf::PixbufError::CorruptImage => e
+      raise CorruptImageError, e.message
     end
 
     # Returns generated pixbuf
