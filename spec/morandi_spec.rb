@@ -59,7 +59,7 @@ RSpec.describe Morandi, '#process' do
     describe 'when given a blank file' do
       it 'should fail' do
         File.open(file_in, 'w') { |fp| fp << '' }
-        expect { process_image }.to raise_exception(GdkPixbuf::PixbufError::CorruptImage)
+        expect { process_image }.to raise_exception(Morandi::CorruptImageError)
         expect(File).not_to exist(file_out)
       end
     end
@@ -67,7 +67,7 @@ RSpec.describe Morandi, '#process' do
     describe 'when given a corrupt file' do
       it 'should fail' do
         File.open(file_in, 'ab') { |fp| fp.truncate(64) }
-        expect { process_image }.to raise_exception(GdkPixbuf::PixbufError::CorruptImage)
+        expect { process_image }.to raise_exception(Morandi::CorruptImageError)
         expect(File).not_to exist(file_out)
       end
     end
@@ -76,7 +76,7 @@ RSpec.describe Morandi, '#process' do
       it 'should fail' do
         File.open(file_in, 'wb') { |fp| fp << 'INVALID' }
         (expect { process_image }).to(raise_error do |err|
-          err.is_a?(GdkPixbuf::PixbufError::UnknownType) or err.is_a?(GdkPixbuf::PixbufError::CorruptImage)
+          err.is_a?(Morandi::UnknownTypeError) or err.is_a?(Morandi::CorruptImageError)
         end)
         expect(File).not_to exist(file_out)
       end
