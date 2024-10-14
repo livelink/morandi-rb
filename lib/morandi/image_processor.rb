@@ -97,10 +97,10 @@ module Morandi
       # @scale = @max_size_px ? @max_size_px / [width, height].max : 1.0
       actual_max = [@pb.width, @pb.height].max
       src_max = if @max_size_px
-                   [width, height].max
-                 else
-                   [@pb.width, @pb.height].max
-                 end
+                  [width, height].max
+                else
+                  [@pb.width, @pb.height].max
+                end
 
       @scale = actual_max / src_max.to_f
     end
