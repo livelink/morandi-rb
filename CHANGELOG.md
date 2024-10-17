@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Extracted image operations to separate files within a dedicated module
 - [BREAKING] Introduced raising Morandi's own errors instead of bubbling Pixbuf's
 
+### Fixed
+- Updated required ruby version in gemspec to reflect dropping Ruby 2.3 support
+
 ## [0.99.03] 19.09.2024
 ### Added
 - Copied pixbufutils and redeye gems into main gem
