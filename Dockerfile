@@ -1,4 +1,4 @@
-FROM ruby:2.7-slim
+FROM ruby:3.3-slim
 
 LABEL Name=morandirb Version=0.0.2
 
