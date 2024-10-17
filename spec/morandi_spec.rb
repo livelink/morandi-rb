@@ -206,7 +206,7 @@ RSpec.describe Morandi, '#process' do
         generate_test_image(icc_path, icc_width, icc_height)
       end
 
-      it 'it should use a file at this location as the input' do
+      it 'should use a file at this location as the input' do
         process_image
 
         expect(File).to exist(file_out)
