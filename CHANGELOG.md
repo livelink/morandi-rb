@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Unreleased
 ### Added
 - Better test coverage for straighten operation
+- Support for visual image comparison in specs
 
 ### Changed
 - Extracted image operations to separate files within a dedicated module
