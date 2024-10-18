@@ -506,6 +506,16 @@ RSpec.describe Morandi, '#process' do
     end
   end
 
+  context 'with non-sRGB colour profile' do
+    let(:file_in) { 'spec/fixtures/pumpkins-icc-adobe-rgb-1998.jpg' }
+
+    it 'converts the profile to sRGB' do
+      process_image
+
+      expect(file_out).to match_reference_image('pumpkins-icc-adobe-rgb-1998-processed-without-modifications')
+    end
+  end
+
   context 'with increasing quality settings' do
     let!(:max_quality_file) do
       Morandi.process(file_in, { 'quality' => 100 }, 'sample/out-100.jpg')
