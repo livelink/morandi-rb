@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'https://github.com/livelink/morandi-rb'
   spec.license       = 'MIT'
 
-  spec.required_ruby_version = '>= 2.0'
+  spec.required_ruby_version = '>= 2.7'
   spec.files         = Dir['CHANGELOG.md', 'LICENSE.txt', 'README.md', 'ext/**/*', 'lib/**/*']
   spec.require_paths = ['lib']
 

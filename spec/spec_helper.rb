@@ -17,8 +17,9 @@ require 'morandi'
 require 'gdk_pixbuf_cairo'
 require 'morandi_native'
 require 'super_diff/rspec'
-
 require 'pry'
+
+require 'support/match_reference_image'
 require_relative 'visual_report_helper'
 require_relative 'colour_helper'
 

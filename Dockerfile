@@ -1,4 +1,4 @@
-FROM ruby:2.7-slim
+FROM ruby:3.3-slim
 
 LABEL Name=morandirb Version=0.0.2
 
@@ -17,9 +17,11 @@ RUN apt-get update && apt-get install -yyq --no-install-recommends \
 RUN gem update --system 3.4.22
 
 WORKDIR /app
-COPY morandi.gemspec Gemfile ./
+COPY morandi.gemspec Gemfile Gemfile.lock ./
 COPY lib/morandi/version.rb lib/morandi/version.rb
 RUN bundle install
 COPY . /app
+# Compile the native extensions
+RUN bundle exec rake compile
 
 CMD ["bundle", "exec", "guard"]
