@@ -40,9 +40,10 @@ RSpec.describe Morandi, '#process' do
   end
 
   describe 'when given an input without any options' do
-    it 'should create ouptut' do
+    it 'creates output' do
       process_image
       expect(File).to exist(file_out)
+      expect(file_out).to match_reference_image('plasma-no-op-output')
     end
   end
 
@@ -84,21 +85,25 @@ RSpec.describe Morandi, '#process' do
       }
     end
 
-    it 'should create ouptut' do
+    it 'creates output' do
       process_image
       expect(File).to exist(file_out)
+      expect(processed_image_type).to eq('jpeg')
+      expect(processed_image_width).to eq 15_839
+      expect(processed_image_height).to eq 18_804
     end
   end
 
   describe 'when given an angle of rotation' do
     let(:options) { { 'angle' => 90 } }
 
-    it 'should do rotation of images' do
+    it 'rotates the image' do
       process_image
 
       expect(File).to exist(file_out)
       expect(original_image_width).to eq(processed_image_height)
       expect(original_image_height).to eq(processed_image_width)
+      expect(file_out).to match_reference_image('plasma-rotated-90')
     end
   end
 
@@ -114,6 +119,7 @@ RSpec.describe Morandi, '#process' do
 
       expect(processed_image_width).to eq(pixbuf.width)
       expect(processed_image_height).to eq(pixbuf.height)
+      expect(file_out).to match_reference_image('plasma-from-pixbuf-no-op-output')
     end
   end
 
@@ -130,6 +136,8 @@ RSpec.describe Morandi, '#process' do
         expect(File).to exist(file_out)
         expect(processed_image_width).to eq(cropped_width)
         expect(processed_image_height).to eq(cropped_height)
+
+        expect(file_out).to match_reference_image('plasma-cropped')
       end
     end
 
@@ -142,6 +150,8 @@ RSpec.describe Morandi, '#process' do
         expect(File).to exist(file_out)
         expect(processed_image_width).to eq(cropped_width)
         expect(processed_image_height).to eq(cropped_height)
+
+        expect(file_out).to match_reference_image('plasma-cropped')
       end
     end
 
@@ -154,6 +164,8 @@ RSpec.describe Morandi, '#process' do
         expect(File).to exist(file_out)
         expect(processed_image_width).to eq(cropped_width)
         expect(processed_image_height).to eq(cropped_height)
+
+        expect(file_out).to match_reference_image('plasma-cropped-negative-initial-coords')
       end
     end
 
@@ -166,6 +178,8 @@ RSpec.describe Morandi, '#process' do
         expect(File).to exist(file_out)
         expect(processed_image_width).to eq(original_image_width + 50)
         expect(processed_image_height).to eq(original_image_height + 50)
+
+        expect(file_out).to match_reference_image('plasma-cropped-excessive-size')
       end
     end
 
@@ -178,6 +192,8 @@ RSpec.describe Morandi, '#process' do
         expect(File).to exist(file_out)
         expect(processed_image_width).to eq(1)
         expect(processed_image_height).to eq(1)
+
+        expect(file_out).to match_reference_image('plasma-cropped-1x1')
       end
     end
   end
@@ -245,6 +261,8 @@ RSpec.describe Morandi, '#process' do
       expect(File).to exist(file_out)
       expect(processed_image_width).to be <= (max_size)
       expect(processed_image_height).to be <= (max_size)
+
+      expect(file_out).to match_reference_image('plasma-constrained-output-size')
     end
   end
 
@@ -256,6 +274,8 @@ RSpec.describe Morandi, '#process' do
 
       expect(File).to exist(file_out)
       expect(processed_image_type).to eq('jpeg')
+
+      expect(file_out).to match_reference_image('plasma-straighten-positive-5')
     end
 
     context 'with a negative straighten value' do
@@ -266,6 +286,8 @@ RSpec.describe Morandi, '#process' do
 
         expect(File).to exist(file_out)
         expect(processed_image_type).to eq('jpeg')
+
+        expect(file_out).to match_reference_image('plasma-straighten-negative-20')
       end
     end
 
@@ -278,6 +300,8 @@ RSpec.describe Morandi, '#process' do
 
         expect(File).to exist(file_out)
         expect(processed_image_type).to eq('jpeg')
+
+        expect(file_out).to match_reference_image('plasma-straighten-on-vertical-image')
       end
     end
   end
@@ -291,17 +315,20 @@ RSpec.describe Morandi, '#process' do
 
       expect(File).to exist(file_out)
       expect(processed_image_type).to eq('jpeg')
+
+      expect(file_out).to match_reference_image('plasma-gamma')
     end
   end
 
   describe 'when given an fx option' do
     let(:options) { { 'fx' => 'sepia' } }
 
-    it 'should reduce the size of images' do
+    it 'applies filter to the image' do
       process_image
 
       expect(File).to exist(file_out)
       expect(processed_image_type).to eq('jpeg')
+      expect(file_out).to match_reference_image('plasma-sepia')
     end
   end
 
@@ -325,6 +352,8 @@ RSpec.describe Morandi, '#process' do
       expect(processed_image_type).to eq('jpeg')
       expect(processed_image_width).to be <= max_width
       expect(processed_image_height).to be <= max_height
+
+      expect(file_out).to match_reference_image('plasma-auto-cropped')
     end
   end
 
@@ -342,6 +371,8 @@ RSpec.describe Morandi, '#process' do
                                                                                  100))).to be_redish
       expect(crude_average_colour(GdkPixbuf::Pixbuf.new(file: file_out).subpixbuf(505, 605, 100,
                                                                                   100))).to be_greyish
+
+      expect(file_out).to match_reference_image('redeye-correction')
     end
 
     context 'with a gray image and invalid spots' do
@@ -361,7 +392,7 @@ RSpec.describe Morandi, '#process' do
     end
   end
 
-  describe 'when given a sharpen option' do
+  describe 'when given a negative sharpen option' do
     let(:options) { { 'sharpen' => -3 } }
 
     it 'should blur the image' do
@@ -369,6 +400,7 @@ RSpec.describe Morandi, '#process' do
 
       expect(File).to exist(file_out)
       expect(processed_image_type).to eq('jpeg')
+      expect(file_out).to match_reference_image('plasma-blurred')
     end
   end
 
@@ -380,6 +412,8 @@ RSpec.describe Morandi, '#process' do
 
       expect(File).to exist(file_out)
       expect(processed_image_type).to eq('jpeg')
+
+      expect(file_out).to match_reference_image('plasma-sharpened')
     end
   end
 
@@ -404,6 +438,8 @@ RSpec.describe Morandi, '#process' do
         expect(processed_image_type).to eq('jpeg')
         expect(processed_image_width).to eq(original_image_width)
         expect(processed_image_height).to eq(original_image_height)
+
+        expect(file_out).to match_reference_image('plasma-bordered-dominant')
       end
     end
 
@@ -417,6 +453,8 @@ RSpec.describe Morandi, '#process' do
         expect(processed_image_type).to eq('jpeg')
         expect(processed_image_width).to eq(original_image_width)
         expect(processed_image_height).to eq(original_image_height)
+
+        expect(file_out).to match_reference_image('plasma-bordered-black')
       end
     end
 
@@ -430,6 +468,8 @@ RSpec.describe Morandi, '#process' do
         expect(processed_image_type).to eq('jpeg')
         expect(processed_image_width).to eq(original_image_width)
         expect(processed_image_height).to eq(original_image_height)
+
+        expect(file_out).to match_reference_image('plasma-bordered-white')
       end
     end
 
@@ -443,6 +483,8 @@ RSpec.describe Morandi, '#process' do
         expect(processed_image_type).to eq('jpeg')
         expect(processed_image_width).to eq(original_image_width)
         expect(processed_image_height).to eq(original_image_height)
+
+        expect(file_out).to match_reference_image('plasma-bordered-retro-background')
       end
     end
   end
@@ -465,6 +507,8 @@ RSpec.describe Morandi, '#process' do
       expect(processed_image_type).to eq('jpeg')
       expect(processed_image_width).to eq(original_image_width)
       expect(processed_image_height).to eq(original_image_height)
+
+      expect(file_out).to match_reference_image('plasma-bordered-retro-style')
     end
   end
 
@@ -494,6 +538,8 @@ RSpec.describe Morandi, '#process' do
       expect(processed_image_type).to eq('jpeg')
       expect(processed_image_width).to eq(desired_image_width)
       expect(processed_image_height).to eq(desired_image_height)
+
+      expect(file_out).to match_reference_image('plasma-multiple-transformations')
     end
   end
 
