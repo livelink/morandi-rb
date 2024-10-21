@@ -17,16 +17,6 @@ module Morandi
       false
     end
 
-    # TODO: this doesn't use lcms
-    def self.from_string(string, loader: nil, chunk_size: 4096)
-      loader ||= GdkPixbuf::PixbufLoader.new
-      ((string.bytesize + chunk_size - 1) / chunk_size).times do |i|
-        loader.write(string.byteslice(i * chunk_size, chunk_size))
-      end
-      loader.close
-      loader.pixbuf
-    end
-
     def self.default_icc_path(path)
       "#{path}.icc.jpg"
     end
