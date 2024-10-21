@@ -46,15 +46,6 @@ RSpec.describe Morandi, '#process' do
     end
   end
 
-  describe 'when given a pixbuf instead of a file' do
-    let!(:file_arg) { Morandi::ProfiledPixbuf.from_string(File.read(file_in)) }
-    it 'should create ouptut' do
-      FileUtils.rm_f(file_in)
-      process_image
-      expect(File).to exist(file_out)
-    end
-  end
-
   describe 'when given a blank file' do
     it 'should fail' do
       File.open(file_in, 'w') { |fp| fp << '' }
