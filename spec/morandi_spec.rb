@@ -95,15 +95,42 @@ RSpec.describe Morandi, '#process' do
   end
 
   describe 'when given an angle of rotation' do
-    let(:options) { { 'angle' => 90 } }
+    let(:options) { { 'angle' => angle } }
 
-    it 'rotates the image' do
-      process_image
+    context '90 degress' do
+      let(:angle) { 90 }
 
-      expect(File).to exist(file_out)
-      expect(original_image_width).to eq(processed_image_height)
-      expect(original_image_height).to eq(processed_image_width)
-      expect(file_out).to match_reference_image('plasma-rotated-90')
+      it 'rotates the image' do
+        process_image
+        expect(file_out).to match_reference_image('plasma-rotated-90')
+      end
+    end
+
+    context '180 degress' do
+      let(:angle) { 180 }
+
+      it 'rotates the image' do
+        process_image
+        expect(file_out).to match_reference_image('plasma-rotated-180')
+      end
+    end
+
+    context '270 degress' do
+      let(:angle) { 270 }
+
+      it 'rotates the image' do
+        process_image
+        expect(file_out).to match_reference_image('plasma-rotated-270')
+      end
+    end
+
+    context '360 degress' do
+      let(:angle) { 360 }
+
+      it 'does not perform any rotation' do
+        process_image
+        expect(file_out).to match_reference_image('plasma-no-op-output')
+      end
     end
   end
 
