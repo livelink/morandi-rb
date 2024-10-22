@@ -1,51 +1,29 @@
 # frozen_string_literal: true
 
 require 'gdk_pixbuf2'
+require 'morandi/srgb_conversion'
 
 module Morandi
   # ProfiledPixbuf is a descendent of GdkPixbuf::Pixbuf with ICC support.
   # It attempts to load an image using jpegicc/littlecms to ensure that it is sRGB.
+  # NOTE: pixbuf supports colour profiles, but it requires an explicit icc-profile option to embed it when saving file
   class ProfiledPixbuf < GdkPixbuf::Pixbuf
-    def valid_jpeg?(filename)
-      return false unless File.exist?(filename)
-      return false unless File.size(filename).positive?
-
-      type, = GdkPixbuf::Pixbuf.get_file_info(filename)
-
-      type && type.name.eql?('jpeg')
-    rescue StandardError
-      false
-    end
-
-    def self.default_icc_path(path)
-      "#{path}.icc.jpg"
-    end
-
-    def initialize(file, local_options, max_size_px = nil)
+    def initialize(path, local_options, max_size_px = nil)
       @local_options = local_options
-      @file = file
 
-      if suitable_for_jpegicc?
-        icc_file = icc_cache_path
-        valid_jpeg?(icc_file) || system('jpgicc', '-q97', @file, icc_file, out: '/dev/null', err: '/dev/null')
-        file = icc_file if valid_jpeg?(icc_file)
-      end
+      path = srgb_path(path) || path
 
       if max_size_px
-        super(file: file, width: max_size_px, height: max_size_px)
+        super(file: path, width: max_size_px, height: max_size_px)
       else
-        super(file: file)
+        super(file: path)
       end
     end
 
     private
 
-    def suitable_for_jpegicc?
-      valid_jpeg?(@file)
-    end
-
-    def icc_cache_path
-      @local_options['path.icc'] || Morandi::ProfiledPixbuf.default_icc_path(@file)
+    def srgb_path(original_path)
+      Morandi::SrgbConversion.perform(original_path, target_path: @local_options['path.icc'])
     end
   end
 end
