@@ -349,14 +349,42 @@ RSpec.describe Morandi, '#process' do
   end
 
   describe 'when given an fx option' do
-    let(:options) { { 'fx' => 'sepia' } }
+    let(:options) { { 'fx' => filter_name } }
 
-    it 'applies filter to the image' do
-      process_image
+    context 'with sepia' do
+      let(:filter_name) { 'sepia' }
 
-      expect(File).to exist(file_out)
-      expect(processed_image_type).to eq('jpeg')
-      expect(file_out).to match_reference_image('plasma-sepia')
+      it 'applies filter to the image' do
+        process_image
+
+        expect(File).to exist(file_out)
+        expect(processed_image_type).to eq('jpeg')
+        expect(file_out).to match_reference_image('plasma-sepia')
+      end
+    end
+
+    context 'with bluetone' do
+      let(:filter_name) { 'bluetone' }
+
+      it 'applies filter to the image' do
+        process_image
+
+        expect(File).to exist(file_out)
+        expect(processed_image_type).to eq('jpeg')
+        expect(file_out).to match_reference_image('plasma-bluetone')
+      end
+    end
+
+    context 'with greyscale' do
+      let(:filter_name) { 'greyscale' }
+
+      it 'applies filter to the image' do
+        process_image
+
+        expect(File).to exist(file_out)
+        expect(processed_image_type).to eq('jpeg')
+        expect(file_out).to match_reference_image('plasma-greyscale')
+      end
     end
   end
 
