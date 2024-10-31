@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - Updated required ruby version in gemspec to reflect dropping Ruby 2.3 support
 
+### Removed
+- [BREAKING] `config` accessor in ImageProcessor removed in favour of `user_options` supplied in constructor
+
 ## [0.99.03] 19.09.2024
 ### Added
 - Copied pixbufutils and redeye gems into main gem
