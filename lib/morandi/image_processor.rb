@@ -12,7 +12,6 @@ module Morandi
   # ImageProcessor transforms an image.
   class ImageProcessor
     attr_reader :options, :pb
-    attr_accessor :config
 
     def initialize(file, user_options, local_options = {})
       @file = file
@@ -180,7 +179,6 @@ module Morandi
     }.freeze
     def config_for(key)
       return options[key] if options&.key?(key)
-      return @config[key] if @config&.key?(key)
 
       DEFAULT_CONFIG[key]
     end
