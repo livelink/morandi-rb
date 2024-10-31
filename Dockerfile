@@ -11,6 +11,8 @@ RUN apt-get update && apt-get install -yyq --no-install-recommends \
   liblcms2-utils \
   # When girepository tries to install implicitly, there's an error due to apt being locked; details in commit message
   libgirepository1.0-dev \
+  # At the time of writing, "time" package is only required for benchmark
+  time \
   && apt-get clean \
   && rm -rf /va/lib/apt/lists/*
 

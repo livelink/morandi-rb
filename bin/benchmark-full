@@ -1,0 +1,111 @@
+#!/usr/bin/env ruby
+
+# frozen_string_literal: true
+
+# A script for benchmarking various image operations in terms of execution time, CPU and memory usage
+# Usage:
+# bundle exec bin/benchmark-full
+
+require 'open3'
+require 'csv'
+require 'json'
+
+# Inputs setup is left here for inspiration, but the actual image files are not part of the repo to avoid clutter
+inputs = [
+  {
+    path: 'tmp/high-res-small-size-16000x11000px.jpg',
+    options: { 'crop' => '815,850,14909,10005', 'straighten' => 0.5, 'gamma' => 0.85 },
+    description: 'Huge, pixelised grayscale gradient'
+  },
+  {
+    path: 'tmp/spider-8288816.jpg',
+    options: { 'crop' => '100,100,6000,4000', 'angle' => 180, 'straighten' => -0.5, 'gamma' => 1.2 },
+    description: '10MB stock photo'
+  },
+  {
+    path: 'tmp/apple-8027938.jpg',
+    options: { 'crop' => '300,300,5000,3000', 'gamma' => 1.0 },
+    description: '1MB stock photo'
+  },
+  {
+    path: 'tmp/IMG_1425.jpg',
+    options: { 'crop' => '100,100,2500,2500', 'straighten' => 0.5, 'gamma' => 0.85 },
+    description: 'A typical phone upload'
+  }
+]
+
+module Morandi
+  # Processes given images using available processors, collecting metrics like duration, CPU and peak RAM usage
+  class FullBenchmark
+    TIME_FORMAT_READABLE = "Real: %es, sys: %S, usr: %U; CPU: %P; RSS max: %MKB\n"
+    TIME_FORMAT_PARSEABLE = '%e,%S,%U,%P,%M'
+    IMAGE_PROCESSORS = %w[pixbuf].freeze
+    ITERATIONS_PER_IMAGE = 10
+
+    def initialize(inputs)
+      @inputs = inputs
+    end
+
+    def perform
+      inputs.each do |input|
+        perform_single(input_image_path: input[:path], options: input[:options], description: input[:description])
+      end
+    end
+
+    private
+
+    attr_reader :inputs
+
+    def perform_single(input_image_path:, options:, description:)
+      log <<~TXT.chomp
+        Processing image: #{input_image_path} (#{description}), #{ITERATIONS_PER_IMAGE} runs
+        Options: #{options.inspect}
+      TXT
+
+      IMAGE_PROCESSORS.each do |image_processor|
+        log "  #{image_processor}:"
+
+        stats = Hash.new { |hash, key| hash[key] = [] }
+        cmd = ['bundle', 'exec',
+               '/usr/bin/time', '--format', TIME_FORMAT_PARSEABLE,
+               'bin/process-single', input_image_path, image_processor, options.to_json]
+
+        ITERATIONS_PER_IMAGE.times do |_i|
+          stdout_str, _status = Open3.capture2e(*cmd)
+          result = parse_single_benchmark_result(stdout_str)
+          result.each { |key, value| stats[key] << value }
+        end
+
+        stats.each do |key, entries|
+          avg = entries.sum / entries.length
+          log "    #{key}: avg #{avg.round(2)}; min #{entries.min.round(2)}; max #{entries.max.round(2)}"
+        end
+      end
+    end
+
+    def log(message)
+      puts message
+    end
+
+    def parse_single_benchmark_result(text_to_parse)
+      result = CSV.parse(text_to_parse).first
+
+      {
+        real_time: result[0].to_f,
+        kernel_time: result[1].to_f,
+        user_time: result[2].to_f,
+        cpu_percentage: result[3].sub('%', '').to_i,
+        rss_max_mb: result[4].to_f / 1024
+      }
+    rescue CSV::MalformedCSVError
+      log "Unexpected data in stdout, data for inspection:\n#{text_to_parse}"
+      raise
+    rescue StandardError
+      log "Unhandled error occurred. Data for inspection:\n#{text_to_parse}"
+      log "Parsed data for inspection:\n#{result}"
+      raise
+    end
+  end
+end
+
+Morandi::FullBenchmark.new(inputs).perform
