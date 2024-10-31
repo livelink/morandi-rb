@@ -16,9 +16,9 @@ module Morandi
 
   # The main entry point for the libray
   #
-  # @param in_file [String|GdkPixbuf::Pixbuf] source image
-  # @param settings [Hash]
-  # @param out_file [String] target location for image
+  # @param source [String|GdkPixbuf::Pixbuf] source image
+  # @param options [Hash]
+  # @param target_path [String] target location for image
   # @param local_options [Hash]
   #
   # Settings Key | Values | Description
@@ -34,9 +34,9 @@ module Morandi
   # border-style  | String square,retro | Set border style
   # background-style  | String retro,black,white | Set border colour
   # quality       | String '1'..'100' | Set JPG compression value, defaults to 97%
-  def process(file_in, options, file_out, local_options = {})
-    pro = ImageProcessor.new(file_in, options, local_options)
+  def process(source, options, target_path, local_options = {})
+    pro = ImageProcessor.new(source, options, local_options)
     pro.result
-    pro.write_to_jpeg(file_out)
+    pro.write_to_jpeg(target_path)
   end
 end
