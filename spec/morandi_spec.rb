@@ -413,6 +413,39 @@ RSpec.describe Morandi, '#process' do
     end
   end
 
+  describe 'with limiting the output size without autocrop' do
+    let(:output_width) { 300 }
+    let(:output_height) { 200 }
+
+    let(:options) do
+      {
+        'output.width' => output_width,
+        'output.height' => output_height,
+        'image.auto-crop' => false,
+        'output.limit' => true
+      }
+    end
+
+    it 'scales the entire image proportionally to fit within the square of higher dimension size' do
+      process_image
+
+      expect(processed_image_width).to eq output_width
+      expect(processed_image_height).to eq 243 # NOTE: more than output_height, very confusing!
+    end
+
+    context 'with output orientation being different than input' do
+      let(:output_width) { 200 }
+      let(:output_height) { 300 }
+
+      it 'constraints based on the higher dimension size' do
+        process_image
+
+        expect(processed_image_width).to eq 300 # NOTE: restricting width based on output.height
+        expect(processed_image_height).to eq 243
+      end
+    end
+  end
+
   describe 'when given a redeye option' do
     let(:file_in) { 'spec/fixtures/public-domain-redeye-image-from-wikipedia.jpg' }
     let(:options) { { 'redeye' => [[540, 650]] } }
