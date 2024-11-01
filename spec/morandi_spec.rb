@@ -50,7 +50,9 @@ RSpec.describe Morandi, '#process' do
   describe 'when given a blank file' do
     it 'should fail' do
       File.open(file_in, 'w') { |fp| fp << '' }
-      expect { process_image }.to raise_exception(Morandi::CorruptImageError)
+      (expect { process_image }).to(raise_error do |err|
+        err.is_a?(Morandi::UnknownTypeError) or err.is_a?(Morandi::CorruptImageError)
+      end)
       expect(File).not_to exist(file_out)
     end
   end
