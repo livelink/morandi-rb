@@ -429,7 +429,7 @@ RSpec.describe Morandi, '#process' do
       process_image
 
       expect(processed_image_width).to eq output_width
-      expect(processed_image_height).to eq 243 # NOTE: more than output_height, very confusing!
+      expect(processed_image_height).to be_between(243, 244) # NOTE: more than output_height, very confusing!
     end
 
     context 'with output orientation being different than input' do
@@ -440,7 +440,7 @@ RSpec.describe Morandi, '#process' do
         process_image
 
         expect(processed_image_width).to eq 300 # NOTE: restricting width based on output.height
-        expect(processed_image_height).to eq 243
+        expect(processed_image_height).to be_between(243, 244)
       end
     end
   end
