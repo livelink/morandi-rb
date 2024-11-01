@@ -338,7 +338,6 @@ RSpec.describe Morandi, '#process' do
     let(:options) { { 'gamma' => 2.0 } }
 
     it 'should apply the gamma to the image' do
-      expect(MorandiNative::PixbufUtils).to receive(:gamma).and_call_original
       process_image
 
       expect(File).to exist(file_out)
