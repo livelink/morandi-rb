@@ -436,7 +436,7 @@ RSpec.describe Morandi, '#process' do
 
         expect(processed_image_width).to eq(pixbuf.width)
         expect(processed_image_height).to eq(pixbuf.height)
-        # Pixbuf no-op is slightly different than file no-op because icc colour profile processing only happens for files
+        # Pixbuf's no-op is different than file no-op because icc colour profile processing only happens for files
         expect(file_out).to match_reference_image('plasma-from-pixbuf-no-op-output')
       end
     end
