@@ -20,3 +20,6 @@ stop:
 clean:
 	docker ps -q --filter name=${CONTAINER_NAME} | grep -q . && docker container stop ${CONTAINER_NAME} || true
 	docker image ls -q ${IMAGE_NAME} | grep -q . && docker image rm ${IMAGE_NAME} || true
+
+docs:
+	docker run -it --rm --name ${CONTAINER_NAME} -v ${PWD}:/app ${IMAGE_NAME}:latest yard doc lib/morandi.rb
