@@ -27,8 +27,8 @@ module Morandi
   # @option options [Array[Integer,Integer,Integer,Integer]] 'crop' Crop image (x, y, width, height)
   # @option options [String] 'fx' Apply colour filters ('greyscale', 'sepia', 'bluetone')
   # @option options [String] 'border-style' Set border style ('square', 'retro')
-  # @option options [String] 'background-style' Set border colour ('retro', 'black', 'white')
-  # @option options [String] 'quality' ('97') Set JPG compression value ('1' to '100')
+  # @option options [String] 'background-style' Set border colour ('retro', 'black', 'white', 'dominant')
+  # @option options [Integer] 'quality' (97) Set JPG compression value (1 to 100)
   # @option options [Integer] 'output.max' Downscales the image to fit within the square of given size before
   #                                        processing to limit the required resources
   # @option options [Integer] 'output.width' Sets desired width of resulting image
