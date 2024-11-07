@@ -73,7 +73,7 @@ RSpec::Matchers.define :match_reference_image do |reference_name, file_type: 'jp
     return true if @normalized_mean_error <= tolerance
 
     metadata = RSpec.current_example.metadata
-    spec_name = "#{metadata[:absolute_file_path].split('/spec/').last}:#{metadata[:line_number]}"
+    spec_name = "#{metadata[:absolute_file_path].split('/spec/').last}:#{metadata[:scoped_id]}"
     @debug_data = Morandi::SpecSupport::ImageDebugData.new(spec_name, file_type)
 
     @debug_data.expose_from(reference_path: reference_path, tested_path: tested_path, diff_path: tmp_diff.path)
