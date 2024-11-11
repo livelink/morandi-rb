@@ -26,6 +26,7 @@ Metrics/BlockLength:
   - describe
   - context
   - shared_examples
+  - RSpec::Matchers.define
 
 # Offense count: 1
 # Configuration parameters: CountComments, CountAsOne.

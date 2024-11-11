@@ -42,19 +42,31 @@ module Morandi
 
       attr_reader :exposed_reference_path, :exposed_tested_path, :exposed_diff_path
 
-      def initialize(name, file_type)
-        sanitised_name = name.gsub(/[^a-zA-Z0-9_-]+/, '-')
-        @output_dir = File.join(OUTPUT_ROOT, sanitised_name)
-        @exposed_reference_path = File.join(@output_dir, "reference.#{file_type}")
-        @exposed_tested_path = File.join(@output_dir, "tested.#{file_type}")
-        @exposed_diff_path = File.join(@output_dir, 'diff.png')
+      def initialize(name)
+        @name = name
       end
 
-      def expose_from(reference_path:, tested_path:, diff_path:)
-        FileUtils.mkdir_p(@output_dir)
-        FileUtils.cp(tested_path, @exposed_tested_path)
-        FileUtils.cp(reference_path, @exposed_reference_path)
-        FileUtils.cp(diff_path, @exposed_diff_path)
+      def expose_from(file_type:, tested_path: nil, reference_path: nil, diff_path: nil)
+        sanitised_name = @name.gsub(/[^a-zA-Z0-9_-]+/, '-')
+        output_dir = File.join(OUTPUT_ROOT, sanitised_name)
+        FileUtils.mkdir_p(output_dir)
+
+        if reference_path
+          @exposed_reference_path = File.join(output_dir, "reference.#{file_type}")
+          FileUtils.cp(reference_path, @exposed_reference_path)
+        end
+
+        if tested_path
+          @exposed_tested_path = File.join(output_dir, "tested.#{file_type}")
+          FileUtils.cp(tested_path, @exposed_tested_path)
+        end
+
+        if diff_path
+          @exposed_diff_path = File.join(output_dir, 'diff.png')
+          FileUtils.cp(diff_path, @exposed_diff_path)
+        end
+
+        true
       end
     end
   end
@@ -63,7 +75,18 @@ end
 RSpec::Matchers.define :match_reference_image do |reference_name, file_type: 'jpg', tolerance: 0|
   reference_path = File.join('spec/fixtures/reference_images', "#{reference_name}.#{file_type}")
 
+  def debug_data
+    metadata = RSpec.current_example.metadata
+    spec_name = "#{metadata[:absolute_file_path].split('/spec/').last}:#{metadata[:scoped_id]}"
+    @debug_data ||= Morandi::SpecSupport::ImageDebugData.new(spec_name)
+  end
+
   match do |tested_path|
+    if File.file?(tested_path) && !File.file?(reference_path)
+      debug_data.expose_from(tested_path: tested_path, file_type: file_type)
+      return false
+    end
+
     tmp_diff = Tempfile.new('test-diff')
     comparison = Morandi::SpecSupport::ImageComparison.new(reference_path: reference_path,
                                                            tested_path: tested_path,
@@ -72,25 +95,35 @@ RSpec::Matchers.define :match_reference_image do |reference_name, file_type: 'jp
     @normalized_mean_error = comparison.normalized_mean_error
     return true if @normalized_mean_error <= tolerance
 
-    metadata = RSpec.current_example.metadata
-    spec_name = "#{metadata[:absolute_file_path].split('/spec/').last}:#{metadata[:scoped_id]}"
-    @debug_data = Morandi::SpecSupport::ImageDebugData.new(spec_name, file_type)
-
-    @debug_data.expose_from(reference_path: reference_path, tested_path: tested_path, diff_path: tmp_diff.path)
+    debug_data.expose_from(reference_path: reference_path,
+                           tested_path: tested_path,
+                           diff_path: tmp_diff.path,
+                           file_type: file_type)
     false
   ensure
-    tmp_diff.close!
+    tmp_diff&.close!
   end
 
   failure_message do
-    <<~TXT
-      The provided image and reference image do not match (error: #{@normalized_mean_error}, tolerance: #{tolerance})
-      EXPECTED: #{@debug_data.exposed_reference_path}
-      ACTUAL: #{@debug_data.exposed_tested_path}
-      DIFF: #{@debug_data.exposed_diff_path}
+    if debug_data.exposed_reference_path
+      <<~TXT
+        The provided image and reference image do not match (error: #{@normalized_mean_error}, tolerance: #{tolerance})
+        EXPECTED: #{debug_data.exposed_reference_path}
+        ACTUAL: #{debug_data.exposed_tested_path}
+        DIFF: #{debug_data.exposed_diff_path}
 
-      After manually confirming that the difference is expected, run:
-      cp #{@debug_data.exposed_tested_path} #{reference_path}
-    TXT
+        After manually confirming that the difference is expected, run:
+        cp #{debug_data.exposed_tested_path} #{reference_path}
+
+      TXT
+    else
+      <<~TXT
+        The provided reference image does not exist.
+
+        If there is no typo and tested image is valid, reference can be created with:
+        cp #{debug_data.exposed_tested_path} #{reference_path}
+
+      TXT
+    end
   end
 end
