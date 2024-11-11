@@ -5,3 +5,18 @@ AllCops:
 
 Metrics/BlockLength:
   CountAsOne: ['array', 'hash', 'heredoc', 'method_call']
+  AllowedMethods:
+  - describe
+  - context
+  - shared_examples
+  - RSpec::Matchers.define
+
+Naming/MethodParameterName:
+  AllowedNames:
+    - x
+    - y
+    - cr
+    - x1
+    - y1
+    - x2
+    - y2
