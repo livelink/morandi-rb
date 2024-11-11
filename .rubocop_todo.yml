@@ -18,16 +18,6 @@ Gemspec/RequiredRubyVersion:
 Metrics/AbcSize:
   Max: 94
 
-# Offense count: 3
-# Configuration parameters: CountComments, CountAsOne, ExcludedMethods, IgnoredMethods.
-# IgnoredMethods: refine
-Metrics/BlockLength:
-  AllowedMethods:
-  - describe
-  - context
-  - shared_examples
-  - RSpec::Matchers.define
-
 # Offense count: 1
 # Configuration parameters: CountComments, CountAsOne.
 Metrics/ClassLength:
@@ -52,16 +42,6 @@ Metrics/ParameterLists:
 # Configuration parameters: IgnoredMethods.
 Metrics/PerceivedComplexity:
   Max: 17
-
-Naming/MethodParameterName:
-  AllowedNames:
-    - x
-    - y
-    - cr
-    - x1
-    - y1
-    - x2
-    - y2
 
 # Offense count: 1
 Naming/AccessorMethodName:
