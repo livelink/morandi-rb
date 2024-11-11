@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Support for visual image comparison in specs
 - Automated visual comparison of images in specs, also serving as a record of exact rendering behaviour
 - Development scripts for performing benchmarks
+- Basic test coverage for transparency support
 
 ### Changed
 - Extracted image operations to separate files within a dedicated module

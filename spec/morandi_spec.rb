@@ -421,6 +421,38 @@ RSpec.describe Morandi, '#process' do
         expect(created_file_sizes.sort).to eq(files_in_increasing_quality_order)
       end
     end
+
+    context 'with transparent png input' do
+      let(:file_in) { 'spec/fixtures/match-with-transparency.png' }
+      let(:options) do
+        {
+          'gamma' => 1.1,
+          'fx' => 'sepia',
+          'crop' => [10, 2, 600, 840]
+        }
+      end
+
+      it 'applies transformations' do
+        process_image
+
+        expect(File).to exist(file_out)
+        expect(processed_image_type).to eq('jpeg')
+        expect(file_out).to match_reference_image('match-multiple-operations')
+      end
+
+      context 'with straighten option' do
+        # Tested explicitly, because morandi happens to handle transparency differently when using straighten
+        let(:options) { super().merge('straighten' => 2) }
+
+        it 'applies transformations' do
+          process_image
+
+          expect(File).to exist(file_out)
+          expect(processed_image_type).to eq('jpeg')
+          expect(file_out).to match_reference_image('match-multiple-operations-and-straighten')
+        end
+      end
+    end
   end
 
   context 'pixbuf processor' do
