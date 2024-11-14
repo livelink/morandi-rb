@@ -578,7 +578,10 @@ RSpec.describe Morandi, '#process' do
       end
 
       context 'with a gray image and invalid spots' do
-        let(:file_arg) { solid_colour_image(800, 800, 0x666666ff) }
+        let(:file_in) { 'sample/sample.jpg' }
+        let(:original_image_width) { 800 }
+        let(:original_image_height) { 800 }
+        let(:generate_image) { generate_test_image_solid(file_in, width: 800, height: 800, colour: '#666666') }
         let(:options) { { 'redeye' => [[540, 650], [-100, 100]] } }
 
         it 'should not break or corrupt the image' do
@@ -587,9 +590,9 @@ RSpec.describe Morandi, '#process' do
           expect(File).to exist(file_out)
           expect(processed_image_type).to eq('jpeg')
 
-          expect(crude_average_colour(file_arg.subpixbuf(505, 605, 100, 100))).to be_greyish
-          expect(crude_average_colour(GdkPixbuf::Pixbuf.new(file: file_out).subpixbuf(505, 605, 100,
-                                                                                      100))).to be_greyish
+          expect(crude_average_colour(GdkPixbuf::Pixbuf.new(file: file_in).subpixbuf(505, 605, 100, 100))).to be_greyish
+          expect(crude_average_colour(GdkPixbuf::Pixbuf.new(file: file_out).subpixbuf(505, 605, 100, 100)))
+            .to be_greyish
         end
       end
     end

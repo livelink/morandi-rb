@@ -16,25 +16,12 @@ module ColourHelper
   def generate_test_image(at_file_path, fill:, width: 600, height: 300)
     fill = Array(fill).flatten
 
-    system(
-      'convert',
-      '-size',
-      "#{width}x#{height}",
-      '-seed',
-      '5432',
-      *fill,
-      at_file_path
-    )
+    generate_image_options = ['convert', '-size', "#{width}x#{height}", '-seed', '5432', *fill, at_file_path]
+    system(*generate_image_options) || raise("Failed to generate image.\nCommand: #{generate_image_options.join(' ')}")
   end
 
-  def solid_colour_image(width, height, colour = 0x000000ff)
-    pb = GdkPixbuf::Pixbuf.new(colorspace: GdkPixbuf::Colorspace::RGB,
-                               has_alpha: false,
-                               bits_per_sample: 8,
-                               width: width,
-                               height: height)
-    pb.fill!(colour)
-    pb
+  def generate_test_image_solid(at_file_path, width: 600, height: 300, colour: '#000000')
+    generate_test_image(at_file_path, width: width, height: height, fill: "canvas:#{colour}")
   end
 
   def crude_average_colour(pixbuf)
