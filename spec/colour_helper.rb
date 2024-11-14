@@ -1,15 +1,24 @@
 # frozen_string_literal: true
 
 module ColourHelper
-  def generate_test_image(at_file_path, width = 600, height = 300)
+  def generate_test_image_plasma_checkers(at_file_path, width: 600, height: 300)
+    fill = [
+      ['plasma:red-blue'],
+      ['pattern:checkerboard', '-gravity', 'center', '-geometry', "+#{width * 3 / 4},+0", '-composite']
+    ]
+    generate_test_image(at_file_path, fill: fill, width: width, height: height)
+  end
+
+  def generate_test_image(at_file_path, fill:, width: 600, height: 300)
+    fill = Array(fill).flatten
+
     system(
       'convert',
       '-size',
       "#{width}x#{height}",
       '-seed',
       '5432',
-      'plasma:red-blue',
-      'pattern:checkerboard', '-gravity', 'center', '-geometry', "+#{width * 3 / 4},+0", '-composite',
+      *fill,
       at_file_path
     )
   end
