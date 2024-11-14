@@ -9,6 +9,10 @@ module ColourHelper
     generate_test_image(at_file_path, fill: fill, width: width, height: height)
   end
 
+  def generate_test_image_greyscale(at_file_path, width: 600, height: 300)
+    generate_test_image(at_file_path, fill: 'gradient:white-black', width: width, height: height)
+  end
+
   def generate_test_image(at_file_path, fill:, width: 600, height: 300)
     fill = Array(fill).flatten
 
