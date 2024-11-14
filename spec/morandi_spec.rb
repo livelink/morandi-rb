@@ -27,7 +27,9 @@ RSpec.describe Morandi, '#process' do
   end
 
   before do
-    generate_test_image(file_in, original_image_width, original_image_height) unless File.exist?(file_in)
+    next if File.exist?(file_in)
+
+    generate_test_image_plasma_checkers(file_in, width: original_image_width, height: original_image_height)
   end
 
   after do |ex|
@@ -486,7 +488,7 @@ RSpec.describe Morandi, '#process' do
       let(:icc_height) { 400 }
 
       before do
-        generate_test_image(icc_path, icc_width, icc_height)
+        generate_test_image_plasma_checkers(icc_path, width: icc_width, height: icc_height)
       end
 
       it 'should use a file at this location as the input' do
@@ -516,7 +518,7 @@ RSpec.describe Morandi, '#process' do
       let(:icc_height) { 400 }
 
       before do
-        generate_test_image(icc_path, icc_width, icc_height)
+        generate_test_image_plasma_checkers(icc_path, width: icc_width, height: icc_height)
       end
 
       it 'should ignore the file at this path' do
