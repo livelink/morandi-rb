@@ -82,7 +82,9 @@ RSpec::Matchers.define :match_reference_image do |reference_name, file_type: 'jp
   end
 
   match do |tested_path|
-    if File.file?(tested_path) && !File.file?(reference_path)
+    raise ArgumentError, "Provided path is not a file: #{tested_path}" unless File.file?(tested_path)
+
+    unless File.file?(reference_path)
       debug_data.expose_from(tested_path: tested_path, file_type: file_type)
       return false
     end
