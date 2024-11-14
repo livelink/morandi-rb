@@ -19,7 +19,8 @@ require 'morandi_native'
 require 'super_diff/rspec'
 require 'pry'
 
-require 'support/match_reference_image'
+Dir['spec/support/**/*.rb'].each { |f| require "./#{f}" }
+
 require_relative 'visual_report_helper'
 require_relative 'colour_helper'
 

@@ -17,6 +17,9 @@ RSpec.describe Morandi, '#process' do
   let(:processed_image_type) { processed_image_info[0].name }
   let(:processed_image_width) { processed_image_info[1] }
   let(:processed_image_height) { processed_image_info[2] }
+  let(:generate_image) do
+    generate_test_image_plasma_checkers(file_in, width: original_image_width, height: original_image_height)
+  end
 
   before(:all) do
     FileUtils.mkdir_p('sample')
@@ -29,7 +32,7 @@ RSpec.describe Morandi, '#process' do
   before do
     next if File.exist?(file_in)
 
-    generate_test_image_plasma_checkers(file_in, width: original_image_width, height: original_image_height)
+    generate_image
   end
 
   after do |ex|
@@ -453,6 +456,31 @@ RSpec.describe Morandi, '#process' do
           expect(File).to exist(file_out)
           expect(processed_image_type).to eq('jpeg')
           expect(file_out).to match_reference_image('match-multiple-operations-and-straighten')
+        end
+      end
+    end
+
+    context 'with a non-rgb image' do
+      let(:generate_image) do
+        generate_test_image_greyscale(file_in, width: original_image_width, height: original_image_height)
+      end
+
+      it 'changes greyscale image to srgb' do
+        expect(file_in).to match_colourspace('gray') # Testing a setup to protect from a hidden regression
+        process_image
+
+        expect(file_out).to match_colourspace('srgb')
+      end
+
+      # Colour filters implementation operates on RGB-based constants, thus a dedicated test
+      context 'with colour filter' do
+        let(:options) { super().merge('fx' => 'sepia') }
+
+        it 'creates a valid, srgb image' do
+          process_image
+
+          expect(file_out).to match_reference_image('greyscale-with-sepia')
+          expect(file_out).to match_colourspace('srgb')
         end
       end
     end
