@@ -15,7 +15,7 @@ inputs = [
   {
     path: 'tmp/high-res-small-size-16000x11000px.jpg',
     options: { 'crop' => '815,850,14909,10005', 'straighten' => 0.5, 'gamma' => 0.85 },
-    description: 'Huge, pixelised grayscale gradient'
+    description: 'Huge, pixelised greyscale gradient'
   },
   {
     path: 'tmp/spider-8288816.jpg',
