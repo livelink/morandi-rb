@@ -33,8 +33,9 @@ RSpec.describe Morandi, '#process' do
   end
 
   after do |ex|
-    add_to_visual_report(ex, files = Dir['sample/*'])
-    FileUtils.rm_rf(files)
+    test_files = Dir['sample/*']
+    add_to_visual_report(ex, (test_files + [file_in]).uniq)
+    FileUtils.rm_rf(test_files)
   end
 
   after(:all) do
