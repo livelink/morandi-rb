@@ -45,7 +45,10 @@ RSpec.describe Morandi, '#process' do
     FileUtils.remove_dir('sample/')
   end
 
-  shared_examples 'an image processor' do
+  shared_examples 'an image processor' do |processor_name|
+    let(:reference_image_prefix) { processor_name == 'pixbuf' ? '' : processor_name }
+    subject(:process_image) { Morandi.process(file_arg, options, file_out, { 'processor' => processor_name }) }
+
     describe 'when given an input without any options' do
       it 'creates output' do
         process_image
@@ -487,7 +490,7 @@ RSpec.describe Morandi, '#process' do
   end
 
   context 'pixbuf processor' do
-    it_behaves_like 'an image processor'
+    it_behaves_like 'an image processor', 'pixbuf'
 
     describe 'when given a pixbuf as an input' do
       subject(:process_image) do

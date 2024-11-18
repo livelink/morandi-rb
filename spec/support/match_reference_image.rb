@@ -72,8 +72,9 @@ module Morandi
   end
 end
 
-RSpec::Matchers.define :match_reference_image do |reference_name, file_type: 'jpg', tolerance: 0|
-  reference_path = File.join('spec/fixtures/reference_images', "#{reference_name}.#{file_type}")
+RSpec::Matchers.define :match_reference_image do |*reference_id, file_type: 'jpg', tolerance: 0|
+  *reference_scope, reference_name = reference_id
+  reference_path = File.join('spec/fixtures/reference_images', *reference_scope, "#{reference_name}.#{file_type}")
 
   def debug_data
     metadata = RSpec.current_example.metadata
