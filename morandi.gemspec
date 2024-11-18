@@ -29,4 +29,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'gdk_pixbuf2', '~> 4.0'
   spec.add_dependency 'pango', '~> 4.0'
   spec.add_dependency 'rake-compiler', '~> 1.2'
+  spec.add_dependency 'ruby-vips'
 end

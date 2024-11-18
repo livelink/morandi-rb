@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -yyq --no-install-recommends \
   libgirepository1.0-dev \
   # At the time of writing, "time" package is only required for benchmark
   time \
+  libvips \
   && apt-get clean \
   && rm -rf /va/lib/apt/lists/*
 

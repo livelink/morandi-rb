@@ -7,6 +7,7 @@ require 'morandi/cairo_ext'
 require 'morandi/pixbuf_ext'
 require 'morandi/errors'
 require 'morandi/image_processor'
+require 'morandi/vips_image_processor'
 require 'morandi/redeye'
 require 'morandi/crop_utils'
 
@@ -42,9 +43,20 @@ module Morandi
   # @param target_path [String] target location for image
   # @param local_options [Hash] Hash of options other than desired transformations
   # @option local_options [String] 'path.icc' A path to store the input after converting to sRGB colour space
+  # @options local_options [String] 'processor' ('pixbuf') Name of the image processing library ('pixbuf', 'vips')
   def process(source, options, target_path, local_options = {})
-    pro = ImageProcessor.new(source, options, local_options)
-    pro.result
-    pro.write_to_jpeg(target_path)
+    case local_options['processor']
+    when 'vips'
+      # Cache saves time in expense of RAM when performing the same processing multiple times
+      # Cache is also created for files based on their names, which can lead to leaking files data, so in terms
+      # of security it feels prudent to disable it. Latest libvips supports "revalidate" option to prevent that risk
+      cache_max = 0
+      concurrency = 2 # Hardcoding to 2 for now to maintain some balance between resource usage and performance
+      VipsImageProcessor.with_global_options(cache_max: cache_max, concurrency: concurrency) do
+        VipsImageProcessor.new(source, options).write_to_jpeg(target_path)
+      end
+    else
+      ImageProcessor.new(source, options, local_options).tap(&:result).write_to_jpeg(target_path)
+    end
   end
 end
