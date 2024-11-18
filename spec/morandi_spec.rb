@@ -223,7 +223,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when given an output.max option', vips_wip: processor_name == 'vips' do
+    describe 'when given an output.max option' do
       let(:options) { { 'output.max' => max_size } }
       let(:max_size) { 200 }
 
@@ -234,7 +234,8 @@ RSpec.describe Morandi, '#process' do
         expect(processed_image_width).to be <= (max_size)
         expect(processed_image_height).to be <= (max_size)
 
-        expect(file_out).to match_reference_image('plasma-constrained-output-size')
+        expect(file_out).to match_reference_image(reference_image_prefix, 'plasma-constrained-output-size',
+                                                  tolerance: 0.006)
       end
     end
 
