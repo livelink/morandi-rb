@@ -60,6 +60,10 @@ RSpec.configure do |config|
     puts "Visual report is available here: #{VisualReportHelper.visual_report_path}"
     puts 'Coverage report is here: coverage/index.html'
   end
+
+  config.before(:each, vips_wip: true) do
+    pending('Vips WIP')
+  end
 end
 
 RSpec::Matchers.define :be_redish do

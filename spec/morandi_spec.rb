@@ -49,7 +49,7 @@ RSpec.describe Morandi, '#process' do
     let(:reference_image_prefix) { processor_name == 'pixbuf' ? '' : processor_name }
     subject(:process_image) { Morandi.process(file_arg, options, file_out, { 'processor' => processor_name }) }
 
-    describe 'when given an input without any options' do
+    describe 'when given an input without any options', vips_wip: processor_name == 'vips' do
       it 'creates output' do
         process_image
         expect(File).to exist(file_out)
@@ -87,7 +87,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'with a big image and a bigger cropped area to fill' do
+    describe 'with a big image and a bigger cropped area to fill', vips_wip: processor_name == 'vips' do
       let(:options) do
         {
           'crop' => '0,477,15839,18804',
@@ -111,7 +111,7 @@ RSpec.describe Morandi, '#process' do
     describe 'when given an angle of rotation' do
       let(:options) { { 'angle' => angle } }
 
-      context '90 degress' do
+      context '90 degress', vips_wip: processor_name == 'vips' do
         let(:angle) { 90 }
 
         it 'rotates the image' do
@@ -120,7 +120,7 @@ RSpec.describe Morandi, '#process' do
         end
       end
 
-      context '180 degress' do
+      context '180 degress', vips_wip: processor_name == 'vips' do
         let(:angle) { 180 }
 
         it 'rotates the image' do
@@ -129,7 +129,7 @@ RSpec.describe Morandi, '#process' do
         end
       end
 
-      context '270 degress' do
+      context '270 degress', vips_wip: processor_name == 'vips' do
         let(:angle) { 270 }
 
         it 'rotates the image' do
@@ -138,7 +138,7 @@ RSpec.describe Morandi, '#process' do
         end
       end
 
-      context '360 degress' do
+      context '360 degress', vips_wip: processor_name == 'vips' do
         let(:angle) { 360 }
 
         it 'does not perform any rotation' do
@@ -148,7 +148,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    context 'when give a "crop" option' do
+    context 'when give a "crop" option', vips_wip: processor_name == 'vips' do
       let(:cropped_width) { 300 }
       let(:cropped_height) { 300 }
 
@@ -223,7 +223,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when given an output.max option' do
+    describe 'when given an output.max option', vips_wip: processor_name == 'vips' do
       let(:options) { { 'output.max' => max_size } }
       let(:max_size) { 200 }
 
@@ -238,7 +238,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when given a straighten option' do
+    describe 'when given a straighten option', vips_wip: processor_name == 'vips' do
       let(:options) { { 'straighten' => 5 } }
 
       it 'straightens images' do
@@ -278,7 +278,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when given a gamma option' do
+    describe 'when given a gamma option', vips_wip: processor_name == 'vips' do
       let(:options) { { 'gamma' => 2.0 } }
 
       it 'should apply the gamma to the image' do
@@ -291,7 +291,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when given an fx option' do
+    describe 'when given an fx option', vips_wip: processor_name == 'vips' do
       let(:options) { { 'fx' => filter_name } }
 
       context 'with sepia' do
@@ -331,7 +331,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when changing the dimensions and auto-cropping' do
+    describe 'when changing the dimensions and auto-cropping', vips_wip: processor_name == 'vips' do
       let(:max_width) { 300 }
       let(:max_height) { 200 }
 
@@ -389,7 +389,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    context 'with non-sRGB colour profile' do
+    context 'with non-sRGB colour profile', vips_wip: processor_name == 'vips' do
       let(:file_in) { 'spec/fixtures/pumpkins-icc-adobe-rgb-1998.jpg' }
 
       it 'converts the profile to sRGB' do
@@ -431,7 +431,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    context 'with transparent png input' do
+    context 'with transparent png input', vips_wip: processor_name == 'vips' do
       let(:file_in) { 'spec/fixtures/match-with-transparency.png' }
       let(:options) do
         {
@@ -463,7 +463,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    context 'with a non-rgb image' do
+    context 'with a non-rgb image', vips_wip: processor_name == 'vips' do
       let(:generate_image) do
         generate_test_image_greyscale(file_in, width: original_image_width, height: original_image_height)
       end
@@ -735,5 +735,9 @@ RSpec.describe Morandi, '#process' do
         expect(file_out).to match_reference_image('plasma-multiple-transformations')
       end
     end
+  end
+
+  context 'vips processor' do
+    it_behaves_like 'an image processor', 'vips'
   end
 end
