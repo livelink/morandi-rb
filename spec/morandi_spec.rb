@@ -390,13 +390,14 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    context 'with non-sRGB colour profile', vips_wip: processor_name == 'vips' do
+    context 'with non-sRGB colour profile' do
       let(:file_in) { 'spec/fixtures/pumpkins-icc-adobe-rgb-1998.jpg' }
 
       it 'converts the profile to sRGB' do
         process_image
 
-        expect(file_out).to match_reference_image('pumpkins-icc-adobe-rgb-1998-processed-without-modifications')
+        reference_image_name = 'pumpkins-icc-adobe-rgb-1998-processed-without-modifications'
+        expect(file_out).to match_reference_image(reference_image_prefix, reference_image_name)
       end
     end
 
