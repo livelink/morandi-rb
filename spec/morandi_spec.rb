@@ -49,11 +49,11 @@ RSpec.describe Morandi, '#process' do
     let(:reference_image_prefix) { processor_name == 'pixbuf' ? '' : processor_name }
     subject(:process_image) { Morandi.process(file_arg, options, file_out, { 'processor' => processor_name }) }
 
-    describe 'when given an input without any options', vips_wip: processor_name == 'vips' do
+    describe 'when given an input without any options' do
       it 'creates output' do
         process_image
         expect(File).to exist(file_out)
-        expect(file_out).to match_reference_image('plasma-no-op-output')
+        expect(file_out).to match_reference_image(reference_image_prefix, 'plasma-no-op-output')
       end
     end
 
@@ -138,12 +138,12 @@ RSpec.describe Morandi, '#process' do
         end
       end
 
-      context '360 degress', vips_wip: processor_name == 'vips' do
+      context '360 degrees' do
         let(:angle) { 360 }
 
         it 'does not perform any rotation' do
           process_image
-          expect(file_out).to match_reference_image('plasma-no-op-output')
+          expect(file_out).to match_reference_image(reference_image_prefix, 'plasma-no-op-output')
         end
       end
     end
