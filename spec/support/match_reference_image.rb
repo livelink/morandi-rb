@@ -96,13 +96,15 @@ RSpec::Matchers.define :match_reference_image do |*reference_id, file_type: 'jpg
                                                            diff_path: tmp_diff.path,
                                                            tolerance: tolerance)
     @normalized_mean_error = comparison.normalized_mean_error
-    return true if @normalized_mean_error <= tolerance
 
-    debug_data.expose_from(reference_path: reference_path,
-                           tested_path: tested_path,
-                           diff_path: tmp_diff.path,
-                           file_type: file_type)
-    false
+    if @normalized_mean_error > 0
+      debug_data.expose_from(reference_path: reference_path,
+                             tested_path: tested_path,
+                             diff_path: tmp_diff.path,
+                             file_type: file_type)
+    end
+
+    @normalized_mean_error <= tolerance
   ensure
     tmp_diff&.close!
   end
