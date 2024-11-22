@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    morandi (0.99.03)
+    morandi (0.99.4)
       atk (~> 4.0)
       cairo (~> 1.0)
       colorscore (~> 0.0)

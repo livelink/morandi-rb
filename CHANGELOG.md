@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [0.99.4] 18.11.2024
+## [0.99.4] 22.11.2024
 ### Added
 - Better test coverage for straighten operation
 - Support for visual image comparison in specs
