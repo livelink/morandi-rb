@@ -7,7 +7,7 @@ module Morandi
   module Operation
     # Image Border operation
     # Supports retro (rounded) and square borders
-    # Background colour (ie. border colour) can be white, black, dominant (ie. from image)
+    # Background colour (ie. border colour) can be white, black
     # @!visibility private
     class ImageBorder < ImageOperation
       attr_accessor :style, :colour, :crop, :size, :print_size, :shrink, :border_size
@@ -26,7 +26,7 @@ module Morandi
 
           @border_scale = [img_width, img_height].max.to_f / print_size.max.to_i
 
-          draw_background(cr, img_height, img_width, pixbuf)
+          draw_background(cr, img_height, img_width)
 
           x = border_width
           y = border_width
@@ -75,7 +75,7 @@ module Morandi
         cr.paint(1.0)
       end
 
-      def draw_background(cr, img_height, img_width, pixbuf)
+      def draw_background(cr, img_height, img_width)
         cr.save do
           cr.translate(-@crop[0], -@crop[1]) if @crop && ((@crop[0]).negative? || (@crop[1]).negative?)
 
@@ -86,12 +86,6 @@ module Morandi
 
             cr.rectangle(0, 0, img_width, img_height)
             case colour
-            when 'dominant'
-              pixbuf.scale_max(400).save(fn = "/tmp/hist-#{$PROCESS_ID}.#{Time.now.to_i}", 'jpeg')
-              histogram = Colorscore::Histogram.new(fn)
-              FileUtils.rm_f(fn)
-              col = histogram.scores.first[1]
-              cr.set_source_rgb col.red / 256.0, col.green / 256.0, col.blue / 256.0
             when 'retro'
               cr.set_source_rgb 1, 1, 0.8
             when 'black'

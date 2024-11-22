@@ -633,21 +633,6 @@ RSpec.describe Morandi, '#process' do
         }
       end
 
-      context 'dominant colour background' do
-        let(:background_style) { 'dominant' }
-
-        it 'should maintain the target size' do
-          process_image
-
-          expect(File).to exist(file_out)
-          expect(processed_image_type).to eq('jpeg')
-          expect(processed_image_width).to eq(original_image_width)
-          expect(processed_image_height).to eq(original_image_height)
-
-          expect(file_out).to match_reference_image('plasma-bordered-dominant')
-        end
-      end
-
       context 'black colour background' do
         let(:background_style) { 'black' }
 
@@ -698,7 +683,7 @@ RSpec.describe Morandi, '#process' do
       let(:options) do
         {
           'border-style' => 'retro',
-          'background-style' => 'dominant',
+          'background-style' => 'retro',
           'border-size-mm' => 5,
           'output.width' => original_image_width,
           'output.height' => original_image_height
