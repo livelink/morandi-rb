@@ -292,7 +292,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when given an fx option', vips_wip: processor_name == 'vips' do
+    describe 'when given an fx option' do
       let(:options) { { 'fx' => filter_name } }
 
       context 'with sepia' do
@@ -303,7 +303,7 @@ RSpec.describe Morandi, '#process' do
 
           expect(File).to exist(file_out)
           expect(processed_image_type).to eq('jpeg')
-          expect(file_out).to match_reference_image('plasma-sepia')
+          expect(file_out).to match_reference_image(reference_image_prefix, 'plasma-sepia')
         end
       end
 
@@ -315,7 +315,7 @@ RSpec.describe Morandi, '#process' do
 
           expect(File).to exist(file_out)
           expect(processed_image_type).to eq('jpeg')
-          expect(file_out).to match_reference_image('plasma-bluetone')
+          expect(file_out).to match_reference_image(reference_image_prefix, 'plasma-bluetone')
         end
       end
 
@@ -327,7 +327,7 @@ RSpec.describe Morandi, '#process' do
 
           expect(File).to exist(file_out)
           expect(processed_image_type).to eq('jpeg')
-          expect(file_out).to match_reference_image('plasma-greyscale')
+          expect(file_out).to match_reference_image(reference_image_prefix, 'plasma-greyscale')
         end
       end
     end
@@ -465,12 +465,12 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    context 'with a non-rgb image', vips_wip: processor_name == 'vips' do
+    context 'with a non-rgb image' do
       let(:generate_image) do
         generate_test_image_greyscale(file_in, width: original_image_width, height: original_image_height)
       end
 
-      it 'changes greyscale image to srgb' do
+      it 'changes greyscale image to srgb', vips_wip: processor_name == 'vips' do
         expect(file_in).to match_colourspace('gray') # Testing a setup to protect from a hidden regression
         process_image
 
@@ -484,7 +484,7 @@ RSpec.describe Morandi, '#process' do
         it 'creates a valid, srgb image' do
           process_image
 
-          expect(file_out).to match_reference_image('greyscale-with-sepia')
+          expect(file_out).to match_reference_image(reference_image_prefix, 'greyscale-with-sepia')
           expect(file_out).to match_colourspace('srgb')
         end
       end
