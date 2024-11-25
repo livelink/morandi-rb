@@ -6,7 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## UNRELEASED
 ### Added
-- Vips image processor
+- Vips image processor (resizing)
+- Vips colour filters
 
 ### Removed
 - [BREAKING] dropped support for a broken 'dominant' border colour
