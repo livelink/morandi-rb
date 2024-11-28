@@ -60,6 +60,7 @@ module Morandi
         @scale = 1.0
       end
 
+      apply_crop!
       apply_filters!
 
       return unless @options['output.limit'] && @output_width && @output_height
@@ -81,6 +82,24 @@ module Morandi
     end
 
     private
+
+    def apply_crop!
+      crop = @options['crop']
+
+      return if crop.nil? && @options['image.auto-crop'].eql?(false)
+
+      crop = crop.split(',').map(&:to_i) if crop.is_a?(String) && crop =~ /^\d+,\d+,\d+,\d+/
+
+      crop = nil unless crop.is_a?(Array) && crop.size.eql?(4) && crop.all? do |i|
+        i.is_a?(Numeric)
+      end
+      # can't crop, won't crop
+      return if @output_width.nil? && @output_height.nil? && crop.nil?
+
+      crop = crop.map { |s| (s.to_f * @scale).floor } if crop && not_equal_to_one(@scale)
+      crop ||= Morandi::CropUtils.autocrop_coords(@img.width, @img.height, @output_width, @output_height)
+      @img = Morandi::CropUtils.apply_crop_vips(@img, crop[0], crop[1], crop[2], crop[3])
+    end
 
     def apply_filters!
       filter_name = @options['fx']

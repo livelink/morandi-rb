@@ -91,5 +91,39 @@ module Morandi
       end
       pixbuf
     end
+
+    def apply_crop_vips(img, x_coord, y_coord, width, height)
+      if x_coord.negative? ||
+         y_coord.negative? ||
+         ((x_coord + width) > img.width) ||
+         ((y_coord + height) > img.height)
+
+        extract_area_x = [0, x_coord].max
+        extract_area_y = [0, y_coord].max
+        area_to_copy = img.extract_area(extract_area_x, extract_area_y, img.width - extract_area_x,
+                                        img.height - extract_area_y)
+
+        fill_colour = [255, 255, 255]
+        pixel = (Vips::Image.black(1, 1).colourspace(:srgb) + fill_colour).cast(img.format)
+        canvas = pixel.embed 0, 0, width, height, extend: :copy
+
+        cropped = canvas.composite(area_to_copy, :over, x: [-x_coord, 0].max,
+                                                        y: [-y_coord, 0].max,
+                                                        compositing_space: area_to_copy.interpretation)
+
+        # Because image is drawn on an opaque white, alpha doesn't matter at this point anyway, so let's strip the
+        # alpha channel from the output. According to #composite docs, the resulting image always has alpha channel,
+        # but I added a guard to avoid regressions if that ever changes.
+        cropped = cropped.extract_band(0, n: cropped.bands - 1) if cropped.has_alpha?
+        cropped
+      else
+        x_coord = x_coord.clamp(0, img.width)
+        y_coord = y_coord.clamp(0, img.height)
+        width = width.clamp(1, img.width - x_coord)
+        height = height.clamp(1, img.height - y_coord)
+
+        img.crop(x_coord, y_coord, width, height)
+      end
+    end
   end
 end

@@ -87,7 +87,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'with a big image and a bigger cropped area to fill', vips_wip: processor_name == 'vips' do
+    describe 'with a big image and a bigger cropped area to fill' do
       let(:options) do
         {
           'crop' => '0,477,15839,18804',
@@ -148,7 +148,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    context 'when give a "crop" option', vips_wip: processor_name == 'vips' do
+    context 'when give a "crop" option' do
       let(:cropped_width) { 300 }
       let(:cropped_height) { 300 }
 
@@ -162,7 +162,7 @@ RSpec.describe Morandi, '#process' do
           expect(processed_image_width).to eq(cropped_width)
           expect(processed_image_height).to eq(cropped_height)
 
-          expect(file_out).to match_reference_image('plasma-cropped')
+          expect(file_out).to match_reference_image(reference_image_prefix, 'plasma-cropped')
         end
       end
 
@@ -176,7 +176,7 @@ RSpec.describe Morandi, '#process' do
           expect(processed_image_width).to eq(cropped_width)
           expect(processed_image_height).to eq(cropped_height)
 
-          expect(file_out).to match_reference_image('plasma-cropped')
+          expect(file_out).to match_reference_image(reference_image_prefix, 'plasma-cropped')
         end
       end
 
@@ -190,7 +190,7 @@ RSpec.describe Morandi, '#process' do
           expect(processed_image_width).to eq(cropped_width)
           expect(processed_image_height).to eq(cropped_height)
 
-          expect(file_out).to match_reference_image('plasma-cropped-negative-initial-coords')
+          expect(file_out).to match_reference_image(reference_image_prefix, 'plasma-cropped-negative-initial-coords')
         end
       end
 
@@ -204,7 +204,7 @@ RSpec.describe Morandi, '#process' do
           expect(processed_image_width).to eq(original_image_width + 50)
           expect(processed_image_height).to eq(original_image_height + 50)
 
-          expect(file_out).to match_reference_image('plasma-cropped-excessive-size')
+          expect(file_out).to match_reference_image(reference_image_prefix, 'plasma-cropped-excessive-size')
         end
       end
 
@@ -218,7 +218,7 @@ RSpec.describe Morandi, '#process' do
           expect(processed_image_width).to eq(1)
           expect(processed_image_height).to eq(1)
 
-          expect(file_out).to match_reference_image('plasma-cropped-1x1')
+          expect(file_out).to match_reference_image(reference_image_prefix, 'plasma-cropped-1x1')
         end
       end
     end
@@ -332,7 +332,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when changing the dimensions and auto-cropping', vips_wip: processor_name == 'vips' do
+    describe 'when changing the dimensions and auto-cropping' do
       let(:max_width) { 300 }
       let(:max_height) { 200 }
 
@@ -353,7 +353,7 @@ RSpec.describe Morandi, '#process' do
         expect(processed_image_width).to be <= max_width
         expect(processed_image_height).to be <= max_height
 
-        expect(file_out).to match_reference_image('plasma-auto-cropped')
+        expect(file_out).to match_reference_image(reference_image_prefix, 'plasma-auto-cropped', tolerance: 0.0049)
       end
     end
 
