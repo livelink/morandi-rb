@@ -111,30 +111,30 @@ RSpec.describe Morandi, '#process' do
     describe 'when given an angle of rotation' do
       let(:options) { { 'angle' => angle } }
 
-      context '90 degress', vips_wip: processor_name == 'vips' do
+      context '90 degress' do
         let(:angle) { 90 }
 
         it 'rotates the image' do
           process_image
-          expect(file_out).to match_reference_image('plasma-rotated-90')
+          expect(file_out).to match_reference_image(reference_image_prefix, 'plasma-rotated-90')
         end
       end
 
-      context '180 degress', vips_wip: processor_name == 'vips' do
+      context '180 degress' do
         let(:angle) { 180 }
 
         it 'rotates the image' do
           process_image
-          expect(file_out).to match_reference_image('plasma-rotated-180')
+          expect(file_out).to match_reference_image(reference_image_prefix, 'plasma-rotated-180')
         end
       end
 
-      context '270 degress', vips_wip: processor_name == 'vips' do
+      context '270 degress' do
         let(:angle) { 270 }
 
         it 'rotates the image' do
           process_image
-          expect(file_out).to match_reference_image('plasma-rotated-270')
+          expect(file_out).to match_reference_image(reference_image_prefix, 'plasma-rotated-270')
         end
       end
 

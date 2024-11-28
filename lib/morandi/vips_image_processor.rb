@@ -60,6 +60,7 @@ module Morandi
         @scale = 1.0
       end
 
+      apply_rotate!
       apply_crop!
       apply_filters!
 
@@ -82,6 +83,23 @@ module Morandi
     end
 
     private
+
+    def angle
+      @options['angle'].to_i % 360
+    end
+
+    def apply_rotate!
+      @img = case angle
+             when 0 then @img
+             when 90 then @img.rot90
+             when 180 then @img.rot180
+             when 270 then @img.rot270
+             else raise('"angle" option only accepts multiples of 90')
+             end
+
+      @image_width = @img.width
+      @image_height = @img.height
+    end
 
     def apply_crop!
       crop = @options['crop']
