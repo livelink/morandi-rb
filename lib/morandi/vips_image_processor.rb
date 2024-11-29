@@ -3,6 +3,7 @@
 require 'vips'
 
 require 'morandi/srgb_conversion'
+require 'morandi/operation/vips_straighten'
 
 module Morandi
   # An alternative to ImageProcessor which is based on libvips for concurrent and less memory-intensive processing
@@ -98,6 +99,10 @@ module Morandi
              when 270 then @img.rot270
              else raise('"angle" option only accepts multiples of 90')
              end
+
+      unless @options['straighten'].to_f.zero?
+        @img = Morandi::Operation::VipsStraighten.new_from_hash(angle: @options['straighten'].to_f).call(@img)
+      end
 
       @image_width = @img.width
       @image_height = @img.height
