@@ -239,7 +239,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    context 'when given a straighten option', vips_wip: processor_name == 'vips' do
+    context 'when given a straighten option' do
       let(:options) { { 'straighten' => 5 } }
 
       it 'straightens images' do
@@ -248,7 +248,7 @@ RSpec.describe Morandi, '#process' do
         expect(File).to exist(file_out)
         expect(processed_image_type).to eq('jpeg')
 
-        expect(file_out).to match_reference_image('plasma-straighten-positive-5')
+        expect(file_out).to match_reference_image(reference_image_prefix, 'plasma-straighten-positive-5')
       end
 
       context 'with a negative straighten value' do
@@ -260,7 +260,7 @@ RSpec.describe Morandi, '#process' do
           expect(File).to exist(file_out)
           expect(processed_image_type).to eq('jpeg')
 
-          expect(file_out).to match_reference_image('plasma-straighten-negative-20')
+          expect(file_out).to match_reference_image(reference_image_prefix, 'plasma-straighten-negative-20')
         end
       end
 
@@ -274,7 +274,7 @@ RSpec.describe Morandi, '#process' do
           expect(File).to exist(file_out)
           expect(processed_image_type).to eq('jpeg')
 
-          expect(file_out).to match_reference_image('plasma-straighten-on-vertical-image')
+          expect(file_out).to match_reference_image(reference_image_prefix, 'plasma-straighten-on-vertical-image')
         end
       end
     end
