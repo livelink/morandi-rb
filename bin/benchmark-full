@@ -75,6 +75,7 @@ module Morandi
           stdout_str, _status = Open3.capture2e(*cmd)
           result = parse_single_benchmark_result(stdout_str)
           result.each { |key, value| stats[key] << value }
+          stats[:output_size_mb] << (File.size(output_image_path).to_f / 1024 / 1024).round(2)
         end
 
         stats.each do |key, entries|
