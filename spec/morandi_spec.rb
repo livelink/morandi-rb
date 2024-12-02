@@ -49,7 +49,7 @@ RSpec.describe Morandi, '#process' do
     let(:reference_image_prefix) { processor_name == 'pixbuf' ? '' : processor_name }
     subject(:process_image) { Morandi.process(file_arg, options, file_out, { 'processor' => processor_name }) }
 
-    describe 'when given an input without any options' do
+    context 'when given an input without any options' do
       it 'creates output' do
         process_image
         expect(File).to exist(file_out)
@@ -57,7 +57,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when given a blank file' do
+    context 'when given a blank file' do
       it 'should fail' do
         File.open(file_in, 'w') { |fp| fp << '' }
         expect { process_image }.to raise_error(
@@ -68,7 +68,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when given a corrupt file' do
+    context 'when given a corrupt file' do
       it 'should fail' do
         File.open(file_in, 'ab') { |fp| fp.truncate(64) }
         expect { process_image }.to raise_exception(Morandi::CorruptImageError)
@@ -76,7 +76,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when given a invalid file format' do
+    context 'when given a invalid file format' do
       it 'should fail' do
         File.open(file_in, 'wb') { |fp| fp << 'INVALID' }
         expect { process_image }.to raise_error(
@@ -87,7 +87,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'with a big image and a bigger cropped area to fill' do
+    context 'with a big image and a bigger cropped area to fill' do
       let(:options) do
         {
           'crop' => '0,477,15839,18804',
@@ -108,7 +108,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when given an angle of rotation' do
+    context 'when given an angle of rotation' do
       let(:options) { { 'angle' => angle } }
 
       context '90 degress' do
@@ -152,7 +152,7 @@ RSpec.describe Morandi, '#process' do
       let(:cropped_width) { 300 }
       let(:cropped_height) { 300 }
 
-      describe 'when given an array of dimensions' do
+      context 'when given an array of dimensions' do
         let(:options) { { 'crop' => [10, 10, cropped_width, cropped_height] } }
 
         it 'should crop the image' do
@@ -166,7 +166,7 @@ RSpec.describe Morandi, '#process' do
         end
       end
 
-      describe 'when given a string of dimensions' do
+      context 'when given a string of dimensions' do
         let(:options) { { 'crop' => "10,10,#{cropped_width},#{cropped_height}" } }
 
         it 'should do cropping of images with a string' do
@@ -180,7 +180,7 @@ RSpec.describe Morandi, '#process' do
         end
       end
 
-      describe 'with negative initial coordinates' do
+      context 'with negative initial coordinates' do
         let(:options) { { 'crop' => [-50, -50, cropped_width, cropped_height] } }
 
         it 'crops the image to desired dimensions' do
@@ -194,7 +194,7 @@ RSpec.describe Morandi, '#process' do
         end
       end
 
-      describe 'with desired dimensions exceeding the size of original image' do
+      context 'with desired dimensions exceeding the size of original image' do
         let(:options) { { 'crop' => [0, 0, original_image_width + 50, original_image_height + 50] } }
 
         it 'crops the image to desired dimensions' do
@@ -208,7 +208,7 @@ RSpec.describe Morandi, '#process' do
         end
       end
 
-      describe 'with negative dimensions' do
+      context 'with negative dimensions' do
         let(:options) { { 'crop' => [0, 0, -10, -10] } }
 
         it 'crops the image to 1x1px' do
@@ -223,7 +223,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when given an output.max option' do
+    context 'when given an output.max option' do
       let(:options) { { 'output.max' => max_size } }
       let(:max_size) { 200 }
 
@@ -239,7 +239,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when given a straighten option', vips_wip: processor_name == 'vips' do
+    context 'when given a straighten option', vips_wip: processor_name == 'vips' do
       let(:options) { { 'straighten' => 5 } }
 
       it 'straightens images' do
@@ -279,7 +279,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when given a gamma option', vips_wip: processor_name == 'vips' do
+    context 'when given a gamma option', vips_wip: processor_name == 'vips' do
       let(:options) { { 'gamma' => 2.0 } }
 
       it 'should apply the gamma to the image' do
@@ -292,7 +292,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when given an fx option' do
+    context 'when given an fx option' do
       let(:options) { { 'fx' => filter_name } }
 
       context 'with sepia' do
@@ -332,7 +332,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when changing the dimensions and auto-cropping' do
+    context 'when changing the dimensions and auto-cropping' do
       let(:max_width) { 300 }
       let(:max_height) { 200 }
 
@@ -357,7 +357,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'with limiting the output size without autocrop' do
+    context 'with limiting the output size without autocrop' do
       let(:output_width) { 300 }
       let(:output_height) { 200 }
 
@@ -494,7 +494,7 @@ RSpec.describe Morandi, '#process' do
   context 'pixbuf processor' do
     it_behaves_like 'an image processor', 'pixbuf'
 
-    describe 'when given a pixbuf as an input' do
+    context 'when given a pixbuf as an input' do
       subject(:process_image) do
         Morandi.process(pixbuf, options, file_out)
       end
@@ -511,7 +511,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when the user supplies a path.icc in the "local_options" argument' do
+    context 'when the user supplies a path.icc in the "local_options" argument' do
       subject(:process_image) do
         Morandi.process(file_in, options, file_out, local_options)
       end
@@ -545,7 +545,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when the user supplies a path.icc in the "options" argument' do
+    context 'when the user supplies a path.icc in the "options" argument' do
       let(:icc_path) { 'sample/icc_insecure_test.jpg' }
       let(:options) { { 'path.icc' => icc_path } }
       let(:icc_width) { 900 }
@@ -564,7 +564,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when given a redeye option' do
+    context 'when given a redeye option' do
       let(:file_in) { 'spec/fixtures/public-domain-redeye-image-from-wikipedia.jpg' }
       let(:options) { { 'redeye' => [[540, 650]] } }
 
@@ -602,7 +602,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when given a negative sharpen option' do
+    context 'when given a negative sharpen option' do
       let(:options) { { 'sharpen' => -3 } }
 
       it 'should blur the image' do
@@ -614,7 +614,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when given a postive sharpen option' do
+    context 'when given a postive sharpen option' do
       let(:options) { { 'sharpen' => 3 } }
 
       it 'should sharpen the image' do
@@ -627,7 +627,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when applying a border and maintaining the original size' do
+    context 'when applying a border and maintaining the original size' do
       let(:options) do
         {
           'border-style' => 'square',
@@ -684,7 +684,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when applying a retro border and maintaining the original size' do
+    context 'when applying a retro border and maintaining the original size' do
       let(:options) do
         {
           'border-style' => 'retro',
@@ -707,7 +707,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    describe 'when applying multiple transformations' do
+    context 'when applying multiple transformations' do
       let(:desired_image_width) { 300 }
       let(:desired_image_height) { 260 }
 
