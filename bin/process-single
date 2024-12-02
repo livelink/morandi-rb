@@ -14,13 +14,6 @@ processor = ARGV[1]
 options_json = ARGV[2]
 
 options = options_json ? JSON.parse(options_json) : { 'straighten' => 0.5, 'gamma' => 0.85 }
-
-processor_instance = case processor
-                     when 'pixbuf'
-                       Morandi::ImageProcessor.new(input_file_path, options, {}).tap(&:result)
-                     else
-                       raise("Not a supported processor: #{processor}")
-                     end
-
 output_path = "#{input_file_path}-#{processor}-output.jpg"
-processor_instance.write_to_jpeg(output_path)
+
+Morandi.process(input_file_path, options, output_path, 'processor' => processor)
