@@ -74,12 +74,14 @@ module Morandi
       raise 'not implemented'
     end
 
-    def write_to_jpeg(write_to, quality = nil)
+    def write_to_jpeg(target_path, quality = nil)
       process!
 
       quality ||= @options.fetch('quality', 97)
 
-      @img.write_to_file(write_to, Q: quality)
+      target_path_jpg = "#{target_path}.jpg" # Vips chooses format based on file extension, this ensures jpg
+      @img.write_to_file(target_path_jpg, Q: quality)
+      FileUtils.mv(target_path_jpg, target_path)
     end
 
     private

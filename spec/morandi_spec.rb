@@ -489,6 +489,16 @@ RSpec.describe Morandi, '#process' do
         end
       end
     end
+
+    context 'with output file having jpg extension' do
+      let(:file_out) { "#{super()}.png" }
+
+      it 'writes file as jpg' do
+        process_image
+
+        expect(processed_image_type).to eq('jpeg')
+      end
+    end
   end
 
   context 'pixbuf processor' do
