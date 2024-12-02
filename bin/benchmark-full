@@ -39,7 +39,7 @@ module Morandi
   class FullBenchmark
     TIME_FORMAT_READABLE = "Real: %es, sys: %S, usr: %U; CPU: %P; RSS max: %MKB\n"
     TIME_FORMAT_PARSEABLE = '%e,%S,%U,%P,%M'
-    IMAGE_PROCESSORS = %w[pixbuf].freeze
+    IMAGE_PROCESSORS = %w[vips pixbuf].freeze
     ITERATIONS_PER_IMAGE = 10
 
     def initialize(inputs)
