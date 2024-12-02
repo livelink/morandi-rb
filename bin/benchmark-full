@@ -66,9 +66,10 @@ module Morandi
         log "  #{image_processor}:"
 
         stats = Hash.new { |hash, key| hash[key] = [] }
+        output_image_path = "#{input_image_path}-#{image_processor}-output.jpg"
         cmd = ['bundle', 'exec',
                '/usr/bin/time', '--format', TIME_FORMAT_PARSEABLE,
-               'bin/process-single', input_image_path, image_processor, options.to_json]
+               'bin/process-single', input_image_path, image_processor, output_image_path, options.to_json]
 
         ITERATIONS_PER_IMAGE.times do |_i|
           stdout_str, _status = Open3.capture2e(*cmd)
