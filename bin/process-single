@@ -11,9 +11,9 @@ require 'morandi'
 
 input_file_path = ARGV[0]
 processor = ARGV[1]
-options_json = ARGV[2]
+output_file_path = ARGV[2]
+options_json = ARGV[3]
 
 options = options_json ? JSON.parse(options_json) : { 'straighten' => 0.5, 'gamma' => 0.85 }
-output_path = "#{input_file_path}-#{processor}-output.jpg"
 
-Morandi.process(input_file_path, options, output_path, 'processor' => processor)
+Morandi.process(input_file_path, options, output_file_path, 'processor' => processor)
