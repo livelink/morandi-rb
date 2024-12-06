@@ -279,7 +279,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    context 'when given a gamma option', vips_wip: processor_name == 'vips' do
+    context 'when given a gamma option' do
       let(:options) { { 'gamma' => 2.0 } }
 
       it 'should apply the gamma to the image' do
@@ -288,7 +288,7 @@ RSpec.describe Morandi, '#process' do
         expect(File).to exist(file_out)
         expect(processed_image_type).to eq('jpeg')
 
-        expect(file_out).to match_reference_image('plasma-gamma')
+        expect(file_out).to match_reference_image(reference_image_prefix, 'plasma-gamma')
       end
     end
 
