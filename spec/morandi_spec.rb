@@ -433,7 +433,7 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    context 'with transparent png input', vips_wip: processor_name == 'vips' do
+    context 'with transparent png input' do
       let(:file_in) { 'spec/fixtures/match-with-transparency.png' }
       let(:options) do
         {
@@ -448,7 +448,7 @@ RSpec.describe Morandi, '#process' do
 
         expect(File).to exist(file_out)
         expect(processed_image_type).to eq('jpeg')
-        expect(file_out).to match_reference_image('match-multiple-operations')
+        expect(file_out).to match_reference_image(reference_image_prefix, 'match-multiple-operations')
       end
 
       context 'with straighten option' do
@@ -460,7 +460,7 @@ RSpec.describe Morandi, '#process' do
 
           expect(File).to exist(file_out)
           expect(processed_image_type).to eq('jpeg')
-          expect(file_out).to match_reference_image('match-multiple-operations-and-straighten')
+          expect(file_out).to match_reference_image(reference_image_prefix, 'match-multiple-operations-and-straighten')
         end
       end
     end
