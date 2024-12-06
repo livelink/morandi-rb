@@ -61,6 +61,7 @@ module Morandi
         @scale = 1.0
       end
 
+      apply_gamma!
       apply_rotate!
       apply_crop!
       apply_filters!
@@ -86,6 +87,12 @@ module Morandi
     end
 
     private
+
+    def apply_gamma!
+      return unless @options['gamma'] && not_equal_to_one(@options['gamma'])
+
+      @img = @img.gamma(exponent: @options['gamma'])
+    end
 
     def angle
       @options['angle'].to_i % 360

@@ -23,8 +23,9 @@ module Morandi
   # @option options [Float] 'gamma' Gamma correct image
   # @option options [Integer] 'contrast' Change image contrast (-20..20)
   # @option options [Integer] 'sharpen' Sharpen (1..5) / Blur (-1..-5)
+  # @option options [Integer] 'straighten' Rotate by a small angle (in degrees) and zoom in to fill the size
   # @option options [Array[[Integer,Integer],...]] 'redeye' Apply redeye correction at point
-  # @option options [Integer] 'angle' Rotate image clockwise by multiple of 90 (0, 90, 180, 270)
+  # @option options [Integer] 'angle' Rotate image clockwise by multiple of 90 degrees (0, 90, 180, 270)
   # @option options [Array[Integer,Integer,Integer,Integer]] 'crop' Crop image (x, y, width, height)
   # @option options [String] 'fx' Apply colour filters ('greyscale', 'sepia', 'bluetone')
   # @option options [String] 'border-style' Set border style ('square', 'retro')
