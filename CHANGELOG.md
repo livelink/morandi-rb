@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Vips rotate
 - Vips straighten
 - Vips gamma
+- Vips stripping alpha
 
 ### Removed
 - [BREAKING] dropped support for a broken 'dominant' border colour

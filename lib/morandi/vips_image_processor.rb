@@ -66,10 +66,12 @@ module Morandi
       apply_crop!
       apply_filters!
 
-      return unless @options['output.limit'] && @output_width && @output_height
+      if @options['output.limit'] && @output_width && @output_height
+        scale_factor = [@output_width, @output_height].max.to_f / [@img.width, @img.height].max
+        @img = @img.resize(scale_factor) if scale_factor < 1.0
+      end
 
-      scale_factor = [@output_width, @output_height].max.to_f / [@img.width, @img.height].max
-      @img = @img.resize(scale_factor) if scale_factor < 1.0
+      strip_alpha!
     end
 
     def write_to_png(_write_to, _orientation = :any)
@@ -87,6 +89,15 @@ module Morandi
     end
 
     private
+
+    # Remove the alpha channel if present. Vips supports alpha, but the current Pixbuf processor happens to strip it in
+    # most cases (straighten and cropping beyond image bounds are exceptions)
+    #
+    # Alternatively, alpha can be left intact for more accurate processing and transparent output or merged into an
+    # image using Vips::Image#flatten for less resource-intensive processing
+    def strip_alpha!
+      @img = @img.extract_band(0, n: @img.bands - 1) if @img.has_alpha?
+    end
 
     def apply_gamma!
       return unless @options['gamma'] && not_equal_to_one(@options['gamma'])
