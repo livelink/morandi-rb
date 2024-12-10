@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Vips straighten
 - Vips gamma
 - Vips stripping alpha
+- Explicit error when trying to use VipsProcessor with unsupported options
 
 ### Removed
 - [BREAKING] dropped support for a broken 'dominant' border colour
