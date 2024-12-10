@@ -750,6 +750,35 @@ RSpec.describe Morandi, '#process' do
   end
 
   context 'vips processor' do
+    subject(:process_image) do
+      Morandi.process(file_arg, options, file_out, 'processor' => 'vips')
+    end
+
     it_behaves_like 'an image processor', 'vips'
+
+    context 'with pixbuf object given as input' do
+      let(:file_arg) { GdkPixbuf::Pixbuf.new(file: file_in) }
+
+      it 'raises ArgumentError' do
+        expect { process_image }.to raise_error(ArgumentError, 'Requested unsupported Vips operation')
+      end
+    end
+
+    {
+      'brighten' => 1.0,
+      'contrast' => 1.0,
+      'sharpen' => 1.0,
+      'redeye' => [[540, 650]],
+      'border-style' => 'square',
+      'background-style' => 'retro'
+    }.each do |option_name, option_value|
+      context "with unsupported operation `#{option_name}` requested" do
+        let(:options) { { option_name => option_value } }
+
+        it 'raises ArgumentError' do
+          expect { process_image }.to raise_error(ArgumentError, 'Requested unsupported Vips operation')
+        end
+      end
+    end
   end
 end

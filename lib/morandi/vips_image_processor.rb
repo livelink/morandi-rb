@@ -18,6 +18,18 @@ module Morandi
     }.freeze
     SUPPORTED_FILTERS = COLOUR_FILTER_MODIFIERS.keys + ['greyscale']
 
+    def self.supports?(input, options)
+      return false unless input.is_a?(String)
+      return false if options['brighten'].to_f != 0
+      return false if options['contrast'].to_f != 0
+      return false if options['sharpen'].to_f != 0
+      return false if options['redeye']&.any?
+      return false if options['border-style']
+      return false if options['background-style']
+
+      true
+    end
+
     # Vips options are global, this method sets them for yielding, then restores to original
     def self.with_global_options(cache_max:, concurrency:)
       previous_cache_max = Vips.cache_max

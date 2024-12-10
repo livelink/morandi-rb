@@ -44,10 +44,14 @@ module Morandi
   # @param target_path [String] target location for image
   # @param local_options [Hash] Hash of options other than desired transformations
   # @option local_options [String] 'path.icc' A path to store the input after converting to sRGB colour space
-  # @options local_options [String] 'processor' ('pixbuf') Name of the image processing library ('pixbuf', 'vips')
+  # @option local_options [String] 'processor' ('pixbuf') Name of the image processing library ('pixbuf', 'vips')
+  #                                                       NOTE: vips processor only handles subset of operations,
+  #                                                       see `Morandi::VipsImageProcessor.supports?` for details
   def process(source, options, target_path, local_options = {})
     case local_options['processor']
     when 'vips'
+      raise(ArgumentError, 'Requested unsupported Vips operation') unless VipsImageProcessor.supports?(source, options)
+
       # Cache saves time in expense of RAM when performing the same processing multiple times
       # Cache is also created for files based on their names, which can lead to leaking files data, so in terms
       # of security it feels prudent to disable it. Latest libvips supports "revalidate" option to prevent that risk
