@@ -403,19 +403,19 @@ RSpec.describe Morandi, '#process' do
 
     context 'with increasing quality settings' do
       let!(:max_quality_file) do
-        Morandi.process(file_in, { 'quality' => 100 }, 'sample/out-100.jpg')
+        Morandi.process(file_in, { 'quality' => 100 }, 'sample/out-100.jpg', 'processor' => processor_name)
       end
 
       let(:max_quality_file_size) { File.size('sample/out-100.jpg') }
 
       let!(:default_of_97_quality_file) do
-        Morandi.process(file_in, {}, 'sample/out-97.jpg')
+        Morandi.process(file_in, {}, 'sample/out-97.jpg', 'processor' => processor_name)
       end
 
       let(:default_of_97_quality_file_size) { File.size('sample/out-97.jpg') }
 
       let!(:quality_of_40_file) do
-        Morandi.process(file_in, { 'quality' => 40 }, 'sample/out-40.jpg')
+        Morandi.process(file_in, { 'quality' => 40 }, 'sample/out-40.jpg', 'processor' => processor_name)
       end
 
       let(:quality_of_40_file_size) { File.size('sample/out-40.jpg') }
