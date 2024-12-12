@@ -84,6 +84,7 @@ module Morandi
       end
 
       strip_alpha!
+      ensure_srgb!
     end
 
     def write_to_png(_write_to, _orientation = :any)
@@ -160,8 +161,8 @@ module Morandi
       filter_name = @options['fx']
       return unless SUPPORTED_FILTERS.include?(filter_name)
 
-      # The filter-related constants assume RGB colourspace, so it requires conversion
-      @img = @img.colourspace(:srgb) unless @img.interpretation == :srgb
+      # The filter-related constants assume RGB colourspace, so it requires early conversion
+      ensure_srgb!
 
       # Convert to greyscale using weights
       rgb_factors = RGB_LUMINANCE_EXTRACTION_FACTORS
@@ -184,6 +185,10 @@ module Morandi
 
     def not_equal_to_one(float)
       (float - 1.0).abs >= Float::EPSILON
+    end
+
+    def ensure_srgb!
+      @img = @img.colourspace(:srgb) unless @img.interpretation == :srgb
     end
   end
 end

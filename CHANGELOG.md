@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Vips gamma
 - Vips stripping alpha
 - Explicit error when trying to use VipsProcessor with unsupported options
+- Vips cast to srgb when image uses a different colourspace
 
 ### Removed
 - [BREAKING] dropped support for a broken 'dominant' border colour

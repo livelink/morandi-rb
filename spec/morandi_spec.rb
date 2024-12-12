@@ -470,7 +470,7 @@ RSpec.describe Morandi, '#process' do
         generate_test_image_greyscale(file_in, width: original_image_width, height: original_image_height)
       end
 
-      it 'changes greyscale image to srgb', vips_wip: processor_name == 'vips' do
+      it 'changes greyscale image to srgb' do
         expect(file_in).to match_colourspace('gray') # Testing a setup to protect from a hidden regression
         process_image
 
