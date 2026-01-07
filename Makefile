@@ -9,7 +9,7 @@ build: Dockerfile
 	docker build -t ${IMAGE_NAME}:latest .
 
 run:
-	docker run -it --rm --name ${CONTAINER_NAME} -v ${PWD}:/app ${IMAGE_NAME}:latest
+	docker run -it --rm --name ${CONTAINER_NAME} -v ${PWD}:/app ${IMAGE_NAME}:latest bash -c "bundle exec rake compile && bundle exec guard"
 
 shell:
 	docker exec -it ${CONTAINER_NAME} /bin/bash
