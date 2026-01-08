@@ -231,8 +231,8 @@ RSpec.describe Morandi, '#process' do
         process_image
 
         expect(File).to exist(file_out)
-        expect(processed_image_width).to be <= (max_size)
-        expect(processed_image_height).to be <= (max_size)
+        expect(processed_image_width).to be <= max_size
+        expect(processed_image_height).to be <= max_size
 
         expect(file_out).to match_reference_image(reference_image_prefix, 'plasma-constrained-output-size',
                                                   tolerance: 0.006)

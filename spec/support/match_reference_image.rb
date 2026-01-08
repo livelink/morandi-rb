@@ -66,7 +66,7 @@ module Morandi
           FileUtils.cp(diff_path, @exposed_diff_path)
         end
 
-        true
+        nil
       end
     end
   end

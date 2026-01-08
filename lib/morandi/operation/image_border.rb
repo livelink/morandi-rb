@@ -16,7 +16,7 @@ module Morandi
         return pixbuf unless %w[square retro].include? @style
 
         create_pixbuf_from_image_surface(:rgb24, pixbuf.width, pixbuf.height) do |cr|
-          if @crop && ((@crop[0]).negative? || (@crop[1]).negative?)
+          if @crop && (@crop[0].negative? || @crop[1].negative?)
             img_width = size[0]
             img_height = size[1]
           else
@@ -38,7 +38,7 @@ module Morandi
           # Should be less than 1
           pb_scale = (longest_side - (border_width * 2)) / longest_side
 
-          if @crop && ((@crop[0]).negative? || (@crop[1]).negative?)
+          if @crop && (@crop[0].negative? || @crop[1].negative?)
             x -= @crop[0]
             y -= @crop[1]
           end
@@ -77,7 +77,7 @@ module Morandi
 
       def draw_background(cr, img_height, img_width)
         cr.save do
-          cr.translate(-@crop[0], -@crop[1]) if @crop && ((@crop[0]).negative? || (@crop[1]).negative?)
+          cr.translate(-@crop[0], -@crop[1]) if @crop && (@crop[0].negative? || @crop[1].negative?)
 
           cr.save do
             cr.set_operator :source
