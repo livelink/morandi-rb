@@ -68,7 +68,7 @@ module Morandi
       end
       if @size_limit_on_load_px
         @scale = @size_limit_on_load_px.to_f / [@img.width, @img.height].max
-        @img = @img.resize(@scale) if not_equal_to_one(@scale)
+        @img = @img.resize(@scale) if not_equal_to_one?(@scale)
       else
         @scale = 1.0
       end
@@ -113,7 +113,7 @@ module Morandi
     end
 
     def apply_gamma!
-      return unless @options['gamma'] && not_equal_to_one(@options['gamma'])
+      return unless @options['gamma'] && not_equal_to_one?(@options['gamma'])
 
       @img = @img.gamma(exponent: @options['gamma'])
     end
@@ -152,7 +152,7 @@ module Morandi
       # can't crop, won't crop
       return if @output_width.nil? && @output_height.nil? && crop.nil?
 
-      crop = crop.map { |s| (s.to_f * @scale).floor } if crop && not_equal_to_one(@scale)
+      crop = crop.map { |s| (s.to_f * @scale).floor } if crop && not_equal_to_one?(@scale)
       crop ||= Morandi::CropUtils.autocrop_coords(@img.width, @img.height, @output_width, @output_height)
       @img = Morandi::CropUtils.apply_crop_vips(@img, crop[0], crop[1], crop[2], crop[3])
     end
@@ -183,7 +183,7 @@ module Morandi
       @img = @img.linear(1.0, colour_filter_modifier)
     end
 
-    def not_equal_to_one(float)
+    def not_equal_to_one?(float)
       (float - 1.0).abs >= Float::EPSILON
     end
 

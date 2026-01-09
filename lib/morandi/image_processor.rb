@@ -126,7 +126,7 @@ module Morandi
         @pb = MorandiNative::PixbufUtils.brightness(@pb, brighten)
       end
 
-      if options['gamma'] && not_equal_to_one(options['gamma'])
+      if options['gamma'] && not_equal_to_one?(options['gamma'])
         @pb = MorandiNative::PixbufUtils.gamma(@pb,
                                                options['gamma'])
       end
@@ -197,7 +197,7 @@ module Morandi
       # can't crop, won't crop
       return if @width.nil? && @height.nil? && crop.nil?
 
-      crop = crop.map { |s| (s.to_f * @scale).floor } if crop && not_equal_to_one(@scale)
+      crop = crop.map { |s| (s.to_f * @scale).floor } if crop && not_equal_to_one?(@scale)
 
       crop ||= Morandi::CropUtils.autocrop_coords(@pb.width, @pb.height, @width, @height)
 
@@ -226,7 +226,7 @@ module Morandi
       colour ||= 'black'
 
       crop = options['crop']
-      crop = crop.map { |s| (s.to_f * @scale).floor } if crop && not_equal_to_one(@scale)
+      crop = crop.map { |s| (s.to_f * @scale).floor } if crop && not_equal_to_one?(@scale)
 
       op = Morandi::Operation::ImageBorder.new_from_hash(
         'style' => style,
@@ -243,7 +243,7 @@ module Morandi
 
     private
 
-    def not_equal_to_one(float)
+    def not_equal_to_one?(float)
       (float - 1.0).abs >= Float::EPSILON
     end
   end
