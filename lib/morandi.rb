@@ -43,7 +43,6 @@ module Morandi
   #                                                              size of the longer edge (ignoring shorter dimension!)
   # @param target_path [String] target location for image
   # @param local_options [Hash] Hash of options other than desired transformations
-  # @option local_options [String] 'path.icc' A path to store the input after converting to sRGB colour space
   # @option local_options [String] 'processor' ('pixbuf') Name of the image processing library ('pixbuf', 'vips')
   #                                                       NOTE: vips processor only handles subset of operations,
   #                                                       see `Morandi::VipsImageProcessor.supports?` for details

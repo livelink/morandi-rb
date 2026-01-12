@@ -521,59 +521,6 @@ RSpec.describe Morandi, '#process' do
       end
     end
 
-    context 'when the user supplies a path.icc in the "local_options" argument' do
-      subject(:process_image) do
-        Morandi.process(file_in, options, file_out, local_options)
-      end
-
-      let(:icc_path) { 'sample/icc_secure_test.jpg' }
-      let(:local_options) { { 'path.icc' => icc_path } }
-      let(:icc_width) { 900 }
-      let(:icc_height) { 400 }
-
-      before do
-        generate_test_image_plasma_checkers(icc_path, width: icc_width, height: icc_height)
-      end
-
-      it 'should use a file at this location as the input' do
-        process_image
-
-        expect(File).to exist(file_out)
-        expect(processed_image_width).to eq(icc_width)
-        expect(processed_image_height).to eq(icc_height)
-      end
-
-      context 'if no file at this location exists' do
-        let(:different_icc_path) { 'sample/different_secure_test.jpg' }
-        let(:local_options) { { 'path.icc' => different_icc_path } }
-
-        it 'should create one' do
-          process_image
-
-          expect(File).to exist(different_icc_path)
-        end
-      end
-    end
-
-    context 'when the user supplies a path.icc in the "options" argument' do
-      let(:icc_path) { 'sample/icc_insecure_test.jpg' }
-      let(:options) { { 'path.icc' => icc_path } }
-      let(:icc_width) { 900 }
-      let(:icc_height) { 400 }
-
-      before do
-        generate_test_image_plasma_checkers(icc_path, width: icc_width, height: icc_height)
-      end
-
-      it 'should ignore the file at this path' do
-        process_image
-
-        expect(File).to exist(file_out)
-        expect(processed_image_width).not_to eq(icc_width)
-        expect(processed_image_height).not_to eq(icc_height)
-      end
-    end
-
     context 'when given a redeye option' do
       let(:file_in) { 'spec/fixtures/public-domain-redeye-image-from-wikipedia.jpg' }
       let(:options) { { 'redeye' => [[540, 650]] } }

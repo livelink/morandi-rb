@@ -7,12 +7,10 @@ module Morandi
   class SrgbConversion
     # Performs a conversion to srgb colour space if possible
     # Returns a path to converted file on success or nil on failure
-    def self.perform(path, target_path: nil)
+    def self.perform(path)
       return unless suitable_for_jpegicc?(path)
 
-      icc_file_path = target_path || default_icc_path(path)
-      return icc_file_path if valid_jpeg?(icc_file_path)
-
+      icc_file_path = default_icc_path(path)
       system('jpgicc', '-q97', path, icc_file_path, out: '/dev/null', err: '/dev/null')
 
       return unless valid_jpeg?(icc_file_path)
