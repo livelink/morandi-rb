@@ -57,7 +57,10 @@ module Morandi
       cache_max = 0
       concurrency = 2 # Hardcoding to 2 for now to maintain some balance between resource usage and performance
       VipsImageProcessor.with_global_options(cache_max: cache_max, concurrency: concurrency) do
-        VipsImageProcessor.new(source, options).write_to_jpeg(target_path)
+        srgb_converted_file_path = Morandi::SrgbConversion.perform(source)
+        VipsImageProcessor.new(srgb_converted_file_path || source, options).write_to_jpeg(target_path)
+      ensure
+        FileUtils.rm_f(srgb_converted_file_path) if srgb_converted_file_path
       end
     else
       ImageProcessor.new(source, options, local_options).tap(&:result).write_to_jpeg(target_path)

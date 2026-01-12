@@ -9,13 +9,16 @@ module Morandi
   # NOTE: pixbuf supports colour profiles, but it requires an explicit icc-profile option to embed it when saving file
   class ProfiledPixbuf < GdkPixbuf::Pixbuf
     def initialize(path, _local_options, max_size_px = nil)
-      path = srgb_path(path) || path
+      srgb_converted_file_path = srgb_path(path)
+      path = srgb_converted_file_path || path
 
       if max_size_px
         super(file: path, width: max_size_px, height: max_size_px)
       else
         super(file: path)
       end
+    ensure
+      FileUtils.rm_f(srgb_converted_file_path) if srgb_converted_file_path
     end
 
     private

@@ -45,9 +45,19 @@ RSpec.describe Morandi, '#process' do
     FileUtils.remove_dir('sample/')
   end
 
+  shared_examples 'tidy processor' do
+    it 'only leaves unchanged input, and a new output file with no other leftovers' do
+      expect { process_image }.to change { Dir['sample/*'].count }.by(1)
+
+      expect(File.exist?(file_in)).to eq true
+    end
+  end
+
   shared_examples 'an image processor' do |processor_name|
     let(:reference_image_prefix) { processor_name == 'pixbuf' ? '' : processor_name }
     subject(:process_image) { Morandi.process(file_arg, options, file_out, { 'processor' => processor_name }) }
+
+    it_behaves_like 'tidy processor'
 
     context 'when given an input without any options' do
       it 'creates output' do
@@ -469,6 +479,8 @@ RSpec.describe Morandi, '#process' do
       let(:generate_image) do
         generate_test_image_greyscale(file_in, width: original_image_width, height: original_image_height)
       end
+
+      it_behaves_like 'tidy processor'
 
       it 'changes greyscale image to srgb' do
         expect(file_in).to match_colourspace('gray') # Testing a setup to protect from a hidden regression

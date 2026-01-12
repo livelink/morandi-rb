@@ -68,8 +68,6 @@ module VisualReportHelper
           fp.puts %(<pre>#{CGI.escapeHTML(JSON.pretty_generate(example.example_group_instance.options))}</pre>)
           fp.puts %(</td><td>)
           files.each.with_index do |filename, index|
-            next if File.basename(filename) == 'sample.jpg.icc.jpg'
-
             base = name_for(filename, example, index)
             FileUtils.cp(filename, "spec/reports/#{base}")
             fp << %(<div class="img-block"><img src="#{base}" style="max-width: 300px; height: auto;"><br>)

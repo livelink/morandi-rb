@@ -13,7 +13,10 @@ module Morandi
       icc_file_path = default_icc_path(path)
       system('jpgicc', '-q97', path, icc_file_path, out: '/dev/null', err: '/dev/null')
 
-      return unless valid_jpeg?(icc_file_path)
+      unless valid_jpeg?(icc_file_path)
+        FileUtils.rm_f(icc_file_path) # jpgicc likes to leave an empty file after failing
+        return
+      end
 
       icc_file_path
     end

@@ -55,8 +55,7 @@ module Morandi
     end
 
     def process!
-      srgb_converted_file_path = Morandi::SrgbConversion.perform(@path)
-      source_file_path = srgb_converted_file_path || @path
+      source_file_path = @path
       begin
         @img = Vips::Image.new_from_file(source_file_path)
       rescue Vips::Error => e
