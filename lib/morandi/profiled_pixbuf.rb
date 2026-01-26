@@ -8,22 +8,23 @@ module Morandi
   # It attempts to load an image using jpegicc/littlecms to ensure that it is sRGB.
   # NOTE: pixbuf supports colour profiles, but it requires an explicit icc-profile option to embed it when saving file
   class ProfiledPixbuf < GdkPixbuf::Pixbuf
-    def initialize(path, local_options, max_size_px = nil)
-      @local_options = local_options
-
-      path = srgb_path(path) || path
+    def initialize(path, _local_options, max_size_px = nil)
+      srgb_converted_file_path = srgb_path(path)
+      path = srgb_converted_file_path || path
 
       if max_size_px
         super(file: path, width: max_size_px, height: max_size_px)
       else
         super(file: path)
       end
+    ensure
+      FileUtils.rm_f(srgb_converted_file_path) if srgb_converted_file_path
     end
 
     private
 
     def srgb_path(original_path)
-      Morandi::SrgbConversion.perform(original_path, target_path: @local_options['path.icc'])
+      Morandi::SrgbConversion.perform(original_path)
     end
   end
 end

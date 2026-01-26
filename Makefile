@@ -6,7 +6,7 @@ CONTAINER_NAME=morandirb
 all: clean build run
 
 build: Dockerfile
-	docker build -t ${IMAGE_NAME}:latest .
+	docker buildx build -t ${IMAGE_NAME}:latest . --load
 
 run:
 	docker run -it --rm --name ${CONTAINER_NAME} -v ${PWD}:/app ${IMAGE_NAME}:latest bash -c "bundle exec rake compile && bundle exec guard"

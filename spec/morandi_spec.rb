@@ -45,9 +45,19 @@ RSpec.describe Morandi, '#process' do
     FileUtils.remove_dir('sample/')
   end
 
+  shared_examples 'tidy processor' do
+    it 'only leaves unchanged input, and a new output file with no other leftovers' do
+      expect { process_image }.to change { Dir['sample/*'].count }.by(1)
+
+      expect(File.exist?(file_in)).to eq true
+    end
+  end
+
   shared_examples 'an image processor' do |processor_name|
     let(:reference_image_prefix) { processor_name == 'pixbuf' ? '' : processor_name }
     subject(:process_image) { Morandi.process(file_arg, options, file_out, { 'processor' => processor_name }) }
+
+    it_behaves_like 'tidy processor'
 
     context 'when given an input without any options' do
       it 'creates output' do
@@ -470,6 +480,8 @@ RSpec.describe Morandi, '#process' do
         generate_test_image_greyscale(file_in, width: original_image_width, height: original_image_height)
       end
 
+      it_behaves_like 'tidy processor'
+
       it 'changes greyscale image to srgb' do
         expect(file_in).to match_colourspace('gray') # Testing a setup to protect from a hidden regression
         process_image
@@ -518,59 +530,6 @@ RSpec.describe Morandi, '#process' do
         expect(processed_image_height).to eq(pixbuf.height)
         # Pixbuf's no-op is different than file no-op because icc colour profile processing only happens for files
         expect(file_out).to match_reference_image('plasma-from-pixbuf-no-op-output')
-      end
-    end
-
-    context 'when the user supplies a path.icc in the "local_options" argument' do
-      subject(:process_image) do
-        Morandi.process(file_in, options, file_out, local_options)
-      end
-
-      let(:icc_path) { 'sample/icc_secure_test.jpg' }
-      let(:local_options) { { 'path.icc' => icc_path } }
-      let(:icc_width) { 900 }
-      let(:icc_height) { 400 }
-
-      before do
-        generate_test_image_plasma_checkers(icc_path, width: icc_width, height: icc_height)
-      end
-
-      it 'should use a file at this location as the input' do
-        process_image
-
-        expect(File).to exist(file_out)
-        expect(processed_image_width).to eq(icc_width)
-        expect(processed_image_height).to eq(icc_height)
-      end
-
-      context 'if no file at this location exists' do
-        let(:different_icc_path) { 'sample/different_secure_test.jpg' }
-        let(:local_options) { { 'path.icc' => different_icc_path } }
-
-        it 'should create one' do
-          process_image
-
-          expect(File).to exist(different_icc_path)
-        end
-      end
-    end
-
-    context 'when the user supplies a path.icc in the "options" argument' do
-      let(:icc_path) { 'sample/icc_insecure_test.jpg' }
-      let(:options) { { 'path.icc' => icc_path } }
-      let(:icc_width) { 900 }
-      let(:icc_height) { 400 }
-
-      before do
-        generate_test_image_plasma_checkers(icc_path, width: icc_width, height: icc_height)
-      end
-
-      it 'should ignore the file at this path' do
-        process_image
-
-        expect(File).to exist(file_out)
-        expect(processed_image_width).not_to eq(icc_width)
-        expect(processed_image_height).not_to eq(icc_height)
       end
     end
 

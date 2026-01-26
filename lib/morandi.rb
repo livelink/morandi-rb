@@ -43,7 +43,6 @@ module Morandi
   #                                                              size of the longer edge (ignoring shorter dimension!)
   # @param target_path [String] target location for image
   # @param local_options [Hash] Hash of options other than desired transformations
-  # @option local_options [String] 'path.icc' A path to store the input after converting to sRGB colour space
   # @option local_options [String] 'processor' ('pixbuf') Name of the image processing library ('pixbuf', 'vips')
   #                                                       NOTE: vips processor only handles subset of operations,
   #                                                       see `Morandi::VipsImageProcessor.supports?` for details
@@ -58,7 +57,10 @@ module Morandi
       cache_max = 0
       concurrency = 2 # Hardcoding to 2 for now to maintain some balance between resource usage and performance
       VipsImageProcessor.with_global_options(cache_max: cache_max, concurrency: concurrency) do
-        VipsImageProcessor.new(source, options).write_to_jpeg(target_path)
+        srgb_converted_file_path = Morandi::SrgbConversion.perform(source)
+        VipsImageProcessor.new(srgb_converted_file_path || source, options).write_to_jpeg(target_path)
+      ensure
+        FileUtils.rm_f(srgb_converted_file_path) if srgb_converted_file_path
       end
     else
       ImageProcessor.new(source, options, local_options).tap(&:result).write_to_jpeg(target_path)
