@@ -16,6 +16,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.7'
   spec.files         = Dir['CHANGELOG.md', 'LICENSE.txt', 'README.md', 'ext/**/*', 'lib/**/*']
+                       .reject { |f| f.end_with?('.so') }
   spec.require_paths = ['lib']
 
   spec.extensions    = %w[ext/morandi_native/extconf.rb ext/gdk_pixbuf_cairo/extconf.rb]
