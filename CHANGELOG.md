@@ -4,7 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [0.101.0] 14.01.2026
+## UNRELEASED
+### Fixed
+- Unnecessary `.so` files are no longer shipped with the gem
+
+## [0.101.0] 28.01.2026
 ### Added
 - [BREAKING] introduced automated cleanup of srgb files after processing
 
