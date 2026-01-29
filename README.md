@@ -37,3 +37,9 @@ For the detailed documentation of options see `lib/morandi.rb`
 ### Development
 
 Since this gem depends on the `liblcms2-utils` library, which can be awkward to install on some operating systems, we also provide a development docker image. A Makefile is also provided as a simple CLI. To build the image and run the container, type `make` from the project root. The container itself runs `guard` as its main process. Running the container via `make` will drop you into the guard prompt, which will run the test suite whenever any of the source code or tests are changed. The tests can be kicked-off manually via the `all` command at the guard prompt. Individual test can be run using the `focus: true` annotation on an example or describe block. If you need to access a bash shell in the container (for example, to run rubocop), use the command `make shell`.
+
+#### Ruby Version Management
+
+This project uses **containerized development** with Docker. The Ruby version is specified in the `Dockerfile` and is automatically managed within the container. There is no `.ruby-version` file because it's redundant in containerized workflows and can cause conflicts with local Ruby version managers like rbenv. 
+
+For a detailed explanation of how containerized development affects Ruby version management, see [docs/CONTAINERIZED_DEVELOPMENT.md](docs/CONTAINERIZED_DEVELOPMENT.md).
