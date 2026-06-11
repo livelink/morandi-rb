@@ -36,4 +36,29 @@ For the detailed documentation of options see `lib/morandi.rb`
 
 ### Development
 
-Since this gem depends on the `liblcms2-utils` library, which can be awkward to install on some operating systems, we also provide a development docker image. A Makefile is also provided as a simple CLI. To build the image and run the container, type `make` from the project root. The container itself runs `guard` as its main process. Running the container via `make` will drop you into the guard prompt, which will run the test suite whenever any of the source code or tests are changed. The tests can be kicked-off manually via the `all` command at the guard prompt. Individual test can be run using the `focus: true` annotation on an example or describe block. If you need to access a bash shell in the container (for example, to run rubocop), use the command `make shell`.
+Development happens inside a docker image, with a Makefile provided as a simple CLI.
+
+#### Build the image and run the container
+
+```bash
+make
+```
+
+Above launches `guard`, which automatically runs tests when any file changes.
+
+#### Run the full test suite manually from the guard prompt
+```bash
+all
+```
+
+#### Run an individual test
+
+Add the `focus: true` annotation to an example or describe block.
+
+#### Open a bash shell in the container
+
+Useful, for example, to run rubocop:
+
+```bash
+make shell
+```
