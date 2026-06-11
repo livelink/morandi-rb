@@ -62,3 +62,8 @@ Useful, for example, to run rubocop:
 ```bash
 make shell
 ```
+
+> [!NOTE]
+> The image builds and the gem works on ARM platform, but a few specs fail with tiny rendering output mismatches.
+>
+> CI uses AMD64 and is a source of truth for the specs
