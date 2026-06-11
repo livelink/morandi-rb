@@ -26,7 +26,6 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'atk', '~> 4.0'
   spec.add_dependency 'cairo', '~> 1.0'
-  spec.add_dependency 'colorscore', '~> 0.0'
   spec.add_dependency 'gdk_pixbuf2', '~> 4.0'
   spec.add_dependency 'pango', '~> 4.0'
   spec.add_dependency 'rake-compiler', '~> 1.2'

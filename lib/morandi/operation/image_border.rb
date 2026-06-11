@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'colorscore'
 require 'morandi/image_operation'
 
 module Morandi

@@ -4,7 +4,7 @@ Library of simple image manipulations - replicating the behaviour of morandi-js.
 
 ## Installation
 
-Install `liblcms2-utils` to provide the `jpgicc` command used by `Morandi::ProfiledPixbuf`. Also ensure that your host system has `imagemagick` installed, which is required by the `colorscore` gem.
+Install `liblcms2-utils` to provide the `jpgicc` command used by `Morandi::ProfiledPixbuf`.
 
 Add this line to your application's Gemfile:
 
