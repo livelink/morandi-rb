@@ -1,10 +1,9 @@
 PATH
   remote: .
   specs:
-    morandi (0.100.0)
+    morandi (0.101.0)
       atk (~> 4.0)
       cairo (~> 1.0)
-      colorscore (~> 0.0)
       gdk_pixbuf2 (~> 4.0)
       pango (~> 4.0)
       rake-compiler (~> 1.2)
@@ -25,11 +24,9 @@ GEM
       cairo (>= 1.16.2)
       glib2 (= 4.2.4)
     coderay (1.1.3)
-    color (1.8)
-    colorscore (0.0.5)
-      color
     diff-lcs (1.5.1)
     docile (1.4.1)
+    ffi (1.17.0-aarch64-linux-gnu)
     ffi (1.17.0-x86_64-linux-gnu)
     fiddle (1.1.3)
     formatador (1.1.0)
@@ -142,6 +139,7 @@ GEM
     yard (0.9.37)
 
 PLATFORMS
+  aarch64-linux
   x86_64-linux
 
 DEPENDENCIES

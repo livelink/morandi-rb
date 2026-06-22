@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## UNRELEASED
 ### Fixed
 - Unnecessary `.so` files are no longer shipped with the gem
+- Rubocop on CI
+
+### Removed
+- Obsolete dependency on colorscore
 
 ## [0.101.0] 28.01.2026
 ### Added

@@ -9,7 +9,11 @@ gem 'guard'
 gem 'guard-rspec'
 gem 'rake'
 gem 'rspec'
-gem 'rubocop'
 gem 'simplecov'
 gem 'super_diff'
 gem 'yard'
+
+# Kept in a separate group so CI can lint without installing the native gems
+group :rubocop do
+  gem 'rubocop'
+end
