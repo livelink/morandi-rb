@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    morandi (0.101.0)
+    morandi (0.102.0)
       atk (~> 4.0)
       cairo (~> 1.0)
       gdk_pixbuf2 (~> 4.0)
