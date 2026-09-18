@@ -8,6 +8,11 @@ require 'rubygems'
 gem 'glib2'
 require 'mkmf-gnome'
 
+# Disable floating-point contraction (FMA fusion) so image math yields
+# identical results across CPUs/compilers. append_cflags only adds the flag
+# if the compiler accepts it, so this stays safe on older toolchains.
+append_cflags('-ffp-contract=off')
+
 def macos?
   !!(RUBY_PLATFORM =~ /darwin/)
 end
