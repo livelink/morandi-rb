@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
+require 'gdk_pixbuf2'
+require 'cairo'
+
 require 'morandi/version'
+
 require 'morandi_native'
 
 require 'morandi/cairo_ext'
