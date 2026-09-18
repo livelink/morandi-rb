@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.103.0] 21.09.2026
+### Fixed
+- disabled fusing floating point operations for consistent renders between CPU architectures
+- load errors caused by missing requires
+- excluded stale compilation artifacts from being moved to docker image
+
 ## [0.102.0] 07.09.2026
 ### Fixed
 - Unnecessary `.so` files are no longer shipped with the gem
