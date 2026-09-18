@@ -22,3 +22,10 @@
 **/values.dev.yaml
 README.md
 sample/**
+
+tmp/**
+pkg/**
+coverage/**
+**/*.so
+**/*.o
+**/Makefile
